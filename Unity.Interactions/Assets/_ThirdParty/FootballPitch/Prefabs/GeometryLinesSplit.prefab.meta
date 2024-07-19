@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4a298b86e645edf43a76b117d3e341fe
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Prefabs/GeometryLinesSplit.prefab
+  uploadId: 607427

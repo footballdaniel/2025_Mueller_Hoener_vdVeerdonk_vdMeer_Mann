@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b52e1a66011bdb74a963999bf8ddd92d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/FootballPitch02WhiteLines.mat
+  uploadId: 607427

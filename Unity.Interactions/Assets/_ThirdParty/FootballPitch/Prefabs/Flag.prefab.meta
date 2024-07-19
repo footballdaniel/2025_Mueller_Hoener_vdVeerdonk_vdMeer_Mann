@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6296c2204b87bd749965f5662df5946a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Prefabs/Flag.prefab
+  uploadId: 607427

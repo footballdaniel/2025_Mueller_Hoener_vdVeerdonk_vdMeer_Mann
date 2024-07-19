@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5fd12a52fe3a1c24b8302612567a4fed
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Prefabs/Dugout.prefab
+  uploadId: 607427

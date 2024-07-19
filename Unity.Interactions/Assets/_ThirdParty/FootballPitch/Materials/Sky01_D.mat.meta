@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d930b34377cef29429b863a9e02063a5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/Sky01_D.mat
+  uploadId: 607427

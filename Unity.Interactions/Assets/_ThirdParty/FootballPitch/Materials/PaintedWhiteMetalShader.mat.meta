@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 62c108a26545fc94999e8ffe3b5665e0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/PaintedWhiteMetalShader.mat
+  uploadId: 607427

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 89d20bec46d03e949a90bc433f541127
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Prefabs/FootballPitch03.prefab
+  uploadId: 607427

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b4508d94cfdb9924c86096722cdeadec
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/FootballSub.mat
+  uploadId: 607427
