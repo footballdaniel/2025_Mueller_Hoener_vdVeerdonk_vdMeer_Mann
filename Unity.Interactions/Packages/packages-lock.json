@@ -46,7 +46,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.28",
+      "version": "3.0.31",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -247,6 +247,18 @@
         "com.unity.xr.core-utils": "2.1.1"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.vroom.balltracking": {
+      "version": "file:com.vu.passdetection",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.vroom.powerwall": {
+      "version": "file:com.vu.powerwall",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
