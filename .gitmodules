@@ -1,6 +1,6 @@
 [submodule "Unity.Interactions/Packages/com.vu.powerwall"]
 	path = Unity.Interactions/Packages/com.vu.powerwall
-	url = git@github.com:footballdaniel/com.vu.powerwall
+	url = https://github.com/footballdaniel/com.vu.powerwall
 [submodule "Unity.Interactions/Packages/com.vu.passdetection"]
 	path = Unity.Interactions/Packages/com.vu.passdetection
-	url = git@github.com:footballdaniel/com.vu.passdetection
+	url = https://github.com/footballdaniel/com.vu.passdetection
