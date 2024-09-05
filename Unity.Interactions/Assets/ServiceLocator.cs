@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ServiceLocator : MonoBehaviour
 {
-	// Use a dictionary to store services
-	static Dictionary<Type, object> _services = new();
+	// Dictionary to store services
+	private static Dictionary<Type, object> _services = new();
 
 	// Retrieve a service by type from the dictionary
 	public static TInterface Get<TInterface>() where TInterface : class
@@ -13,77 +13,54 @@ public class ServiceLocator : MonoBehaviour
 		var serviceType = typeof(TInterface);
 
 		if (_services.TryGetValue(serviceType, out var service))
+		{
 			return service as TInterface;
+		}
+
 		Debug.LogWarning($"Service of type {serviceType.Name} not found.");
 		return null;
 	}
 
-	void OnValidate()
+	// Scan the child objects of the ServiceLocator and register services
+	public void DiscoverServices()
 	{
 		_services.Clear();
 
-		// Find all components that implement IService<T>
+		// Find all components in child objects of the ServiceLocator
 		foreach (Transform child in transform)
-		foreach (var component in child.GetComponents<Component>())
 		{
-			var interfaces = component.GetType().GetInterfaces();
-
-			foreach (var iface in interfaces)
-				if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IService<>))
+			foreach (var component in child.GetComponents<Component>())
+			{
+				// Find components that implement IService<T>
+				var interfaces = component.GetType().GetInterfaces();
+				foreach (var iface in interfaces)
 				{
-					// Extract the generic argument (T in IService<T>)
-					var serviceType = iface.GetGenericArguments()[0];
+					if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IService<>))
+					{
+						// Extract the generic argument (T in IService<T>)
+						var serviceType = iface.GetGenericArguments()[0];
 
-					// Register the service via the Services class
-					Services.AddSingleton(serviceType, component);
+						// Register the service in the service dictionary
+						if (!_services.ContainsKey(serviceType))
+						{
+							_services.Add(serviceType, component);
+							Debug.Log($"Discovered and registered service: {serviceType.Name}");
+						}
+					}
 				}
+			}
 		}
+	}
+
+	// Auto-discover services when the script is validated in the editor
+	void OnValidate()
+	{
+		DiscoverServices();
 	}
 }
 
-public static class Services
-{
-	static Dictionary<Type, object> _singletonServices = new();
-
-	// Add a singleton service with a specific type
-	public static void AddSingleton(Type interfaceType, object implementation)
-	{
-		if (!_singletonServices.ContainsKey(interfaceType))
-		{
-			_singletonServices[interfaceType] = implementation;
-			Debug.Log($"Registered singleton service: {interfaceType.Name}");
-		}
-		else
-			Debug.LogWarning($"Service of type {interfaceType.Name} is already registered.");
-	}
-
-	// Generic method to register a singleton service
-	public static void AddSingleton<TInterface>(TInterface service) where TInterface : class
-	{
-		var serviceType = typeof(TInterface);
-
-		if (!_singletonServices.ContainsKey(serviceType))
-		{
-			_singletonServices[serviceType] = service;
-			Debug.Log($"Registered singleton service: {serviceType.Name}");
-		}
-		else
-			Debug.LogWarning($"Service of type {serviceType.Name} is already registered.");
-	}
-
-	// Generic method to get a singleton service
-	public static TInterface GetService<TInterface>() where TInterface : class
-	{
-		var serviceType = typeof(TInterface);
-
-		if (_singletonServices.TryGetValue(serviceType, out var service))
-			return service as TInterface;
-		Debug.LogWarning($"Service of type {serviceType.Name} not found.");
-		return null;
-	}
-}
-
+// Generic service interface definition
 public interface IService<T>
 {
-	// Define any required methods for the service
+	// Define service-specific methods or properties
 }
