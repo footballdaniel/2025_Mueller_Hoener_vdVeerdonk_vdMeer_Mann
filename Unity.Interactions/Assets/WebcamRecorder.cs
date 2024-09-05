@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public interface IWebcamRecorder
@@ -22,12 +23,25 @@ public class WebcamRecorder : MonoBehaviour, IWebcamRecorder
 public interface IWeatherService
 {
 	string GetForecast();
+	string GetId(); // To identify the instance
 }
 
 public class WeatherService : IWeatherService
 {
+	private string _id;
+
+	public WeatherService()
+	{
+		_id = Guid.NewGuid().ToString(); // Unique ID per instance
+	}
+
 	public string GetForecast()
 	{
 		return "Sunny with a chance of rain";
+	}
+
+	public string GetId()
+	{
+		return _id;
 	}
 }
