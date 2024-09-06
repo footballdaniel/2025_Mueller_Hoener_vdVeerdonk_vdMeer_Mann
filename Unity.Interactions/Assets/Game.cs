@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Game : MonoBehaviour
@@ -5,12 +6,14 @@ public class Game : MonoBehaviour
 	[SerializeField] private bool _recordWebam;
 	[SerializeField] private int _recordingFrameRateHz = 10;
 
-	public WebcamRecorder WebcamRecorder { get; private set; }
+	public VideoCaptureRecorder WebcamRecorder { get; private set; }
 	
 	
 	void Start()
 	{
-		WebcamRecorder = ServiceLocator.Get<WebcamRecorder>();
+		WebcamRecorder = ServiceLocator.Get<VideoCaptureRecorder>();
+		WebcamRecorder.StartRecording();
+		
 		SetRecordingFrameRate(_recordingFrameRateHz);
 	}
 
@@ -19,12 +22,11 @@ public class Game : MonoBehaviour
 		Time.fixedDeltaTime = 1f / recordingFrameRateHz;
 	}
 
-
-	void FixedUpdate()
+	private void Update()
 	{
-		if (_recordWebam)
-			WebcamRecorder.RecordFrame();
+		if (Time.timeSinceLevelLoad > 3)
+		{
+			WebcamRecorder.StopRecording();
+		}
 	}
-	
-	
 }

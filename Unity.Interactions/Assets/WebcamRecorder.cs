@@ -1,103 +1,146 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
+using UnityEngine.Windows.WebCam;
+using System;
+using System.Collections.Generic;
 
-public class WebcamRecorder : MonoBehaviour, IDisposable
+public class VideoCaptureRecorder : MonoBehaviour
 {
-	[SerializeField] string[] _devices;
-	[SerializeField] int _selectedDeviceIndex;
+    public bool IsRecording => _isRecording;
 
-	private void Start()
-	{
-		StartRecording();
-	}
+    private VideoCapture _videoCapture = null;
+    private bool _isRecording = false;
+    private string _filePath;
 
-	void OnValidate()
-	{
-		_devices = WebCamTexture.devices.Select(d => d.name).ToArray();	
-	}
+    [SerializeField] private Resolution _selectedResolution;
+    [SerializeField] private float _selectedFrameRate;
+    private bool _stopAlreadyRequested;
 
+    // Public properties to expose selected resolution and frame rate
+    public Resolution SelectedResolution
+    {
+        get => _selectedResolution;
+        set => _selectedResolution = value;
+    }
 
-	public void RecordFrame()
-	{
-		Debug.Log(Time.time);
-		
-		if (!_webCamTexture.didUpdateThisFrame)
-			return;
+    public float FrameRate
+    {
+        get => _selectedFrameRate;
+        set => _selectedFrameRate = value;
+    }
 
+    // Public property to get all available resolutions
+    public List<Resolution> AvailableResolutions => new List<Resolution>(VideoCapture.SupportedResolutions);
 
-		_frameTexture = new Texture2D(_webCamTexture.width, _webCamTexture.height);
-		_frameTexture.SetPixels32(_webCamTexture.GetPixels32());
-		_frameTexture.Apply();
+    // Method to get available frame rates for a specific resolution
+    public List<float> GetAvailableFrameratesFor(Resolution resolution)
+    {
+        return new List<float>(VideoCapture.GetSupportedFrameRatesForResolution(resolution));
+    }
 
-		SaveFrameToDisk(_frameTexture);
-	}
+    // Start recording process
+    public void StartRecording()
+    {
+        if (_isRecording)
+        {
+            Debug.LogWarning("Already recording.");
+            return;
+        }
 
-	void StartRecording()
-	{
-		var device = WebCamTexture.devices[_selectedDeviceIndex];
-		_webCamTexture = new WebCamTexture(device.name, 640, 480);
-		_webCamTexture.Play();
+        VideoCapture.CreateAsync(false, OnVideoCaptureCreatedCallback);
+    }
 
-		_outputFolder = Path.Combine(Application.persistentDataPath, "CapturedFrames");
+    // Stop recording process
+    public void StopRecording()
+    {
+        if (!_isRecording || _stopAlreadyRequested)
+            return;
+        
+        _stopAlreadyRequested = true;
+        _videoCapture?.StopRecordingAsync(OnStoppedRecordingVideoCallback);
+    }
 
-		if (!Directory.Exists(_outputFolder))
-			Directory.CreateDirectory(_outputFolder);
+    // Callback when the video capture instance is created
+    private void OnVideoCaptureCreatedCallback(VideoCapture videoCapture)
+    {
+        _videoCapture = videoCapture;
 
-		// Correctly format path to ffmpeg in Plugins directory
-		_ffmpegPath = Path.Combine(Application.dataPath, "_Project", "Plugins", "ffmpeg.exe").Replace("/", "\\");
+        // Ensure valid resolution and frame rate
+        var cameraResolution = _selectedResolution;
+        var cameraParameters = new CameraParameters
+        {
+            hologramOpacity = 0.0f,
+            frameRate = _selectedFrameRate,
+            cameraResolutionWidth = cameraResolution.width,
+            cameraResolutionHeight = cameraResolution.height,
+            pixelFormat = CapturePixelFormat.BGRA32
+        };
 
-		var ffmpegFile = new FileInfo(_ffmpegPath);
+        _videoCapture.StartVideoModeAsync(cameraParameters,
+            VideoCapture.AudioState.ApplicationAndMicAudio,
+            OnStartedVideoCaptureModeCallback);
+    }
 
-		// exists?
-		if (!ffmpegFile.Exists)
-			Debug.LogError("ffmpeg.exe not found at path: " + _ffmpegPath);
+    // Callback when video mode starts
+    private void OnStartedVideoCaptureModeCallback(VideoCapture.VideoCaptureResult result)
+    {
+        if (result.success)
+        {
+            var timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+            var filename = $"Recording_{timeStamp}.mp4";
+            _filePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
 
-		_frameCount = 0;
-	}
+            _videoCapture.StartRecordingAsync(_filePath, OnStartedRecordingVideoCallback);
+        }
+        else
+        {
+            Debug.LogError("Failed to start video capture mode.");
+        }
+    }
 
-	void SaveRecording()
-	{
-		var outputVideoPath = Path.Combine(Application.persistentDataPath, "output_video.mp4").Replace("/", "\\");
-		// var ffmpegArgsWritingPlainVideo = $"-r 30 -i \"{_outputFolder}\\frame_%04d.png\" -vcodec libx264 -pix_fmt yuv420p \"{outputVideoPath}\"";
-		var ffmpegArgsWithFrameNumber = $"-r 30 -i \"{_outputFolder}\\frame_%04d.png\" -vf \"drawtext=text='%{{n}}':x=w-tw-10:y=10:fontsize=24:fontcolor=white\" -vcodec libx264 -pix_fmt yuv420p \"{outputVideoPath}\"";
+    // Callback when recording starts
+    private void OnStartedRecordingVideoCallback(VideoCapture.VideoCaptureResult result)
+    {
+        if (result.success)
+        {
+            Debug.Log("Started recording video.");
+            _isRecording = true;
+        }
+        else
+        {
+            Debug.LogError("Failed to start recording video.");
+        }
+    }
 
-		var ffmpegProcess = new Process();
-		ffmpegProcess.StartInfo.FileName = _ffmpegPath;
-		ffmpegProcess.StartInfo.Arguments = ffmpegArgsWithFrameNumber;
-		ffmpegProcess.StartInfo.RedirectStandardOutput = true;
-		ffmpegProcess.StartInfo.UseShellExecute = false;
-		ffmpegProcess.StartInfo.CreateNoWindow = true;
-		ffmpegProcess.Start();
-		ffmpegProcess.WaitForExit();
+    // Callback when recording stops
+    private void OnStoppedRecordingVideoCallback(VideoCapture.VideoCaptureResult result)
+    {
+        if (result.success)
+        {
+            Debug.Log($"Stopped recording video. File saved to: {_filePath}");
+            _isRecording = false;
+            _stopAlreadyRequested = false;
+            _videoCapture?.StopVideoModeAsync(OnStoppedVideoCaptureModeCallback);
+        }
+        else
+        {
+            Debug.LogError("Failed to stop recording video.");
+        }
+    }
 
-		// Clean up the frames after creating the video
-		Directory.Delete(_outputFolder, true);
-	}
+    // Callback when video mode stops
+    private void OnStoppedVideoCaptureModeCallback(VideoCapture.VideoCaptureResult result)
+    {
+        if (result.success)
+        {
+            Debug.Log("Stopped video capture mode.");
+        }
+        else
+        {
+            Debug.LogError("Failed to stop video capture mode.");
+        }
 
-	void SaveFrameToDisk(Texture2D frame)
-	{
-		var bytes = frame.EncodeToPNG();
-		var frameFileName = Path.Combine(_outputFolder, $"frame_{_frameCount:D4}.png");
-		File.WriteAllBytes(frameFileName, bytes);
-		_frameCount++;
-		
-		Debug.Log("Saved frame: " + frameFileName);
-	}
-
-	string _ffmpegPath;
-	int _frameCount;
-	Texture2D _frameTexture;
-	bool _isRecording;
-	string _outputFolder;
-	WebCamTexture _webCamTexture;
-
-	public void Dispose()
-	{
-		SaveRecording();
-		
-	}
+        // Dispose the VideoCapture object
+        _videoCapture?.Dispose();
+        _videoCapture = null;
+    }
 }

@@ -466,9 +466,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7750c11096e5bef42bf895143792e9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _devices:
-  - HD User Facing
-  _selectedDeviceIndex: 0
+  _supportedResolutions:
+  - 1280x720
+  - 640x360
+  - 640x480
+  _supportedFrameRates:
+  - 30
+  - 10
+  _selectedResolution: 1
+  _selectedFrameRate: 1
 --- !u!1 &403343055
 GameObject:
   m_ObjectHideFlags: 0
@@ -1232,7 +1238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _recordWebam: 1
-  _recordingFrameRateHz: 1
+  _recordingFrameRateHz: 10
 --- !u!1 &1958320398
 GameObject:
   m_ObjectHideFlags: 0
