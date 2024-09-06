@@ -1,13 +1,19 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class WebcamRecorder : MonoBehaviour
+public class WebcamRecorder : MonoBehaviour, IDisposable
 {
 	[SerializeField] string[] _devices;
 	[SerializeField] int _selectedDeviceIndex;
+
+	private void Start()
+	{
+		StartRecording();
+	}
 
 	void OnValidate()
 	{
@@ -15,11 +21,10 @@ public class WebcamRecorder : MonoBehaviour
 	}
 
 
-	void Update()
+	public void RecordFrame()
 	{
-		if (!_isRecording)
-			return;
-
+		Debug.Log(Time.time);
+		
 		if (!_webCamTexture.didUpdateThisFrame)
 			return;
 
@@ -31,9 +36,8 @@ public class WebcamRecorder : MonoBehaviour
 		SaveFrameToDisk(_frameTexture);
 	}
 
-	public void StartRecording()
+	void StartRecording()
 	{
-		_isRecording = true;
 		var device = WebCamTexture.devices[_selectedDeviceIndex];
 		_webCamTexture = new WebCamTexture(device.name, 640, 480);
 		_webCamTexture.Play();
@@ -55,9 +59,8 @@ public class WebcamRecorder : MonoBehaviour
 		_frameCount = 0;
 	}
 
-	public void StopRecording()
+	void SaveRecording()
 	{
-		_isRecording = false;
 		var outputVideoPath = Path.Combine(Application.persistentDataPath, "output_video.mp4").Replace("/", "\\");
 		// var ffmpegArgsWritingPlainVideo = $"-r 30 -i \"{_outputFolder}\\frame_%04d.png\" -vcodec libx264 -pix_fmt yuv420p \"{outputVideoPath}\"";
 		var ffmpegArgsWithFrameNumber = $"-r 30 -i \"{_outputFolder}\\frame_%04d.png\" -vf \"drawtext=text='%{{n}}':x=w-tw-10:y=10:fontsize=24:fontcolor=white\" -vcodec libx264 -pix_fmt yuv420p \"{outputVideoPath}\"";
@@ -81,6 +84,8 @@ public class WebcamRecorder : MonoBehaviour
 		var frameFileName = Path.Combine(_outputFolder, $"frame_{_frameCount:D4}.png");
 		File.WriteAllBytes(frameFileName, bytes);
 		_frameCount++;
+		
+		Debug.Log("Saved frame: " + frameFileName);
 	}
 
 	string _ffmpegPath;
@@ -89,4 +94,10 @@ public class WebcamRecorder : MonoBehaviour
 	bool _isRecording;
 	string _outputFolder;
 	WebCamTexture _webCamTexture;
+
+	public void Dispose()
+	{
+		SaveRecording();
+		
+	}
 }
