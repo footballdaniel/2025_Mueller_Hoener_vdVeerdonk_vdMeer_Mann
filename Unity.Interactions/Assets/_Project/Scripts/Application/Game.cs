@@ -2,42 +2,37 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-	[Header("Settings"), SerializeField] private bool _recordVideo;
-	
+    [Header("Settings"), SerializeField] private bool _recordVideo;
 
-	public VideoCaptureRecorder WebcamRecorder { get; private set; }
-	
-	
-	void Start()
-	{
-		// Get services for app
-		WebcamRecorder = ServiceLocator.Get<VideoCaptureRecorder>();
-		
-		// Setup app behaviour
-		var init = new InitState(this);
-		var startRecording = new StartRecordingState(this);
-		var trial = new TrialState(this);
-		var stopRecording = new StopRecordingState(this);
-		var end = new EndState(this);
+    public VideoCaptureRecorder WebcamRecorder { get; private set; }
+    
+    private StateMachine _stateMachine;
 
-		init.AddTransition(new Transition(startRecording, _recordVideo));
-		init.AddTransition(new Transition(trial, !_recordVideo));
-		
-		trial.AddTransition(new Transition(stopRecording, _recordVideo));
-		trial.AddTransition(new Transition(end, !_recordVideo));
-		
-		stopRecording.AddTransition(new Transition(end, true));
-		
-		// Start app
-		_stateMachine = new StateMachine();
-		_stateMachine.SetState(init);
-	}
+    void Start()
+    {
+        // Get services for app
+        WebcamRecorder = ServiceLocator.Get<VideoCaptureRecorder>();
 
+        // Setup app behaviour
+        var init = new InitState(this);
+        var startRecording = new StartRecordingState(this);
+        var trial = new TrialState(this);
+        var end = new EndState(this);
 
+        // Adding transitions based on predicates
+        init.AddTransition(new Transition(startRecording, new BooleanPredicate(_recordVideo)));
+        init.AddTransition(new Transition(trial, new BooleanPredicate(!_recordVideo)));
 
-	private StateMachine _stateMachine;
-	private void Update()
-	{
-		_stateMachine.Tick();
-	}
+        // Using EventPredicate to subscribe to GameEvents.TrialEnded
+        trial.AddTransition(new Transition(end, new EventPredicate(GameEvents.TrialEnded)));
+
+        // Start app
+        _stateMachine = new StateMachine();
+        _stateMachine.SetState(init);
+    }
+
+    private void Update()
+    {
+        _stateMachine.Tick();
+    }
 }

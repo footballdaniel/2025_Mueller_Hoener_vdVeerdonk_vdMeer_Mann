@@ -8,7 +8,7 @@ internal class GameState
     }
 	
     protected readonly Game _context;
-    public List<Transition> Transitions => new List<Transition>();
+    public List<Transition> Transitions { get; } = new List<Transition>();
 
     protected GameState(Game context)
     {
