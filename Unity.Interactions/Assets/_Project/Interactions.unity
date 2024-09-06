@@ -462,9 +462,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 280879196}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28fd8a0594144091850976860c482163, type: 3}
+  m_Script: {fileID: 11500000, guid: 7750c11096e5bef42bf895143792e9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _devices:
+  - HD User Facing
+  - USB  Live camera
+  - OBS Virtual Camera
+  _selectedDeviceIndex: 0
 --- !u!1 &403343055
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,7 +1231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bef2547dbd828847bff4e6c5f781ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _services: {fileID: 0}
 --- !u!1 &1958320398
 GameObject:
   m_ObjectHideFlags: 0

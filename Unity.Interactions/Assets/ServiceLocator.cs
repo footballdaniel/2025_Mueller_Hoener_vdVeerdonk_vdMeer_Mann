@@ -4,63 +4,28 @@ using UnityEngine;
 
 public class ServiceLocator : MonoBehaviour
 {
-	// Dictionary to store services
-	private static Dictionary<Type, object> _services = new();
+	static Dictionary<Type, object> _services = new();
 
-	// Retrieve a service by type from the dictionary
-	public static TInterface Get<TInterface>() where TInterface : class
+	public static T Get<T>() where T : class
 	{
-		var serviceType = typeof(TInterface);
-
-		if (_services.TryGetValue(serviceType, out var service))
-		{
-			return service as TInterface;
-		}
-
-		Debug.LogWarning($"Service of type {serviceType.Name} not found.");
-		return null;
+		_services.TryGetValue(typeof(T), out var service);
+		return service as T;
 	}
 
-	// Scan the child objects of the ServiceLocator and register services
-	public void DiscoverServices()
+	void OnEnable()
 	{
 		_services.Clear();
 
-		// Find all components in child objects of the ServiceLocator
-		foreach (Transform child in transform)
+		foreach (var service in GetComponentsInChildren<MonoBehaviour>())
 		{
-			foreach (var component in child.GetComponents<Component>())
-			{
-				// Find components that implement IService<T>
-				var interfaces = component.GetType().GetInterfaces();
-				foreach (var iface in interfaces)
-				{
-					if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IService<>))
-					{
-						// Extract the generic argument (T in IService<T>)
-						var serviceType = iface.GetGenericArguments()[0];
+			var serviceType = service.GetType();
 
-						// Register the service in the service dictionary
-						if (!_services.ContainsKey(serviceType))
-						{
-							_services.Add(serviceType, component);
-							Debug.Log($"Discovered and registered service: {serviceType.Name}");
-						}
-					}
-				}
-			}
+			if (!_services.TryAdd(serviceType, service))
+				Debug.LogWarning($"Service {serviceType.Name} is already registered");
 		}
+		
+		// log name of sservices
+		var serviceNames = string.Join(", ", _services.Keys);
+		Debug.Log($"Registered services: {serviceNames}");
 	}
-
-	// Auto-discover services when the script is validated in the editor
-	void OnValidate()
-	{
-		DiscoverServices();
-	}
-}
-
-// Generic service interface definition
-public interface IService<T>
-{
-	// Define service-specific methods or properties
 }
