@@ -18,6 +18,12 @@ internal class TrialState : GameState
 
         if (_context.Trial.Duration > 3f)
         {
+            if (!_context.RecordVideo)
+            {
+                AppEvents.TrialEnded?.Invoke();
+                return;
+            }
+            
             _context.WebcamRecorder.StopRecording();
             
             if (!_context.WebcamRecorder.IsRecording)

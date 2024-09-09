@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 internal class EventPredicate : IPredicate
 {
@@ -17,7 +16,6 @@ internal class EventPredicate : IPredicate
 
 	void OnTriggered()
 	{
-		Debug.Log("Triggered");
 		_eventTriggered = true;
 	}
 }

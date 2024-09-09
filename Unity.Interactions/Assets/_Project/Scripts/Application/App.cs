@@ -2,12 +2,10 @@ using UnityEngine;
 
 public class App : MonoBehaviour
 {
-	[Header("Settings"), SerializeField] bool _recordVideo;
-
-	StateMachine _stateMachine;
-
+	[Header("Settings")]
+	[field:SerializeReference] public bool RecordVideo { get; private set; }
 	public IWebcamRecorder WebcamRecorder { get; private set; }
-	public Trial Trial;
+	public Trial Trial { get; set; }
 
 	void Start()
 	{
@@ -21,8 +19,8 @@ public class App : MonoBehaviour
 		var end = new EndState(this);
 
 		// Adding transitions based on predicates
-		init.AddTransition(new Transition(startRecording, new BooleanPredicate(_recordVideo)));
-		init.AddTransition(new Transition(trial, new BooleanPredicate(!_recordVideo)));
+		init.AddTransition(new Transition(startRecording, new BooleanPredicate(RecordVideo)));
+		init.AddTransition(new Transition(trial, new BooleanPredicate(!RecordVideo)));
 		
 		startRecording.AddTransition(new Transition(trial, new EventPredicate(ref AppEvents.RecordingStarted)));
 		
@@ -37,4 +35,6 @@ public class App : MonoBehaviour
 	{
 		_stateMachine.Tick();
 	}
+	
+	StateMachine _stateMachine;
 }

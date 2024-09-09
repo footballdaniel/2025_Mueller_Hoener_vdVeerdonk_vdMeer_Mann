@@ -1,47 +1,24 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace System.Runtime.CompilerServices.VideoRecorder
+namespace _Project.Scripts.Infra
 {
 	public class FfmpegVideoRecorder : MonoBehaviour, IWebcamRecorder
 	{
 		[SerializeField] WebcamSelector _webcamSelector;
 		
-		Process _ffmpegProcess;
-		string _ffmpegPath;
 		public bool IsRecording { get; private set; }
-		[field: SerializeReference] public float FrameRate { get; private set; }
 
 		public void InitiateRecorder()
 		{
-			_ffmpegPath = Path.Combine(Application.dataPath, "_Project", "Plugins", "ffmpeg.exe").Replace("/", "\\");
-
-			var ffmpegFile = new FileInfo(_ffmpegPath);
-
-			if (!ffmpegFile.Exists)
-			{
-				Debug.LogError("ffmpeg.exe not found at path: " + _ffmpegPath);
+			if (!TryLocateFFMpeg())
 				return;
-			}
 
-			var webcamName = _webcamSelector.Webcams.First();
-			var date = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-			var outputPath = Path.Combine(Application.persistentDataPath, "video_" + date + ".mp4").Replace("/", "\\");
-			
-			// var arguments = $"-f dshow -i video=\"{webcamName}\" -vcodec libx264 -pix_fmt yuv420p -y \"{outputPath}\"";
-			// var arguments = @$"-f dshow -i video=""{webcamName}"" -vcodec libx264 -pix_fmt yuv420p -vf ""drawtext=text='Elapsed Time: %{{eif:floor(t*10)}}.%{{eif:mod(t*10,10)}} s':fontsize=24:fontcolor=white:x=10:y=10"" -y ""{outputPath}""";
-			
-			var elapsedTimeExpression = "%{eif\\:t*1000\\:d} ms";
-			var drawTextCommand = $"drawtext=text='Elapsed Time\\: {elapsedTimeExpression}':x=10:y=10";
-			var arguments = $"-f dshow -i video=\"{webcamName}\" -vcodec libx264 -pix_fmt yuv420p -vf \"{drawTextCommand}\" -y \"{outputPath}\"";
-
-
-
-			Debug.Log("FFmpeg arguments: " + arguments);
-
+			var arguments = PrepareArgs();
 
 			_ffmpegProcess = new Process
 			{
@@ -56,33 +33,72 @@ namespace System.Runtime.CompilerServices.VideoRecorder
 					CreateNoWindow = true
 				}
 			};
-			
+
 			_ffmpegProcess.ErrorDataReceived += (sender, args) =>
 			{
-				if (args.Data == null)
-					return;
-				
-				if (args.Data.ToLower().Contains("error"))
-					Debug.LogError($"FFmpeg error: {args.Data}");
-			
-				if (args.Data.Contains("frame")) // Looks for "frame" in the output
-				{
-					IsRecording = true; // Set IsRecording to true when frame data is found
-				}
+				LogErrors(args);
+				WaitForStartOfRecording(args);
 			};
 
 			_ffmpegProcess.Start();
 			_ffmpegProcess.BeginErrorReadLine();
 		}
 
+		string PrepareArgs()
+		{
+			var webcamName = _webcamSelector.Webcams.First();
+			var date = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+			var outputPath = Path.Combine(Application.persistentDataPath, "video_" + date + ".mp4").Replace("/", "\\");
+
+			var elapsedTimeExpression = "%{eif\\:t*1000\\:d} ms";
+			var drawTextCommand = $"drawtext=text='Elapsed Time\\: {elapsedTimeExpression}':x=10:y=10";
+			var arguments = $"-f dshow -i video=\"{webcamName}\" -vcodec libx264 -pix_fmt yuv420p -vf \"{drawTextCommand}\" -y \"{outputPath}\"";
+
+			Debug.Log("FFmpeg arguments: " + arguments);
+			return arguments;
+		}
+
+		bool TryLocateFFMpeg()
+		{
+			_ffmpegPath = Path.Combine(Application.dataPath, "_Project", "Plugins", "ffmpeg.exe").Replace("/", "\\");
+			var ffmpegFile = new FileInfo(_ffmpegPath);
+			if (!ffmpegFile.Exists)
+			{
+				Debug.LogError("ffmpeg.exe not found at path: " + _ffmpegPath);
+				return false;
+			}
+
+			return true;
+		}
+
+		void WaitForStartOfRecording(DataReceivedEventArgs args)
+		{
+			if (args.Data.Contains("frame"))
+				IsRecording = true;
+		}
+
+		static void LogErrors(DataReceivedEventArgs args)
+		{
+			if (args.Data == null)
+				return;
+			
+			if (!args.Data.ToLower().Contains("error"))
+				return;
+
+			if (args.Data.Contains("Fontconfig error: Cannot load default config file"))
+				return;
+					
+			Debug.LogError($"FFmpeg error: {args.Data}");
+		}
+
 		public void StopRecording()
 		{
 			if (_ffmpegProcess == null || _ffmpegProcess.HasExited)
 				return;
-			
+
 			_ffmpegProcess.StandardInput.WriteLine("q");
 			_ffmpegProcess.StandardInput.Close();
-			
+
 			_ffmpegProcess.WaitForExit();
 			IsRecording = false;
 			_ffmpegProcess.Dispose();
@@ -94,5 +110,8 @@ namespace System.Runtime.CompilerServices.VideoRecorder
 		{
 			StopRecording();
 		}
+		
+		Process _ffmpegProcess;
+		string _ffmpegPath;
 	}
 }
