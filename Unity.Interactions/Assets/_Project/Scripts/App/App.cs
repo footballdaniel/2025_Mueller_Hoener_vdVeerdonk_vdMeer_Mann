@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using _Project.Scripts.App.States;
 using UnityEngine;
 
@@ -7,10 +8,12 @@ namespace _Project.Scripts.App
 	{
 		[Header("Dependencies")]
 		[field: SerializeReference] public UI UI { get; private set; }
-	
+		[field: SerializeReference] public User User { get; private set; }
+		[field: SerializeReference] public DominantFoot DominantFoot { get; private set; }
+
 		[Header("Prefabs")]
 		public Opponent OpponentPrefab;
-		public User User;
+		public Ball BallPrefab;
 	
 		[Header("Settings")]
 		[field:SerializeReference] public bool RecordVideo { get; private set; }
@@ -20,6 +23,7 @@ namespace _Project.Scripts.App
 		public Experiment Experiment { get; private set; }
 		public Trial CurrentTrial { get; set; }
 		public Opponent Opponent { get; set; }
+		public Ball Ball { get; set; }
 
 		void Start()
 		{
@@ -30,10 +34,9 @@ namespace _Project.Scripts.App
 		
 			// Setup app behaviour
 			var init = new InitState(this);
-			var load = new LoadState(this);
 			var startRecording = new StartRecordingVideoState(this);
 			var trial = new TrialState(this);
-			var end = new EndState(this);
+			var end = new TrialEndState(this);
 
 			// Adding transitions based on predicates
 			init.AddTransition(new Transition(startRecording, new CompositePredicate(RecordVideo, ref Events.NextTrialRequested)));
@@ -54,17 +57,5 @@ namespace _Project.Scripts.App
 	
 		StateMachine _stateMachine;
 	}
-
-	internal class LoadState : State
-	{
-		public LoadState(App app) : base(app)
-		{
-			
-		}
-
-		public override void Enter()
-		{
-			
-		}
-	}
+	
 }
