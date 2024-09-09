@@ -35,7 +35,7 @@ public class WebcamRecorder : MonoBehaviour, IWebcamRecorder
 	}
 
 	// Start recording process
-	public void StartRecording()
+	public void InitiateRecorder()
 	{
 		if (_isRecording)
 		{

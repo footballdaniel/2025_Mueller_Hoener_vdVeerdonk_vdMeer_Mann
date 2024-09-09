@@ -7,6 +7,7 @@ public class App : MonoBehaviour
 	StateMachine _stateMachine;
 
 	public IWebcamRecorder WebcamRecorder { get; private set; }
+	public Trial Trial;
 
 	void Start()
 	{

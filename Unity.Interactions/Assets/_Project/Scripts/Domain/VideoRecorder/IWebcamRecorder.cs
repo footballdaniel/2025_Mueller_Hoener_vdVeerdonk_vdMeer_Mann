@@ -1,9 +1,9 @@
 public interface IWebcamRecorder
 {
 	bool IsRecording { get; }
-	float FrameRate { get; set; }
+	float FrameRate { get;}
 	
-	void StartRecording();
+	void InitiateRecorder();
 	void StopRecording();
 	
 }

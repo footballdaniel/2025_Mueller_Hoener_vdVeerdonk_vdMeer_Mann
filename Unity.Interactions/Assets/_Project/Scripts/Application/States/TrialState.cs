@@ -9,7 +9,7 @@ internal class TrialState : GameState
     public override void Tick()
     {
 
-        if (Time.timeSinceLevelLoad > 3)
+        if (Time.timeSinceLevelLoad > 10)
         {
             _context.WebcamRecorder.StopRecording();
             

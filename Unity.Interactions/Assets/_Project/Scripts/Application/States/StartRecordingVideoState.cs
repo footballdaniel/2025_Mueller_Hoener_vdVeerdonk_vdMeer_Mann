@@ -6,7 +6,7 @@
 
     public override void Enter()
     {
-        _context.WebcamRecorder.StartRecording();
+        _context.WebcamRecorder.InitiateRecorder();
 
     }
 
