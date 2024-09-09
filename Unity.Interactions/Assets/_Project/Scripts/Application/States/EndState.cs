@@ -1,6 +1,6 @@
 ﻿internal class EndState : GameState
 {
-    public EndState(Game game) : base(game)
+    public EndState(App app) : base(app)
     {
     }
 }

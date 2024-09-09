@@ -14,7 +14,7 @@ internal class InitState : GameState
         Time.fixedDeltaTime = 1f / recordingFrameRateHz;
     }
 
-    public InitState(Game context) : base(context)
+    public InitState(App context) : base(context)
     {
     }
 

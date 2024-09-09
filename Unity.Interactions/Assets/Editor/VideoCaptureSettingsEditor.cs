@@ -1,10 +1,10 @@
 using System.Linq;
 using UnityEditor;
 
-[CustomEditor(typeof(VideoCaptureRecorder))]
+[CustomEditor(typeof(WebcamRecorder))]
 public class VideoCaptureRecorderEditor : Editor
 {
-    private VideoCaptureRecorder _videoCaptureRecorder;
+    private WebcamRecorder _webcamRecorder;
     private int _selectedResolutionIndex;
     private int _selectedFrameRateIndex;
     private string[] _resolutionOptions;
@@ -12,7 +12,7 @@ public class VideoCaptureRecorderEditor : Editor
 
     private void OnEnable()
     {
-        _videoCaptureRecorder = (VideoCaptureRecorder)target;
+        _webcamRecorder = (WebcamRecorder)target;
         UpdateResolutionOptions();
         UpdateFrameRateOptions();
     }
@@ -26,9 +26,9 @@ public class VideoCaptureRecorderEditor : Editor
         _selectedResolutionIndex = EditorGUILayout.Popup("Resolution", _selectedResolutionIndex, _resolutionOptions);
 
         // Update selected resolution in MonoBehaviour
-        if (_selectedResolutionIndex >= 0 && _selectedResolutionIndex < _videoCaptureRecorder.AvailableResolutions.Count)
+        if (_selectedResolutionIndex >= 0 && _selectedResolutionIndex < _webcamRecorder.AvailableResolutions.Count)
         {
-            _videoCaptureRecorder.SelectedResolution = _videoCaptureRecorder.AvailableResolutions[_selectedResolutionIndex];
+            _webcamRecorder.SelectedResolution = _webcamRecorder.AvailableResolutions[_selectedResolutionIndex];
             UpdateFrameRateOptions(); // Update frame rate options based on selected resolution
         }
 
@@ -39,7 +39,7 @@ public class VideoCaptureRecorderEditor : Editor
         // Update selected frame rate in MonoBehaviour
         if (_selectedFrameRateIndex >= 0 && _frameRateOptions != null && _frameRateOptions.Length > 0)
         {
-            _videoCaptureRecorder.FrameRate = float.Parse(_frameRateOptions[_selectedFrameRateIndex]);
+            _webcamRecorder.FrameRate = float.Parse(_frameRateOptions[_selectedFrameRateIndex]);
         }
 
         serializedObject.ApplyModifiedProperties();
@@ -48,22 +48,22 @@ public class VideoCaptureRecorderEditor : Editor
     // Helper function to update the resolution options dropdown
     private void UpdateResolutionOptions()
     {
-        var availableResolutions = _videoCaptureRecorder.AvailableResolutions;
+        var availableResolutions = _webcamRecorder.AvailableResolutions;
         _resolutionOptions = availableResolutions.Select(res => res.width + "x" + res.height).ToArray();
         
         // Set the selected resolution index based on the current selected resolution
-        _selectedResolutionIndex = availableResolutions.IndexOf(_videoCaptureRecorder.SelectedResolution);
+        _selectedResolutionIndex = availableResolutions.IndexOf(_webcamRecorder.SelectedResolution);
         if (_selectedResolutionIndex < 0) _selectedResolutionIndex = 0;
     }
 
     // Helper function to update the frame rate options dropdown based on the selected resolution
     private void UpdateFrameRateOptions()
     {
-        var availableFrameRates = _videoCaptureRecorder.GetAvailableFrameratesFor(_videoCaptureRecorder.SelectedResolution);
+        var availableFrameRates = _webcamRecorder.GetAvailableFrameratesFor(_webcamRecorder.SelectedResolution);
         _frameRateOptions = availableFrameRates.Select(fps => fps.ToString()).ToArray();
         
         // Set the selected frame rate index based on the current selected frame rate
-        _selectedFrameRateIndex = availableFrameRates.IndexOf(_videoCaptureRecorder.FrameRate);
+        _selectedFrameRateIndex = availableFrameRates.IndexOf(_webcamRecorder.FrameRate);
         if (_selectedFrameRateIndex < 0) _selectedFrameRateIndex = 0;
     }
 }

@@ -16,16 +16,36 @@ public class ServiceLocator : MonoBehaviour
 	{
 		_services.Clear();
 
-		foreach (var service in GetComponentsInChildren<MonoBehaviour>())
+		foreach (var component in GetComponentsInChildren<MonoBehaviour>())
 		{
-			var serviceType = service.GetType();
-
-			if (!_services.TryAdd(serviceType, service))
-				Debug.LogWarning($"Service {serviceType.Name} is already registered");
+			RegisterMonobehaviours(component);
+			RegisterInterfaces(component);
 		}
 		
-		// log name of sservices
 		var serviceNames = string.Join(", ", _services.Keys);
 		Debug.Log($"Registered services: {serviceNames}");
 	}
+
+	#region Implementation
+
+	static void RegisterInterfaces(MonoBehaviour service)
+	{
+		var serviceType = service.GetType();
+
+		foreach (var interfaceType in serviceType.GetInterfaces())
+		{
+			if (!_services.TryAdd(interfaceType, service))
+				Debug.LogWarning($"Service {interfaceType.Name} is already registered");
+		}
+	}
+
+	static void RegisterMonobehaviours(MonoBehaviour service)
+	{
+		var serviceType = service.GetType();
+
+		if (!_services.TryAdd(serviceType, service))
+			Debug.LogWarning($"Service {serviceType.Name} is already registered");
+	}
+
+	#endregion
 }

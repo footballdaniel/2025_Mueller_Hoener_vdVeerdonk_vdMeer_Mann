@@ -2,7 +2,7 @@
 
 internal class TrialState : GameState
 {
-    public TrialState(Game game) : base(game)
+    public TrialState(App app) : base(app)
     {
     }
 
@@ -15,7 +15,7 @@ internal class TrialState : GameState
             
             if (!_context.WebcamRecorder.IsRecording)
             {
-                GameEvents.TrialEnded?.Invoke();
+                AppEvents.TrialEnded?.Invoke();
             }
         }
 

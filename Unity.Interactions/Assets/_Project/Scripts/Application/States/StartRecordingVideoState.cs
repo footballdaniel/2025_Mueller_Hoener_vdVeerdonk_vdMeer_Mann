@@ -1,17 +1,18 @@
-﻿internal class StartRecordingState : GameState
+﻿internal class StartRecordingVideoState : GameState
 {
-    public StartRecordingState(Game game) : base(game)
+    public StartRecordingVideoState(App app) : base(app)
     {
     }
 
     public override void Enter()
     {
         _context.WebcamRecorder.StartRecording();
+
     }
-    
+
     public override void Tick()
     {
         if (_context.WebcamRecorder.IsRecording)
-            GameEvents.RecordingStarted?.Invoke();
+            AppEvents.RecordingStarted?.Invoke();
     }
 }

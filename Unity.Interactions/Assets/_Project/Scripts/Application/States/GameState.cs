@@ -7,10 +7,10 @@ internal class GameState
         Transitions.Add(transition);
     }
 	
-    protected readonly Game _context;
+    protected readonly App _context;
     public List<Transition> Transitions { get; } = new List<Transition>();
 
-    protected GameState(Game context)
+    protected GameState(App context)
     {
         _context = context;
     }
