@@ -26,7 +26,7 @@ namespace _Project.Scripts.App.States
             if (_hasPassed) return;
             
             _hasPassed = true;
-            _app.Ball = Object.Instantiate(_app.BallPrefab);
+            _app.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
             _app.Ball.Set(pass);
         }
 

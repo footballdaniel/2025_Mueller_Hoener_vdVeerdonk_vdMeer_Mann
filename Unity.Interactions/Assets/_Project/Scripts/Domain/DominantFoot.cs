@@ -39,7 +39,7 @@ public class DominantFoot : MonoBehaviour
 
 			if (_velocityLastFrame > VelocityTowardsTarget)
 			{
-				Passed?.Invoke(new Pass(Speed, velocity.normalized));
+				Passed?.Invoke(new Pass(Speed, transform.position, velocity.normalized));
 				Debug.Log("Kick detected with speed: " + Speed + " and velocity: " + velocity);
 			}
 			
