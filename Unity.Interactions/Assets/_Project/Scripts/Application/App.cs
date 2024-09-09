@@ -4,8 +4,16 @@ public class App : MonoBehaviour
 {
 	[Header("Settings")]
 	[field:SerializeReference] public bool RecordVideo { get; private set; }
+	
+	[Header("Prefabs")]
+	public Opponent OpponentPrefab;
+	public User User;
+	
+	
+	[Header("Internal state")]
 	public IWebcamRecorder WebcamRecorder { get; private set; }
 	public Trial Trial { get; set; }
+	public Opponent Opponent { get; set; }
 
 	void Start()
 	{
@@ -21,10 +29,9 @@ public class App : MonoBehaviour
 		// Adding transitions based on predicates
 		init.AddTransition(new Transition(startRecording, new BooleanPredicate(RecordVideo)));
 		init.AddTransition(new Transition(trial, new BooleanPredicate(!RecordVideo)));
-		
 		startRecording.AddTransition(new Transition(trial, new EventPredicate(ref AppEvents.RecordingStarted)));
-		
 		trial.AddTransition(new Transition(end, new EventPredicate(ref AppEvents.TrialEnded)));
+		end.AddTransition(new Transition(init, new EventPredicate(ref AppEvents.RestartRequested)));
 
 		// Start app
 		_stateMachine = new StateMachine();

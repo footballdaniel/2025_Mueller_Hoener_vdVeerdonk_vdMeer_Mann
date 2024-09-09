@@ -9,14 +9,15 @@ internal class TrialState : GameState
     public override void Enter()
     {
         _context.Trial = new Trial(Time.timeSinceLevelLoad);
+        _context.Opponent = Object.Instantiate(_context.OpponentPrefab);
+        _context.Opponent.Set(_context.User);
     }
 
     public override void Tick()
     {
-        
         _context.Trial.Tick(Time.deltaTime);
 
-        if (_context.Trial.Duration > 3f)
+        if (_context.Trial.Duration > 10f)
         {
             if (!_context.RecordVideo)
             {

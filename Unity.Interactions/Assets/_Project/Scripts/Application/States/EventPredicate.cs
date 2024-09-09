@@ -11,7 +11,11 @@ internal class EventPredicate : IPredicate
 
 	public bool ShouldTransition()
 	{
-		return _eventTriggered;
+		if (!_eventTriggered)
+			return false;
+		
+		_eventTriggered = false;
+		return true;
 	}
 
 	void OnTriggered()

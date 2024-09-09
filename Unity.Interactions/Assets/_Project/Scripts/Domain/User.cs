@@ -1,15 +1,12 @@
 using UnityEngine;
 
-public class User : MonoBehaviour
+public interface IUser
 {
-    void Start()
-    {
-        
-    }
+	Vector2 Position { get; }
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+public class User : MonoBehaviour, IUser
+{
+	public Vector2 Position => new(transform.position.x, transform.position.z);
 }
