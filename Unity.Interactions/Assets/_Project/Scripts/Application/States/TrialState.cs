@@ -6,10 +6,17 @@ internal class TrialState : GameState
     {
     }
 
+    public override void Enter()
+    {
+        _context.Trial = new Trial(Time.timeSinceLevelLoad);
+    }
+
     public override void Tick()
     {
+        
+        _context.Trial.Tick(Time.deltaTime);
 
-        if (Time.timeSinceLevelLoad > 10)
+        if (_context.Trial.Duration > 3f)
         {
             _context.WebcamRecorder.StopRecording();
             
@@ -18,9 +25,6 @@ internal class TrialState : GameState
                 AppEvents.TrialEnded?.Invoke();
             }
         }
-
-
-
     }
 
     public override void Exit()

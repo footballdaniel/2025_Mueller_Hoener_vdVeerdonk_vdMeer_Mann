@@ -34,8 +34,8 @@ namespace System.Runtime.CompilerServices.VideoRecorder
 			// var arguments = $"-f dshow -i video=\"{webcamName}\" -vcodec libx264 -pix_fmt yuv420p -y \"{outputPath}\"";
 			// var arguments = @$"-f dshow -i video=""{webcamName}"" -vcodec libx264 -pix_fmt yuv420p -vf ""drawtext=text='Elapsed Time: %{{eif:floor(t*10)}}.%{{eif:mod(t*10,10)}} s':fontsize=24:fontcolor=white:x=10:y=10"" -y ""{outputPath}""";
 			
-			var elapsedTimeExpression = "%{eif\\:floor(t*10)\\:d}.%{eif\\:mod(t*10,10)\\:d} s";
-			var drawTextCommand = $"drawtext=text='Elapsed Time\\: {elapsedTimeExpression}':fontsize=24:fontcolor=white:x=10:y=10";
+			var elapsedTimeExpression = "%{eif\\:t*1000\\:d} ms";
+			var drawTextCommand = $"drawtext=text='Elapsed Time\\: {elapsedTimeExpression}':x=10:y=10";
 			var arguments = $"-f dshow -i video=\"{webcamName}\" -vcodec libx264 -pix_fmt yuv420p -vf \"{drawTextCommand}\" -y \"{outputPath}\"";
 
 

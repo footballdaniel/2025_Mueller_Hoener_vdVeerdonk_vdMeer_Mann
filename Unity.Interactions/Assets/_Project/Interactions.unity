@@ -786,6 +786,7 @@ GameObject:
   m_Component:
   - component: {fileID: 890045806}
   - component: {fileID: 890045807}
+  - component: {fileID: 890045808}
   m_Layer: 0
   m_Name: FFmpegWebcamRecorder
   m_TagString: Untagged
@@ -820,7 +821,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92a37dcefb94f55869afefb79e32ecd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _webcamSelector: {fileID: 890045808}
   <FrameRate>k__BackingField: 10
+--- !u!114 &890045808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 890045805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000dc8866f17463f9166ff2a550f4a02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Webcams>k__BackingField:
+  - HD User Facing
 --- !u!1 &967266047
 GameObject:
   m_ObjectHideFlags: 0
