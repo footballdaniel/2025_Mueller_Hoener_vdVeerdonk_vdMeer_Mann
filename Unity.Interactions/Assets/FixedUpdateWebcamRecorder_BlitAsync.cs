@@ -35,7 +35,7 @@ namespace _Project
 
 		void OnDestroy()
 		{
-			_webcamTexture.Stop();
+			_webcamTexture?.Stop();
 		}
 
 		void CaptureFrameAsync()

@@ -29,7 +29,7 @@ namespace _Project
 
 		void OnDestroy()
 		{
-			_webcamTexture.Stop();
+			_webcamTexture?.Stop();
 		}
 
 		async void WriteFrameAsJpegAsync()
