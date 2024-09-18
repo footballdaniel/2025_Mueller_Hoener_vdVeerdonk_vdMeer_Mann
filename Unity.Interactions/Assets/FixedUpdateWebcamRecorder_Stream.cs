@@ -1,8 +1,27 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+
+public class AvailableWebCams : List<WebCamConfiguration>
+{
+	public AvailableWebCams()
+	{
+		var devices = WebCamTexture.devices;
+		foreach (var device in devices)
+		{
+			var config = new WebCamConfiguration(device.name, 1920, 1080, 30);
+			Add(config);
+		}
+	}
+}
+
+public record WebCamConfiguration(string DeviceName, int Width, int Height, int FrameRate);
+
 public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
 {
+	[SerializeField] float _frameRate = 5f;
+	
 	void Start()
 	{
 		var devices = WebCamTexture.devices;
@@ -18,10 +37,13 @@ public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		var deltaTime = 1f / _frameRate;
 		_updateTimer += Time.fixedDeltaTime;
-		if (_updateTimer >= 0.2f)
+		float epsilon = 0.0001f; // Small value to account for floating-point errors
+
+		if (_updateTimer >= deltaTime - epsilon)
 		{
-			_updateTimer = 0f;
+			_updateTimer -= deltaTime; // Subtract instead of resetting to zero
 			_frameIndex++;
 			SaveFrameAsPng();
 			Debug.Log(Time.timeSinceLevelLoad + " " + _frameIndex);
@@ -49,7 +71,7 @@ public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
 	{
 		var ffmpegPath = Path.Combine(Application.streamingAssetsPath, "ffmpeg", "ffmpeg.exe");  // Ensure ffmpeg is placed here
 		var videoOutputPath = Path.Combine(Application.persistentDataPath, "output_video.mp4");
-		var arguments = $"-r 5 -i \"{_frameFolderPath}/frame_%06d.png\" -vf \"drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
+		var arguments = $"-r {_frameRate} -i \"{_frameFolderPath}/frame_%06d.png\" -vf \"drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
 
 		var process = new System.Diagnostics.Process();
 		process.StartInfo.FileName = ffmpegPath;

@@ -20,6 +20,7 @@ namespace _Project.Scripts.App
 	
 		[Header("Internal state")]
 		public IWebcamRecorder WebcamRecorder { get; private set; }
+		public WebCamConfiguration WebCamConfiguration { get; set; }
 		public Experiment Experiment { get; private set; }
 		public Trial CurrentTrial { get; set; }
 		public Opponent Opponent { get; set; }
@@ -57,5 +58,8 @@ namespace _Project.Scripts.App
 	
 		StateMachine _stateMachine;
 	}
+	
+	// third, create command based state changes!
+	// second, create selector state with a list of available webcams
 	
 }

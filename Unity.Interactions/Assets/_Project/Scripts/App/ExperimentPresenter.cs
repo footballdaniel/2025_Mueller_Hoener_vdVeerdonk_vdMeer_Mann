@@ -1,17 +1,21 @@
-﻿namespace _Project.Scripts.App
+﻿using System.Collections.Generic;
+
+namespace _Project.Scripts.App
 {
 	public class ExperimentPresenter
 	{
-		public ExperimentPresenter(UI ui)
+		public Observable<bool> CanStartNextTrial { get; private set; } = new Observable<bool>(false);
+		public List<WebCamConfiguration> AvailableWebCams { get; private set; }
+		
+		public ExperimentPresenter(AvailableWebCams availableWebCams)
 		{
-			ui.Set(this);
-			
-			Events.TrialEnded += ui.EnableNextTrial;
+			Events.TrialEnded += () => CanStartNextTrial.Value = true;
 		}
 
 		public void NextTrial()
 		{
 			Events.NextTrialRequested?.Invoke();
+			CanStartNextTrial.Value = false;
 		}
 		
 	}

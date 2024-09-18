@@ -7,27 +7,10 @@ public class UI : MonoBehaviour
 {
 	[SerializeField] TMP_Text _fpsText;
 	[SerializeField] Button _restartButton;
-	ExperimentPresenter _presenter;
-
-	public void Set(ExperimentPresenter presenter)
-	{
-		_presenter = presenter;
-	}
 
 	void OnEnable()
 	{
-		_restartButton.onClick.AddListener(OnNextButtonPressed);
-	}
-
-	void OnNextButtonPressed()
-	{
-		_restartButton.interactable = false;
-		_presenter.NextTrial();
-	}
-
-	void OnDestroy()
-	{
-		_restartButton.onClick.RemoveAllListeners();
+		_restartButton.onClick.AddListener(_presenter.NextTrial);
 	}
 
 	void Update()
@@ -35,9 +18,21 @@ public class UI : MonoBehaviour
 		_fpsText.text = $"FPS: {1 / Time.fixedDeltaTime:0}";
 	}
 
-	public void EnableNextTrial()
+	public void Set(ExperimentPresenter presenter)
 	{
-		_restartButton.interactable = true;
+		_presenter = presenter;
+		_presenter.CanStartNextTrial.ValueChanged += EnableNextTrial;
 	}
-	
-} 
+
+	void EnableNextTrial(bool isEnabled)
+	{
+		_restartButton.interactable = isEnabled;
+	}
+
+	void OnDestroy()
+	{
+		_restartButton.onClick.RemoveAllListeners();
+	}
+
+	ExperimentPresenter _presenter;
+}

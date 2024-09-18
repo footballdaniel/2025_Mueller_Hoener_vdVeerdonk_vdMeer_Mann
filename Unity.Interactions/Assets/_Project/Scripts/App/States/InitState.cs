@@ -6,7 +6,9 @@
 	
 		public override void Enter()
 		{
-			var presenter = new ExperimentPresenter(_app.UI);
+			var availableWebCams = new AvailableWebCams();
+			var presenter = new ExperimentPresenter(availableWebCams);
+			_app.UI.Set(presenter);
 		}
 	
 
