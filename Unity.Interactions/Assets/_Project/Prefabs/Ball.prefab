@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2495267772720923824}
-  - component: {fileID: 5030729523938450816}
+  - component: {fileID: 3596481656360277395}
+  - component: {fileID: 344572734264027488}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -33,7 +34,7 @@ Transform:
   - {fileID: 7856736753130351940}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5030729523938450816
+--- !u!114 &3596481656360277395
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,9 +43,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 5493152933407461402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f804b2935494b6bad6aeadc885883ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4df26105c60e4f52b1d71c205c1eda3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _energyTransferCoefficient: 3.05
+  _rigidbody: {fileID: 344572734264027488}
+--- !u!54 &344572734264027488
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5493152933407461402}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &7861372763287295874
 PrefabInstance:
   m_ObjectHideFlags: 0

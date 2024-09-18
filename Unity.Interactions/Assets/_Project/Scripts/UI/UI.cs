@@ -1,0 +1,43 @@
+using _Project.Scripts.App;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class UI : MonoBehaviour
+{
+	[SerializeField] TMP_Text _fpsText;
+	[SerializeField] Button _restartButton;
+	ExperimentPresenter _presenter;
+
+	public void Set(ExperimentPresenter presenter)
+	{
+		_presenter = presenter;
+	}
+
+	void OnEnable()
+	{
+		_restartButton.onClick.AddListener(OnNextButtonPressed);
+	}
+
+	void OnNextButtonPressed()
+	{
+		_restartButton.interactable = false;
+		_presenter.NextTrial();
+	}
+
+	void OnDestroy()
+	{
+		_restartButton.onClick.RemoveAllListeners();
+	}
+
+	void Update()
+	{
+		_fpsText.text = $"FPS: {1 / Time.fixedDeltaTime:0}";
+	}
+
+	public void EnableNextTrial()
+	{
+		_restartButton.interactable = true;
+	}
+	
+} 
