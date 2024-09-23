@@ -11,7 +11,7 @@ namespace _Project.Scripts.App
 		public override void Enter()
 		{
 			var availableWebCams = new AvailableWebCams();
-			var presenter = new ExperimentPresenter(availableWebCams, _app.Transitions);
+			var presenter = new ExperimentPresenter(availableWebCams, _app);
 			_app.UI.Set(presenter);
 		}
 	}

@@ -5,9 +5,11 @@ namespace _Project.Scripts.App
 	public class ExperimentPresenter
 	{
 
-		public ExperimentPresenter(AvailableWebCams availableWebCams, Transitions transitions)
+		public ExperimentPresenter(AvailableWebCams availableWebCams, App app)
 		{
-			_transitions = transitions;
+			_app = app;
+			
+			AvailableWebCams = availableWebCams;
 		}
 
 		public List<WebCamConfiguration> AvailableWebCams { get; private set; }
@@ -15,9 +17,15 @@ namespace _Project.Scripts.App
 
 		public void NextTrial()
 		{
-			_transitions.StartTrial.Execute();
+			_app.Transitions.StartTrial.Execute();
 		}
 
-		readonly Transitions _transitions;
+		readonly App _app;
+
+		public void Select(WebCamConfiguration webcam)
+		{
+			_app.WebCamConfiguration = webcam;
+			_app.Transitions.StartRecording.Execute();
+		}
 	}
 }

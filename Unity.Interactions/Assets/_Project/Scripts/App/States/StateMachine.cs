@@ -13,7 +13,7 @@ namespace _Project.Scripts.App.States
 			_currentState = state;
 			_currentState.Enter();
 
-			Debug.Log($"State changed to {state.GetType().Name}");
+			Debug.Log($"{state.GetType().Name}");
 		}
 
 		public void Tick()

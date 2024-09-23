@@ -2,11 +2,11 @@ using System.IO;
 using UnityEngine;
 
 
-public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
+public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 {
 	[SerializeField] float _frameRate = 5f;
 	
-	void Start()
+	public void InitiateRecorder()
 	{
 		var devices = WebCamTexture.devices;
 		foreach (var device in devices)
@@ -33,13 +33,6 @@ public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
 			Debug.Log(Time.timeSinceLevelLoad + " " + _frameIndex);
 		}
 	}
-
-	void OnDestroy()
-	{
-		_webcamTexture?.Stop();
-		GenerateVideoWithFfmpeg();
-	}
-
 	void SaveFrameAsPng()
 	{
 		var tex = new Texture2D(_webcamTexture.width, _webcamTexture.height);
@@ -72,4 +65,11 @@ public class FixedUpdateWebcamRecorder_Stream : MonoBehaviour
 	string _frameFolderPath;
 	WebCamTexture _webcamTexture;
 	float _updateTimer;
+	public bool IsRecording => _webcamTexture.isPlaying;
+
+	public void StopRecording()
+	{
+		_webcamTexture?.Stop();
+		GenerateVideoWithFfmpeg();
+	}
 }

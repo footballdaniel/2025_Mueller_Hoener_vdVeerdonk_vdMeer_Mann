@@ -37,46 +37,42 @@ namespace _Project.Scripts.App
 		void Start()
 		{
 			// Monobehaviors
-			// WebcamRecorder = ServiceLocator.Get<IWebcamRecorder>();
+			WebcamRecorder = ServiceLocator.Get<IWebcamRecorder>();
 			UI = ServiceLocator.Get<UI>();
-			
-			Debug.Log(UI);
+			User = ServiceLocator.Get<User>();
+			DominantFoot = ServiceLocator.Get<DominantFoot>();
+		
+			// Prefabs
+			OpponentPrefab = ServiceLocator.Get<Opponent>();
+			BallPrefab = ServiceLocator.Get<Ball>();
+		
+			// State machine
+			StateMachine = new StateMachine();
+			Transitions = new Transitions();
+			Experiment = new Experiment();
+		
+			// States
+			var init = new InitState(this);
+			var webcamSelection = new WebcamSelectionState(this);
+			var startRecording = new StartRecordingVideoState(this);
+			var trial = new TrialState(this);
+			var end = new TrialEndState(this);
+		
+			// Transitions
+			Transitions.StartTrial = new Transition(this, init, trial);
+			Transitions.RecordVideo = new Transition(this, init, webcamSelection);
+			Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
+			Transitions.StartTrial = new Transition(this, startRecording, trial);
+			Transitions.EndTrial = new Transition(this, trial, end);
+		
+			// Start app
+			StateMachine.SetState(init);
 		}
-
-		// 	User = ServiceLocator.Get<User>();
-		// 	DominantFoot = ServiceLocator.Get<DominantFoot>();
-		//
-		// 	// Prefabs
-		// 	OpponentPrefab = ServiceLocator.Get<Opponent>();
-		// 	BallPrefab = ServiceLocator.Get<Ball>();
-		//
-		// 	// State machine
-		// 	StateMachine = new StateMachine();
-		// 	Transitions = new Transitions();
-		// 	Experiment = new Experiment();
-		//
-		// 	// States
-		// 	var init = new InitState(this);
-		// 	var webcamSelection = new WebcamSelectionState(this);
-		// 	var startRecording = new StartRecordingVideoState(this);
-		// 	var trial = new TrialState(this);
-		// 	var end = new TrialEndState(this);
-		//
-		// 	// Transitions
-		// 	Transitions.StartTrial = new Transition(this, init, trial);
-		// 	Transitions.RecordVideo = new Transition(this, init, webcamSelection);
-		// 	Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
-		// 	Transitions.StartTrial = new Transition(this, startRecording, trial);
-		// 	Transitions.EndTrial = new Transition(this, trial, end);
-		//
-		// 	// Start app
-		// 	StateMachine.SetState(init);
-		// }
-		//
-		// void Update()
-		// {
-		// 	StateMachine.Tick();
-		// }
+		
+		void Update()
+		{
+			StateMachine.Tick();
+		}
 	}
 
 }
