@@ -18,19 +18,7 @@ namespace _Project.Scripts.App.States
 
 		public void Tick()
 		{
-			TryTransition();
-
 			_currentState?.Tick();
-		}
-
-		void TryTransition()
-		{
-			// foreach (var transition in _currentState.Transitions)
-			// 	if (transition.TryTransition(out var state))
-			// 	{
-			// 		SetState(state);
-			// 		return;
-			// 	}
 		}
 	}
 }

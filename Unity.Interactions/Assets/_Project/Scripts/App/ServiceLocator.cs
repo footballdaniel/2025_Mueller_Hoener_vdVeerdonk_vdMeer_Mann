@@ -6,6 +6,8 @@ namespace _Project.Scripts.App
 {
 	public class ServiceLocator : MonoBehaviour
 	{
+		[SerializeField] List<GameObject> _prefabs;
+		[SerializeField] List<GameObject> _monobehaviours;
 		static Dictionary<Type, object> _services = new();
 
 		public static T Get<T>() where T : class
@@ -17,6 +19,16 @@ namespace _Project.Scripts.App
 		void OnEnable()
 		{
 			_services.Clear();
+			
+			foreach (var prefab in _prefabs)
+			{
+				var components = prefab.GetComponents<MonoBehaviour>();
+				foreach (var component in components)
+				{
+					RegisterMonobehaviours(component);
+					RegisterInterfaces(component);
+				}
+			}
 
 			foreach (var component in GetComponentsInChildren<MonoBehaviour>())
 			{

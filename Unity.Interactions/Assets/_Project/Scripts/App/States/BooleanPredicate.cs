@@ -9,7 +9,7 @@ namespace _Project.Scripts.App.States
 			_flag = flag;
 		}
 
-		public bool ShouldTransition()
+		public bool IsTrue()
 		{
 			return _flag;
 		}

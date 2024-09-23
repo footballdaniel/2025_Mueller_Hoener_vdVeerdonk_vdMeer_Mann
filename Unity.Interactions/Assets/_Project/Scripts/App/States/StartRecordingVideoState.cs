@@ -15,7 +15,7 @@
         public override void Tick()
         {
             if (_app.WebcamRecorder.IsRecording)
-                Events.RecordingStarted?.Invoke();
+                _app.Transitions.StartTrial.Execute();
         }
     }
 }

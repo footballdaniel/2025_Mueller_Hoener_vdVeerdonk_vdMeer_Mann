@@ -9,12 +9,12 @@ namespace _Project.Scripts.App
 		
 		public ExperimentPresenter(AvailableWebCams availableWebCams)
 		{
-			Events.TrialEnded += () => CanStartNextTrial.Value = true;
+			
 		}
 
 		public void NextTrial()
 		{
-			Events.NextTrialRequested?.Invoke();
+			
 			CanStartNextTrial.Value = false;
 		}
 		

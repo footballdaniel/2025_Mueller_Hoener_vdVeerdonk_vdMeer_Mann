@@ -39,7 +39,7 @@ namespace _Project.Scripts.App.States
             {
                 if (!_app.RecordVideo)
                 {
-                    Events.TrialEnded?.Invoke();
+                    _app.Transitions.EndTrial.Execute();
                     return;
                 }
             
@@ -47,7 +47,7 @@ namespace _Project.Scripts.App.States
             
                 if (!_app.WebcamRecorder.IsRecording)
                 {
-                    Events.TrialEnded?.Invoke();
+                    _app.Transitions.EndTrial.Execute();
                 }
             }
         }

@@ -6,3 +6,5 @@ public interface IWebcamRecorder
 	void StopRecording();
 	
 }
+
+

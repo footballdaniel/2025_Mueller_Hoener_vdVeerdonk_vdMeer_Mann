@@ -11,7 +11,7 @@ namespace _Project.Scripts.App.States
 			eventTrigger += OnTriggered;
 		}
 
-		public bool ShouldTransition()
+		public bool IsTrue()
 		{
 			if (!_eventTriggered)
 				return false;

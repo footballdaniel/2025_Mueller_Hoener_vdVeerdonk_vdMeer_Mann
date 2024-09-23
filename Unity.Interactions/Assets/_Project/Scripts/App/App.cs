@@ -4,53 +4,23 @@ using UnityEngine;
 
 namespace _Project.Scripts.App
 {
-	public class Transitions
-	{
-		public Transition EndTrial { get; set; }
-		public Transition StartRecording;
-		public Transition StartTrial;
-	}
-
-
-	public class Transition
-	{
-
-		public Transition(App app, State from, State to)
-		{
-			_stateMachine = app.StateMachine;
-			_from = from;
-			_to = to;
-		}
-
-		public void Execute()
-		{
-			if (_stateMachine.CurrentState != _from)
-				return;
-
-			_stateMachine.SetState(_to);
-		}
-
-		readonly State _from;
-		readonly StateMachine _stateMachine;
-		readonly State _to;
-	}
 
 
 	public class App : MonoBehaviour
 	{
-		[Header("Dependencies")]
-		[field: SerializeReference] public UI UI { get; private set; }
-
-		[field: SerializeReference] public User User { get; private set; }
-		[field: SerializeReference] public DominantFoot DominantFoot { get; private set; }
-
-		[Header("Prefabs")]
-		public Opponent OpponentPrefab;
-
-		public Ball BallPrefab;
-
 		[Header("Settings")]
 		[field: SerializeReference] public bool RecordVideo { get; private set; }
+
+		[Header("MonoBehaviours")]
+		public UI UI { get; private set; }
+
+		public User User { get; private set; }
+		public DominantFoot DominantFoot { get; private set; }
+
+		[Header("Prefabs")]
+		public Opponent OpponentPrefab { get; private set; }
+
+		public Ball BallPrefab { get; private set; }
 
 		[Header("Internal state")]
 		public IWebcamRecorder WebcamRecorder { get; private set; }
@@ -61,39 +31,38 @@ namespace _Project.Scripts.App
 		public Opponent Opponent { get; set; }
 		public Ball Ball { get; set; }
 
-
+		[Header("State Machine")]
 		public Transitions Transitions { get; private set; }
 
 		public StateMachine StateMachine { get; set; }
 
 		void Start()
 		{
-
-
-			// Get services for app
+			// Monobehaviors
 			WebcamRecorder = ServiceLocator.Get<IWebcamRecorder>();
+			UI = ServiceLocator.Get<UI>();
+			User = ServiceLocator.Get<User>();
+			DominantFoot = ServiceLocator.Get<DominantFoot>();
 
-			Experiment = new Experiment();
+			// Prefabs
+			OpponentPrefab = ServiceLocator.Get<Opponent>();
+			BallPrefab = ServiceLocator.Get<Ball>();
+
+			// State machine
 			StateMachine = new StateMachine();
 			Transitions = new Transitions();
+			Experiment = new Experiment();
 
-			// Setup app behaviour
+			// States
 			var init = new InitState(this);
 			var startRecording = new StartRecordingVideoState(this);
 			var trial = new TrialState(this);
 			var end = new TrialEndState(this);
-			
+
+			// Transitions
 			Transitions.StartRecording = new Transition(this, init, startRecording);
 			Transitions.StartTrial = new Transition(this, startRecording, trial);
 			Transitions.EndTrial = new Transition(this, trial, end);
-
-
-			// // Adding transitions based on predicates
-			// init.AddTransition(new Transition(startRecording, new CompositePredicate(RecordVideo, ref Events.NextTrialRequested)));
-			// init.AddTransition(new Transition(trial, new CompositePredicate(!RecordVideo, ref Events.NextTrialRequested)));
-			// startRecording.AddTransition(new Transition(trial, new EventPredicate(ref Events.RecordingStarted)));
-			// trial.AddTransition(new Transition(end, new EventPredicate(ref Events.TrialEnded)));
-			// end.AddTransition(new Transition(init, new EventPredicate(ref Events.NextTrialRequested)));
 
 			// Start app
 			StateMachine.SetState(init);
@@ -104,8 +73,4 @@ namespace _Project.Scripts.App
 			StateMachine.Tick();
 		}
 	}
-
-	// third, create command based state changes!
-	// second, create selector state with a list of available webcams
-
 }
