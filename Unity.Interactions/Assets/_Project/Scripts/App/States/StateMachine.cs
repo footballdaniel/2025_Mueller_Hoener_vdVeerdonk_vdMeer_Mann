@@ -2,9 +2,10 @@
 
 namespace _Project.Scripts.App.States
 {
-	internal class StateMachine
+	public class StateMachine
 	{
 		State _currentState;
+		public State CurrentState => _currentState;
 
 		public void SetState(State state)
 		{
@@ -24,12 +25,12 @@ namespace _Project.Scripts.App.States
 
 		void TryTransition()
 		{
-			foreach (var transition in _currentState.Transitions)
-				if (transition.TryTransition(out var state))
-				{
-					SetState(state);
-					return;
-				}
+			// foreach (var transition in _currentState.Transitions)
+			// 	if (transition.TryTransition(out var state))
+			// 	{
+			// 		SetState(state);
+			// 		return;
+			// 	}
 		}
 	}
 }

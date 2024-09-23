@@ -2,7 +2,7 @@
 
 namespace _Project.Scripts.App.States
 {
-	internal class State
+	public class State
 	{
 		protected readonly App _app;
 
@@ -10,14 +10,6 @@ namespace _Project.Scripts.App.States
 		{
 			_app = app;
 		}
-
-		public List<Transition> Transitions { get; } = new();
-
-		public void AddTransition(Transition transition)
-		{
-			Transitions.Add(transition);
-		}
-
 
 		public virtual void Enter()
 		{
