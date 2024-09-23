@@ -4,19 +4,20 @@ namespace _Project.Scripts.App
 {
 	public class ExperimentPresenter
 	{
-		public Observable<bool> CanStartNextTrial { get; private set; } = new Observable<bool>(false);
-		public List<WebCamConfiguration> AvailableWebCams { get; private set; }
-		
-		public ExperimentPresenter(AvailableWebCams availableWebCams)
+
+		public ExperimentPresenter(AvailableWebCams availableWebCams, Transitions transitions)
 		{
-			
+			_transitions = transitions;
 		}
+
+		public List<WebCamConfiguration> AvailableWebCams { get; private set; }
+		public Observable<bool> CanStartNextTrial { get; set; } = new(false);
 
 		public void NextTrial()
 		{
-			
-			CanStartNextTrial.Value = false;
+			_transitions.StartTrial.Execute();
 		}
-		
+
+		readonly Transitions _transitions;
 	}
 }

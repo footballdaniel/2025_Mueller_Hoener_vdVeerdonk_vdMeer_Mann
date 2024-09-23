@@ -1,17 +1,19 @@
+using System;
+
 namespace _Project.Scripts.App.States
 {
 	internal class BooleanPredicate : IPredicate
 	{
-		readonly bool _flag;
+		readonly Func<bool> _flag;
 
-		public BooleanPredicate(bool flag)
+		public BooleanPredicate(Func<bool> flag)
 		{
 			_flag = flag;
 		}
 
 		public bool IsTrue()
 		{
-			return _flag;
+			return _flag();
 		}
 	}
 }

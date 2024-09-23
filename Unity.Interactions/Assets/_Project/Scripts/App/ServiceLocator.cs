@@ -8,7 +8,53 @@ namespace _Project.Scripts.App
 	{
 		[SerializeField] List<GameObject> _prefabs;
 		[SerializeField] List<GameObject> _monobehaviours;
-		static Dictionary<Type, object> _services = new();
+
+		void OnEnable()
+		{
+			_services.Clear();
+
+			RegisterObjects(_prefabs);
+			RegisterObjects(_monobehaviours);
+
+			RegisterServices(transform);
+
+			var serviceNames = string.Join(", ", _services.Keys);
+			Debug.Log($"Registered services: {serviceNames}");
+		}
+
+		void RegisterServices(Transform transform1)
+		{
+			for (var i = 0; i < transform1.childCount; i++)
+			{
+				var child = transform1.GetChild(i);
+				var components = child.GetComponents<Component>();
+
+				foreach (var component in components)
+					RegisterComponent(component);
+			}
+		}
+
+		void RegisterObjects(List<GameObject> objects)
+		{
+			foreach (var prefab in objects)
+			{
+				var components = prefab.GetComponents<Component>();
+
+				foreach (var component in components)
+					RegisterComponent(component);
+			}
+		}
+
+		void RegisterComponent(Component component)
+		{
+			var type = component.GetType();
+			_services.TryAdd(type, component);
+
+			var interfaces = type.GetInterfaces();
+			foreach (var interfaceType in interfaces)
+				if (!_services.ContainsKey(interfaceType)) 
+					_services.TryAdd(interfaceType, component);
+		}
 
 		public static T Get<T>() where T : class
 		{
@@ -16,51 +62,7 @@ namespace _Project.Scripts.App
 			return service as T;
 		}
 
-		void OnEnable()
-		{
-			_services.Clear();
-			
-			foreach (var prefab in _prefabs)
-			{
-				var components = prefab.GetComponents<MonoBehaviour>();
-				foreach (var component in components)
-				{
-					RegisterMonobehaviours(component);
-					RegisterInterfaces(component);
-				}
-			}
-
-			foreach (var component in GetComponentsInChildren<MonoBehaviour>())
-			{
-				RegisterMonobehaviours(component);
-				RegisterInterfaces(component);
-			}
+		static Dictionary<Type, Component> _services = new();
 		
-			var serviceNames = string.Join(", ", _services.Keys);
-			Debug.Log($"Registered services: {serviceNames}");
-		}
-
-		#region Implementation
-
-		static void RegisterInterfaces(MonoBehaviour service)
-		{
-			var serviceType = service.GetType();
-
-			foreach (var interfaceType in serviceType.GetInterfaces())
-			{
-				if (!_services.TryAdd(interfaceType, service))
-					Debug.LogWarning($"Service {interfaceType.Name} is already registered");
-			}
-		}
-
-		static void RegisterMonobehaviours(MonoBehaviour service)
-		{
-			var serviceType = service.GetType();
-
-			if (!_services.TryAdd(serviceType, service))
-				Debug.LogWarning($"Service {serviceType.Name} is already registered");
-		}
-
-		#endregion
 	}
 }

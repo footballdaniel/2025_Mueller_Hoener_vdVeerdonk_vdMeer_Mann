@@ -3,20 +3,23 @@
 	internal class InitState : State
 	{
 
-	
-		public override void Enter()
-		{
-			var availableWebCams = new AvailableWebCams();
-			var presenter = new ExperimentPresenter(availableWebCams);
-			_app.UI.Set(presenter);
-		}
-	
-
-
 		public InitState(App app) : base(app)
 		{
 		}
 
 
+		public override void Enter()
+		{
+		}
+
+		public override void Tick()
+		{
+			if (_app.RecordVideo)
+				_app.Transitions.RecordVideo.Execute();
+			else
+				_app.Transitions.StartTrial.Execute();
+		}
+		
+		
 	}
 }
