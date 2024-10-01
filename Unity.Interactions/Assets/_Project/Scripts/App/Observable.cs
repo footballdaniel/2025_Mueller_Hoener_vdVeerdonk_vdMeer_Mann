@@ -1,6 +1,6 @@
 using System;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	public class Observable<T>
 	{

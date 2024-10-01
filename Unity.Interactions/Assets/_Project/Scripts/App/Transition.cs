@@ -1,6 +1,6 @@
-using _Project.Scripts.App.States;
+using App.States;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	public class Transition
 	{

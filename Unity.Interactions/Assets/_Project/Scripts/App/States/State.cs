@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace _Project.Scripts.App.States
+﻿namespace App.States
 {
 	public class State
 	{

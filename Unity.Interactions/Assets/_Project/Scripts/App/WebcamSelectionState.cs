@@ -1,6 +1,8 @@
-using _Project.Scripts.App.States;
+using System.Collections.Generic;
+using App.States;
+using Domain.VideoRecorder;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	internal class WebcamSelectionState : State
 	{
@@ -11,8 +13,30 @@ namespace _Project.Scripts.App
 		public override void Enter()
 		{
 			var availableWebCams = new AvailableWebCams();
-			var presenter = new ExperimentPresenter(availableWebCams, _app);
-			_app.UI.Set(presenter);
+			var presenter = new WebcamSelectionPresenter(availableWebCams, _app);
+			_app.UI.WebcamSelectionUI.Set(presenter);
 		}
+	}
+
+	public class WebcamSelectionPresenter
+	{
+		public WebcamSelectionPresenter(AvailableWebCams availableWebCams, App app)
+		{
+			_app = app;
+
+			AvailableWebCams = availableWebCams;
+		}
+
+		public List<WebCamConfiguration> AvailableWebCams { get; private set; }
+		
+
+		public void Select(WebCamConfiguration webcam)
+		{
+			_app.WebCamConfiguration = webcam;	
+			_app.Transitions.StartTrial.Execute();
+		}
+
+		readonly App _app;
+
 	}
 }

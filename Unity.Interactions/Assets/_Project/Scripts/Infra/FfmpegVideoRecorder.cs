@@ -2,10 +2,11 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Domain.VideoRecorder;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace _Project.Scripts.Infra
+namespace Infra
 {
 	public class FfmpegVideoRecorder : MonoBehaviour, IWebcamRecorder
 	{

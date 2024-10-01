@@ -1,53 +1,56 @@
 using UnityEngine;
 
-public class Opponent : MonoBehaviour
+namespace Domain
 {
-	[SerializeField] float _maxSpeed = 5f;
-	[SerializeField] float _acceleration = 3f;
-	[SerializeField] float _interpersonalDistance = 3f;
-	[SerializeField] float _decelerationStartDistance = 5f;
-
-	float _currentSpeed = 0f;
-	IUser _user;
-	Vector3 _targetPosition;
-
-	void Update()
+	public class Opponent : MonoBehaviour
 	{
-		if (_user == null) return;
+		[SerializeField] float _maxSpeed = 5f;
+		[SerializeField] float _acceleration = 3f;
+		[SerializeField] float _interpersonalDistance = 3f;
+		[SerializeField] float _decelerationStartDistance = 5f;
 
-		var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
-		var direction = userPosition - transform.position;
-		var distance = direction.magnitude;
+		float _currentSpeed = 0f;
+		IUser _user;
+		Vector3 _targetPosition;
 
-		_targetPosition = userPosition - direction.normalized * _interpersonalDistance;
-
-		if (distance > _interpersonalDistance)
+		void Update()
 		{
-			if (distance > _decelerationStartDistance)
+			if (_user == null) return;
+
+			var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
+			var direction = userPosition - transform.position;
+			var distance = direction.magnitude;
+
+			_targetPosition = userPosition - direction.normalized * _interpersonalDistance;
+
+			if (distance > _interpersonalDistance)
 			{
-				_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
+				if (distance > _decelerationStartDistance)
+				{
+					_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
+				}
+				else
+				{
+					var speedFactor = (distance - _interpersonalDistance) / (_decelerationStartDistance - _interpersonalDistance);
+					var targetSpeed = Mathf.Lerp(0, _maxSpeed, speedFactor);
+					_currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, _acceleration * Time.deltaTime);
+				}
+
+				var velocity = (new Vector3(_targetPosition.x, 0, _targetPosition.z) - transform.position).normalized * _currentSpeed;
+				transform.position += velocity * Time.deltaTime;
+
+				var angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+				transform.rotation = Quaternion.Euler(0, angle, 0);
 			}
 			else
 			{
-				var speedFactor = (distance - _interpersonalDistance) / (_decelerationStartDistance - _interpersonalDistance);
-				var targetSpeed = Mathf.Lerp(0, _maxSpeed, speedFactor);
-				_currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, _acceleration * Time.deltaTime);
+				_currentSpeed = 0;
 			}
-
-			var velocity = (new Vector3(_targetPosition.x, 0, _targetPosition.z) - transform.position).normalized * _currentSpeed;
-			transform.position += velocity * Time.deltaTime;
-
-			var angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
-			transform.rotation = Quaternion.Euler(0, angle, 0);
 		}
-		else
+
+		public void Set(IUser user)
 		{
-			_currentSpeed = 0;
+			_user = user;
 		}
-	}
-
-	public void Set(IUser user)
-	{
-		_user = user;
 	}
 }

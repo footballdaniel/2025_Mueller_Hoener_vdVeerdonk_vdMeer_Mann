@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public interface IUser
+namespace Domain
 {
-	Vector2 Position { get; }
+	public interface IUser
+	{
+		Vector2 Position { get; }
+	}
 }

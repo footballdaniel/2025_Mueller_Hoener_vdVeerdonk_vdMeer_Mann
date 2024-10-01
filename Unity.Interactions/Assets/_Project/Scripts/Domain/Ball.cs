@@ -1,8 +1,6 @@
-﻿using _Project.Scripts.Domain;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 
-namespace System.Runtime.CompilerServices
+namespace Domain
 {
 	public class Ball : MonoBehaviour
 	{

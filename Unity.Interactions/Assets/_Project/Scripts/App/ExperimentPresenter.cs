@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Domain.VideoRecorder;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	public class ExperimentPresenter
 	{
@@ -8,7 +9,7 @@ namespace _Project.Scripts.App
 		public ExperimentPresenter(AvailableWebCams availableWebCams, App app)
 		{
 			_app = app;
-			
+
 			AvailableWebCams = availableWebCams;
 		}
 
@@ -20,12 +21,12 @@ namespace _Project.Scripts.App
 			_app.Transitions.StartTrial.Execute();
 		}
 
-		readonly App _app;
-
 		public void Select(WebCamConfiguration webcam)
 		{
 			_app.WebCamConfiguration = webcam;
 			_app.Transitions.StartRecording.Execute();
 		}
+
+		readonly App _app;
 	}
 }

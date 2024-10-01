@@ -1,6 +1,7 @@
+using Domain;
 using UnityEngine;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	public class Experiment
 	{

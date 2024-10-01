@@ -1,16 +1,18 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class User : MonoBehaviour, IUser
+namespace Domain
 {
-	[Header("External dependencies"), SerializeField] XRTracker _headTracker;
-	[SerializeField] DominantFoot _dominantFoot;
-	
-	void Start()
+	public class User : MonoBehaviour, IUser
 	{
-		transform.parent = _headTracker.gameObject.transform;
-	}
+		[Header("External dependencies"), SerializeField] XRTracker _headTracker;
+		[SerializeField] DominantFoot _dominantFoot;
+	
+		void Start()
+		{
+			transform.parent = _headTracker.gameObject.transform;
+		}
 	
 
-	public Vector2 Position => new(transform.position.x, transform.position.z);
+		public Vector2 Position => new(transform.position.x, transform.position.z);
+	}
 }

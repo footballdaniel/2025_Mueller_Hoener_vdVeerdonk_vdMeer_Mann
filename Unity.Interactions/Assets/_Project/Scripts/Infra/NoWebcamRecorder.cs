@@ -1,15 +1,19 @@
+using Domain.VideoRecorder;
 using UnityEngine;
 
-public class NoWebcamRecorder : MonoBehaviour, IWebcamRecorder
+namespace Infra
 {
-	public bool IsRecording => true;
-	public float FrameRate { get; set; } = 10f;
-	
-	public void InitiateRecorder()
+	public class NoWebcamRecorder : MonoBehaviour, IWebcamRecorder
 	{
-	}
+		public bool IsRecording => true;
+		public float FrameRate { get; set; } = 10f;
 	
-	public void StopRecording()
-	{
+		public void InitiateRecorder()
+		{
+		}
+	
+		public void StopRecording()
+		{
+		}
 	}
 }

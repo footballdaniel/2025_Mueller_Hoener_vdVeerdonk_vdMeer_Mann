@@ -1,7 +1,7 @@
-﻿using _Project.Scripts.Domain;
+﻿using Domain;
 using UnityEngine;
 
-namespace _Project.Scripts.App.States
+namespace App.States
 {
     internal class TrialState : State
     {

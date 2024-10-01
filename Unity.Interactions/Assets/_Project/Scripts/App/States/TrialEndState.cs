@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Project.Scripts.App.States
+namespace App.States
 {
     internal class TrialEndState : State
     {

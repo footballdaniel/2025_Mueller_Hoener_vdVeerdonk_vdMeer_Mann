@@ -1,17 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class WebcamSelector : MonoBehaviour
+namespace Domain.VideoRecorder
 {
-	[field: SerializeReference] public List<string> Webcams { get; private set; }
-	
-	void OnValidate()
+	public class WebcamSelector : MonoBehaviour
 	{
-		Webcams = new List<string>();
+		[field: SerializeReference] public List<string> Webcams { get; private set; }
+	
+		void OnValidate()
+		{
+			Webcams = new List<string>();
 
-		var devices = WebCamTexture.devices;
+			var devices = WebCamTexture.devices;
 
-		foreach (var device in devices)
-			Webcams.Add(device.name);
+			foreach (var device in devices)
+				Webcams.Add(device.name);
+		}
 	}
 }

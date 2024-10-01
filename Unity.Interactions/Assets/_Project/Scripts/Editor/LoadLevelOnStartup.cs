@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace _Project.Scripts.Editor
+﻿namespace Editor
 {
 	public class LoadLevelOnStartup
 	{

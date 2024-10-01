@@ -1,10 +1,13 @@
-public interface IWebcamRecorder
+namespace Domain.VideoRecorder
 {
-	bool IsRecording { get; }
+	public interface IWebcamRecorder
+	{
+		bool IsRecording { get; }
 	
-	void InitiateRecorder();
-	void StopRecording();
+		void InitiateRecorder();
+		void StopRecording();
 	
+	}
 }
 
 

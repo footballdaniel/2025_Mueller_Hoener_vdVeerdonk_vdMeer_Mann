@@ -1,8 +1,10 @@
-using System.Runtime.CompilerServices;
-using _Project.Scripts.App.States;
+using App.States;
+using Domain;
+using Domain.VideoRecorder;
+using UI;
 using UnityEngine;
 
-namespace _Project.Scripts.App
+namespace App
 {
 	public class App : MonoBehaviour
 	{
@@ -10,7 +12,7 @@ namespace _Project.Scripts.App
 		[field: SerializeReference] public bool RecordVideo { get; private set; }
 
 		[Header("MonoBehaviours")]
-		public UI UI { get; private set; }
+		public MainUI UI { get; private set; }
 
 		public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
@@ -38,7 +40,7 @@ namespace _Project.Scripts.App
 		{
 			// Monobehaviors
 			WebcamRecorder = ServiceLocator.Get<IWebcamRecorder>();
-			UI = ServiceLocator.Get<UI>();
+			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
 		
