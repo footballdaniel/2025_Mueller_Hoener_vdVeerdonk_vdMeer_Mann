@@ -4,6 +4,11 @@ using Domain.VideoRecorder;
 using UI;
 using UnityEngine;
 
+public class LoggerContext : ScriptableObject
+{
+	// This class can be empty or contain additional logging metadata
+}
+
 namespace App
 {
 	public class App : MonoBehaviour
@@ -62,9 +67,6 @@ namespace App
 			var export = new ExportVideoState(this);
 		
 			// Transitions
-			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
-			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, trial);
-			Transitions.EndTrial = new Transition(this, trial, end);
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
 			Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
 			Transitions.StartTrialWithRecording = new Transition(this, startRecording, trial);
@@ -72,6 +74,10 @@ namespace App
 			Transitions.FinishExport = new Transition(this, export, end);
 			Transitions.WaitForNextTrial = new Transition(this, end, waitForNextTrial);
 			
+			// without recording
+			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
+			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, trial);
+			Transitions.EndTrial = new Transition(this, trial, end);
 		
 			// Start app
 			StateMachine.SetState(init);
