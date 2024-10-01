@@ -7,16 +7,16 @@ namespace UI
 {
 	public class WebcamSelectionUI : MonoBehaviour
 	{
-		[SerializeField] Button _webcamConfigPrefab;
+		[SerializeField] UIWebcamConfigEntry _webcamConfigEntryPrefab;
 		[SerializeField] VerticalLayoutGroup _webcamConfigRoot;
 		
 		public void Set(WebcamSelectionPresenter presenter)
 		{
-			foreach (var webcam in presenter.AvailableWebCams)
+			foreach (var webcam in presenter.WebcamRepository)
 			{
-				var webcamConfig = Instantiate(_webcamConfigPrefab, _webcamConfigRoot.transform);
-				webcamConfig.GetComponentInChildren<TMP_Text>().text = webcam.DeviceName + " " + webcam.FrameRate + "fps" + " " + webcam.Width + "x" + webcam.Height;
-				webcamConfig.onClick.AddListener(() => presenter.Select(webcam));
+				var webcamConfig = Instantiate(_webcamConfigEntryPrefab, _webcamConfigRoot.transform);
+				webcamConfig.Set(webcam);
+				webcamConfig.Button.onClick.AddListener(() => presenter.Select(webcam));
 			}
 		}
 	}

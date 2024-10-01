@@ -3,11 +3,9 @@ namespace Domain.VideoRecorder
 	public interface IWebcamRecorder
 	{
 		bool IsRecording { get; }
-	
-		void InitiateRecorder();
+		bool IsExportComplete { get; }
+		void StartRecording();
 		void StopRecording();
-	
+		void Export();
 	}
 }
-
-

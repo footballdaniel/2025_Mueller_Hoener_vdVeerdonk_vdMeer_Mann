@@ -23,7 +23,7 @@ namespace App
 		public Ball BallPrefab { get; private set; }
 
 		[Header("Internal state")]
-		public IWebcamRecorder WebcamRecorder { get; private set; }
+		public IWebcamRecorder WebcamRecorder { get; set; }
 
 		public WebCamConfiguration WebCamConfiguration { get; set; }
 		public Experiment Experiment { get; private set; }
@@ -39,7 +39,6 @@ namespace App
 		void Start()
 		{
 			// Monobehaviors
-			WebcamRecorder = ServiceLocator.Get<IWebcamRecorder>();
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
@@ -55,17 +54,24 @@ namespace App
 		
 			// States
 			var init = new InitState(this);
-			var webcamSelection = new WebcamSelectionState(this);
-			var startRecording = new StartRecordingVideoState(this);
+			var webcamSelection = new SelectWebcam(this);
+			var waitForNextTrial = new WaitForNextTrialState(this);
+			var startRecording = new StartRecordingVideo(this);
 			var trial = new TrialState(this);
 			var end = new TrialEndState(this);
+			var export = new ExportVideoState(this);
 		
 			// Transitions
-			Transitions.StartTrial = new Transition(this, init, trial);
-			Transitions.RecordVideo = new Transition(this, init, webcamSelection);
-			Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
-			Transitions.StartTrial = new Transition(this, startRecording, trial);
+			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
+			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, trial);
 			Transitions.EndTrial = new Transition(this, trial, end);
+			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
+			Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
+			Transitions.StartTrialWithRecording = new Transition(this, startRecording, trial);
+			Transitions.ExportVideo = new Transition(this, trial, export);
+			Transitions.FinishExport = new Transition(this, export, end);
+			Transitions.WaitForNextTrial = new Transition(this, end, waitForNextTrial);
+			
 		
 			// Start app
 			StateMachine.SetState(init);
@@ -76,5 +82,4 @@ namespace App
 			StateMachine.Tick();
 		}
 	}
-
 }

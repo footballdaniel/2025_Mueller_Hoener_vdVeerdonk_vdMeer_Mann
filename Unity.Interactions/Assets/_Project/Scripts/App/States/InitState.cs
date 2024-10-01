@@ -15,9 +15,9 @@
 		public override void Tick()
 		{
 			if (_app.RecordVideo)
-				_app.Transitions.RecordVideo.Execute();
+				_app.Transitions.SelectWebcam.Execute();
 			else
-				_app.Transitions.StartTrial.Execute();
+				_app.Transitions.BeginExperiment.Execute();
 		}
 		
 		

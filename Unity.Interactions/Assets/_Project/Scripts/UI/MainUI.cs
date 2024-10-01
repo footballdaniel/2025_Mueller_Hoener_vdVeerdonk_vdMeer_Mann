@@ -4,7 +4,7 @@ namespace UI
 {
 	public class MainUI : MonoBehaviour
 	{
+		public ExperimentUI ExperimentUI;
 		public WebcamSelectionUI WebcamSelectionUI;
-		public ExperimentPresenterUI ExperimentPresenterUI;
 	}
 }

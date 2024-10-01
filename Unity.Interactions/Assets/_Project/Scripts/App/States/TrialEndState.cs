@@ -10,8 +10,13 @@ namespace App.States
 
         public override void Enter()
         {
-            Object.Destroy(_app.Ball?.gameObject);
+            Object.Destroy(_app.Ball.gameObject);
             Object.Destroy(_app.Opponent.gameObject);
+        }
+
+        public override void Tick()
+        {
+            _app.Transitions.WaitForNextTrial.Execute();
         }
     }
 }

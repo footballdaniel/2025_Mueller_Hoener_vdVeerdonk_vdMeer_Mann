@@ -250,11 +250,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b88f07c8f13784495e50735ef914d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fpsText: {fileID: 1015579756}
-  _restartButton: {fileID: 632731176}
-  _webcamConfigPrefab: {fileID: 5270205995182826738, guid: 29615973d15b1584cb4093d1e9c2783c,
-    type: 3}
-  _webcamConfigRoot: {fileID: 936901984}
+  ExperimentUI: {fileID: 403343059}
+  WebcamSelectionUI: {fileID: 1310024550}
 --- !u!1001 &128303749
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -441,8 +438,9 @@ GameObject:
   - component: {fileID: 403343056}
   - component: {fileID: 403343058}
   - component: {fileID: 403343057}
+  - component: {fileID: 403343059}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: ExperimentUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -507,6 +505,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 403343055}
   m_CullTransparentMesh: 1
+--- !u!114 &403343059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403343055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf067ac64cc4ecabde479a44bed4736, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fpsText: {fileID: 1015579756}
+  _nextTrialButton: {fileID: 632731176}
 --- !u!1 &431347528
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,7 +883,7 @@ GameObject:
   - component: {fileID: 632731177}
   - component: {fileID: 632731176}
   m_Layer: 5
-  m_Name: Button_Restart
+  m_Name: Button_NextTrial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1577,7 +1589,6 @@ Transform:
   - {fileID: 797247218}
   - {fileID: 1106219722}
   - {fileID: 949755960}
-  - {fileID: 2096471671}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &967266049
@@ -1595,6 +1606,7 @@ MonoBehaviour:
   _prefabs:
   - {fileID: 5493152933407461402, guid: 318d89d166f7740499eaf4c02847f448, type: 3}
   - {fileID: 5629581505529870963, guid: 7b86594d773929c46823c0342271ad3c, type: 3}
+  - {fileID: 6434323134147150877, guid: 236f4da4db801ad459a0df6d538494b6, type: 3}
   _monobehaviours:
   - {fileID: 101493838}
   - {fileID: 893183428}
@@ -1837,8 +1849,9 @@ GameObject:
   - component: {fileID: 1310024547}
   - component: {fileID: 1310024549}
   - component: {fileID: 1310024548}
+  - component: {fileID: 1310024550}
   m_Layer: 5
-  m_Name: Panel_WebcamSelection
+  m_Name: WebcamSelectionUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1902,6 +1915,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1310024546}
   m_CullTransparentMesh: 1
+--- !u!114 &1310024550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310024546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d6ba471db894fe7bfac325862bb1400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _webcamConfigEntryPrefab: {fileID: 7561531539574190614, guid: 29615973d15b1584cb4093d1e9c2783c,
+    type: 3}
+  _webcamConfigRoot: {fileID: 936901984}
 --- !u!1 &1351506096
 GameObject:
   m_ObjectHideFlags: 0
@@ -2668,51 +2696,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &2096471670
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2096471671}
-  - component: {fileID: 2096471672}
-  m_Layer: 0
-  m_Name: FFMpegWebcamRecorder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2096471671
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2096471670}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 967266048}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2096471672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2096471670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ef7e38f823157f498274c494a3b207e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _frameRate: 5
 --- !u!4 &5555404891199946253
 Transform:
   m_ObjectHideFlags: 0
