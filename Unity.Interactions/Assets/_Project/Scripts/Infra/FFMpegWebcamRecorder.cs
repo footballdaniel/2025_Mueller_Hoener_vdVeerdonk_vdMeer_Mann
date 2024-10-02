@@ -1,12 +1,11 @@
-using System.Diagnostics;
+using System;
 using System.IO;
 using Domain.VideoRecorder;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 {
-	[SerializeField] float _frameRate = 5f;
+	[Range(0,30f), SerializeField] int _frameRate;
 
 	public bool IsRecording => _webcamTexture is { isPlaying: true } && _isrecording;
 	public bool IsExportComplete => _isExportComplete;
@@ -14,6 +13,7 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 	public void StartRecording()
 	{
 		_isrecording = true;
+		_startTime = Time.time;
 	}
 
 	public void StopRecording()
@@ -24,13 +24,16 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 
 	public void Export()
 	{
-		GenerateVideoWithFfmpeg();
-		_isExportComplete = true;
+		var videoOutputPath = Path.Combine(Application.persistentDataPath, "output_video.mp4");
+		var progress = new Progress<int>(percent => Debug.Log($"Exporting... {percent}%"));
+
+		FFMpegExporter.ExportCompleted += OnExportCompleted;
+		FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _frameRate, _frameIndex, progress);
 	}
 
 	public void Set(WebCamConfiguration config)
 	{
-		_webcamTexture = new WebCamTexture(config.DeviceName, config.Height, config.Width, (int)config.FrameRate);
+		_webcamTexture = new WebCamTexture(config.DeviceName, config.Width, config.Height, _frameRate);
 
 		_webcamTexture.Play();
 		_frameFolderPath = Path.Combine(Application.persistentDataPath, "CapturedFrames");
@@ -45,33 +48,22 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 
 		var deltaTime = 1f / _frameRate;
 		_updateTimer += Time.fixedDeltaTime;
-		var epsilon = 0.0001f; // Small value to account for floating-point errors
+		var epsilon = 0.0001f;
 
 		if (_updateTimer >= deltaTime - epsilon)
 		{
-			_updateTimer -= deltaTime; // Subtract instead of resetting to zero
+			_updateTimer -= deltaTime;
 			_frameIndex++;
 			SaveFrameAsPng();
-			Debug.Log(Time.timeSinceLevelLoad + " " + _frameIndex);
+			Debug.Log("Time elapsed: " + (Time.time - _startTime) + " seconds, Frame: " + _frameIndex);
 		}
 	}
 
-	void GenerateVideoWithFfmpeg()
+	void OnExportCompleted()
 	{
-		var ffmpegPath = Path.Combine(Application.streamingAssetsPath, "ffmpeg", "ffmpeg.exe"); // Ensure ffmpeg is placed here
-		var videoOutputPath = Path.Combine(Application.persistentDataPath, "output_video.mp4");
-		var arguments = $"-r {_frameRate} -i \"{_frameFolderPath}/frame_%06d.png\" -vf \"drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
-
-		var process = new Process();
-		process.StartInfo.FileName = ffmpegPath;
-		process.StartInfo.Arguments = arguments;
-		process.StartInfo.UseShellExecute = false;
-		process.StartInfo.RedirectStandardOutput = true;
-		process.StartInfo.RedirectStandardError = true;
-		process.StartInfo.CreateNoWindow = true;
-		process.Start();
-		// process.WaitForExit();
+		Debug.Log("Export complete!");
 		_isExportComplete = true;
+		FFMpegExporter.ExportCompleted -= OnExportCompleted;
 	}
 
 	void SaveFrameAsPng()
@@ -90,6 +82,7 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 	int _frameIndex = 0;
 	bool _isExportComplete;
 	bool _isrecording;
+	float _startTime;
 	float _updateTimer;
 	WebCamTexture _webcamTexture;
 }

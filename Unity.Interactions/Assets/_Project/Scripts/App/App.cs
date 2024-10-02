@@ -18,18 +18,16 @@ namespace App
 
 		[Header("MonoBehaviours")]
 		public MainUI UI { get; private set; }
-
 		public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
 
 		[Header("Prefabs")]
 		public Opponent OpponentPrefab { get; private set; }
-
 		public Ball BallPrefab { get; private set; }
 
 		[Header("Internal state")]
 		public IWebcamRecorder WebcamRecorder { get; set; }
-
+		public IWebcamRecorder WebcamRecorderPrefab { get; set; }
 		public WebCamConfiguration WebCamConfiguration { get; set; }
 		public Experiment Experiment { get; private set; }
 		public Trial CurrentTrial { get; set; }
@@ -38,7 +36,6 @@ namespace App
 
 		[Header("State Machine")]
 		public Transitions Transitions { get; private set; }
-
 		public StateMachine StateMachine { get; set; }
 
 		void Start()
@@ -47,6 +44,7 @@ namespace App
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
+			WebcamRecorderFactory = ServiceLocator.Get<IFactory<IWebcamRecorder>>();
 		
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
@@ -66,7 +64,7 @@ namespace App
 			var end = new TrialEndState(this);
 			var export = new ExportVideoState(this);
 		
-			// Transitions
+			// Flow for recording
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
 			Transitions.StartRecording = new Transition(this, webcamSelection, startRecording);
 			Transitions.StartTrialWithRecording = new Transition(this, startRecording, trial);
@@ -74,7 +72,7 @@ namespace App
 			Transitions.FinishExport = new Transition(this, export, end);
 			Transitions.WaitForNextTrial = new Transition(this, end, waitForNextTrial);
 			
-			// without recording
+			// Flow without recording
 			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
 			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, trial);
 			Transitions.EndTrial = new Transition(this, trial, end);
@@ -82,7 +80,9 @@ namespace App
 			// Start app
 			StateMachine.SetState(init);
 		}
-		
+
+		public IFactory<IWebcamRecorder> WebcamRecorderFactory { get; set; }
+
 		void Update()
 		{
 			StateMachine.Tick();

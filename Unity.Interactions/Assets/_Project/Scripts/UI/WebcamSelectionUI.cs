@@ -1,11 +1,10 @@
 using App;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI
 {
-	public class WebcamSelectionUI : MonoBehaviour
+	public class WebcamSelectionUI : UIScreen
 	{
 		[SerializeField] UIWebcamConfigEntry _webcamConfigEntryPrefab;
 		[SerializeField] VerticalLayoutGroup _webcamConfigRoot;

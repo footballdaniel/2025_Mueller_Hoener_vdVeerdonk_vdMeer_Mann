@@ -1,14 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Windows.WebCam;
 
 namespace Domain.VideoRecorder
 {
 	public class WebcamRepository : IRepository<WebCamConfiguration>
 	{
-		public WebcamRepository()
-		{
-		}
-
 		public WebCamConfiguration Get(int id)
 		{
 			return _configs[id];
@@ -17,15 +14,13 @@ namespace Domain.VideoRecorder
 		public IEnumerable<WebCamConfiguration> GetAll()
 		{
 			var devices = WebCamTexture.devices;
-
-			_configs = new List<WebCamConfiguration>();
+			var uniqueSettings = new HashSet<WebCamConfiguration>();
 
 			foreach (var device in devices)
-			{
-				var config = new WebCamConfiguration(device.name, 1920, 1080, 30);
-				_configs.Add(config);
-			}
-			
+			foreach (var resolution in VideoCapture.SupportedResolutions)
+				uniqueSettings.Add(new WebCamConfiguration(device.name, resolution.width, resolution.height));
+
+			_configs = new List<WebCamConfiguration>(uniqueSettings);
 			return _configs;
 		}
 

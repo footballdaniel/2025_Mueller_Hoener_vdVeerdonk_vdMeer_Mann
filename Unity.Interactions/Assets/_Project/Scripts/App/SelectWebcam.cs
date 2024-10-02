@@ -14,6 +14,12 @@ namespace App
 			var availableWebCams = new WebcamRepository();
 			var presenter = new WebcamSelectionPresenter(availableWebCams, _app);
 			_app.UI.WebcamSelectionUI.Set(presenter);
+			_app.UI.WebcamSelectionUI.Show();
+		}
+
+		public override void Exit()
+		{
+			_app.UI.WebcamSelectionUI.Hide();
 		}
 	}
 }

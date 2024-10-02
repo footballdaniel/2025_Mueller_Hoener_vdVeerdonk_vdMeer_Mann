@@ -10,6 +10,6 @@ public class UIWebcamConfigEntry : MonoBehaviour
 
 	public void Set(WebCamConfiguration config)
 	{
-		_text.text = config.DeviceName + " " + config.FrameRate + "fps" + " " + config.Width + "x" + config.Height;
+		_text.text = config.DeviceName + " " + " " + config.Width + "x" + config.Height;
 	}
 }

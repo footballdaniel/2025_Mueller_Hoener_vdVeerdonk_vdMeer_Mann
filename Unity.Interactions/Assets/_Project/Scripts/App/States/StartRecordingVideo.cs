@@ -10,13 +10,14 @@ namespace App.States
 
 		public override void Enter()
 		{
-			_app.WebcamRecorder = new WebcamRecorderFactory(_app.WebCamConfiguration).Create();
-			_app.WebcamRecorder.StartRecording();
+			var recorder = _app.WebcamRecorderFactory.Create();
+			// recorder.
+			// _app.WebcamRecorder.StartRecording();
 		}
 
 		public override void Tick()
 		{
-			if (_app.WebcamRecorder.IsRecording)
+			if (_app.WebcamRecorderPrefab.IsRecording)
 			{
 				Debug.Log("Recording");
 				_app.Transitions.StartTrialWithRecording.Execute();

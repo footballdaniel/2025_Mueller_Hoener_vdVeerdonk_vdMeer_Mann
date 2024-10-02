@@ -1,25 +1,81 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace App
 {
+	
+	[Serializable]
+	public class ServiceTypeReference
+	{
+		public string assemblyQualifiedName;
+	}
+	
+	
 	public class ServiceLocator : MonoBehaviour
 	{
+		[SerializeField] List<GameObject> _prefabsWithInterfaces;
 		[SerializeField] List<GameObject> _prefabs;
 		[SerializeField] List<GameObject> _monobehaviours;
+		
+		[SerializeField] private List<ServiceTypeReference> _serviceTypes;
+
 
 		void OnEnable()
 		{
 			_services.Clear();
 
+			RegisterMonoBehavioursAsFactory(_prefabsWithInterfaces);
 			RegisterObjects(_prefabs);
 			RegisterObjects(_monobehaviours);
-
+			RegisterNonMonobehaviours(_serviceTypes);
 			RegisterServices(transform);
 
 			var serviceNames = string.Join(", ", _services.Keys);
 			Debug.Log($"Registered services: {serviceNames}");
+		}
+		
+		void RegisterNonMonobehaviours(List<ServiceTypeReference> serviceTypes)
+		{
+			foreach (var serviceTypeRef in serviceTypes)
+			{
+				var type = Type.GetType(serviceTypeRef.assemblyQualifiedName);
+				if (type == null)
+				{
+					Debug.LogWarning($"Could not find type {serviceTypeRef.assemblyQualifiedName}");
+					continue;
+				}
+
+				if (type.GetConstructor(Type.EmptyTypes) == null)
+				{
+					Debug.LogWarning($"Type {type.Name} does not have a parameterless constructor");
+					continue;
+				}
+
+				var serviceInstance = Activator.CreateInstance(type);
+				_services.TryAdd(type, serviceInstance);
+				var interfaces = type.GetInterfaces();
+				foreach (var interfaceType in interfaces)
+					if (!_services.ContainsKey(interfaceType))
+						_services.TryAdd(interfaceType, serviceInstance);
+			}
+		}
+		
+
+		void RegisterMonoBehavioursAsFactory(List<GameObject> prefabsWithInterfaces)
+		{
+			foreach (var prefab in prefabsWithInterfaces)
+			{
+				var components = prefab.GetComponents<Component>();
+				foreach (var component in components)
+				{
+					var interfaceType = component.GetType().GetInterfaces()[0];
+					var factoryType = typeof(Factory<>).MakeGenericType(interfaceType);
+					var factory = Activator.CreateInstance(factoryType, component);
+					_services.TryAdd(interfaceType, factory);
+				}
+			}
 		}
 
 		void RegisterServices(Transform transform1)
@@ -62,7 +118,7 @@ namespace App
 			return service as T;
 		}
 
-		static Dictionary<Type, Component> _services = new();
+		static Dictionary<Type, object> _services = new();
 		
 	}
 }

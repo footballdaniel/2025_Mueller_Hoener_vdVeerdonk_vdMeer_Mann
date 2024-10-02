@@ -1136,7 +1136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Content: {fileID: 936901983}
   m_Horizontal: 0
-  m_Vertical: 0
+  m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
   m_Inertia: 1
@@ -1603,10 +1603,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a0e7cc1a483217458368a86a428d312, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefabsWithInterfaces:
+  - {fileID: 6434323134147150877, guid: 236f4da4db801ad459a0df6d538494b6, type: 3}
   _prefabs:
   - {fileID: 5493152933407461402, guid: 318d89d166f7740499eaf4c02847f448, type: 3}
   - {fileID: 5629581505529870963, guid: 7b86594d773929c46823c0342271ad3c, type: 3}
-  - {fileID: 6434323134147150877, guid: 236f4da4db801ad459a0df6d538494b6, type: 3}
   _monobehaviours:
   - {fileID: 101493838}
   - {fileID: 893183428}
