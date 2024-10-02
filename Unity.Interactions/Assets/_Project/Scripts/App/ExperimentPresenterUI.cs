@@ -15,12 +15,12 @@ namespace UI
 			_fpsText.text = $"FPS: {1 / Time.fixedDeltaTime:0}";
 		}
 
-		public void Set(ExperimentPresenter presenter)
+		public void Set(ExperimentViewModel viewModel)
 		{
-			_presenter = presenter;
-			_presenter.CanStartNextTrial.ValueChanged += EnableNextTrial;
+			_viewModel = viewModel;
+			_viewModel.CanStartNextTrial.ValueChanged += EnableNextTrial;
 
-			_restartButton.onClick.AddListener(_presenter.NextTrial);
+			_restartButton.onClick.AddListener(_viewModel.NextTrial);
 		}
 
 		void EnableNextTrial(bool isEnabled)
@@ -33,6 +33,6 @@ namespace UI
 			_restartButton.onClick.RemoveAllListeners();
 		}
 
-		ExperimentPresenter _presenter;
+		ExperimentViewModel _viewModel;
 	}
 }

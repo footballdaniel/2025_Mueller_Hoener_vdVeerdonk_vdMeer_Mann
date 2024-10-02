@@ -3,18 +3,17 @@ using System.IO;
 using Domain.VideoRecorder;
 using UnityEngine;
 
-public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
+public class FFMpegWebcamRecorder : IWebcamRecorder
 {
-	[Range(0,30f), SerializeField] int _frameRate;
+	public FFMpegWebcamRecorder(string deviceName, int width, int height, IProgress<int> progress)
+	{
+		_frameRate = 10;
+		Info = new WebcamInfo(deviceName, width, height);
+		_progress = progress;
+	}
 
 	public bool IsRecording => _webcamTexture is { isPlaying: true } && _isrecording;
 	public bool IsExportComplete => _isExportComplete;
-
-	public void StartRecording()
-	{
-		_isrecording = true;
-		_startTime = Time.time;
-	}
 
 	public void StopRecording()
 	{
@@ -25,24 +24,28 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 	public void Export()
 	{
 		var videoOutputPath = Path.Combine(Application.persistentDataPath, "output_video.mp4");
-		var progress = new Progress<int>(percent => Debug.Log($"Exporting... {percent}%"));
+		
 
 		FFMpegExporter.ExportCompleted += OnExportCompleted;
-		FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _frameRate, _frameIndex, progress);
+		FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _frameRate, _frameIndex, _progress);
 	}
 
-	public void Set(WebCamConfiguration config)
-	{
-		_webcamTexture = new WebCamTexture(config.DeviceName, config.Width, config.Height, _frameRate);
+	public WebcamInfo Info { get; private set; }
 
+	public void StartRecording()
+	{
+		_webcamTexture = new WebCamTexture(Info.DeviceName, Info.Width, Info.Height, 10);
 		_webcamTexture.Play();
 		_frameFolderPath = Path.Combine(Application.persistentDataPath, "CapturedFrames");
 
 		if (!Directory.Exists(_frameFolderPath))
 			Directory.CreateDirectory(_frameFolderPath);
+
+		_isrecording = true;
+		_startTime = Time.time;
 	}
 
-	void FixedUpdate()
+	public void Tick()
 	{
 		if (!IsRecording) return;
 
@@ -55,7 +58,6 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 			_updateTimer -= deltaTime;
 			_frameIndex++;
 			SaveFrameAsPng();
-			Debug.Log("Time elapsed: " + (Time.time - _startTime) + " seconds, Frame: " + _frameIndex);
 		}
 	}
 
@@ -80,9 +82,11 @@ public class FFMpegWebcamRecorder : MonoBehaviour, IWebcamRecorder
 	string _frameFolderPath;
 
 	int _frameIndex = 0;
+	int _frameRate;
 	bool _isExportComplete;
 	bool _isrecording;
 	float _startTime;
 	float _updateTimer;
 	WebCamTexture _webcamTexture;
+	IProgress<int> _progress;
 }

@@ -10,13 +10,15 @@ namespace App
 
 		public override void Enter()
 		{
-			_app.WebcamRecorderPrefab.StopRecording();
-			_app.WebcamRecorderPrefab.Export();
+			ProgressIndicator.Instance.Display("Exporting...", "Frame export", 100);
+			
+			_app.WebcamRecorder.StopRecording();
+			_app.WebcamRecorder.Export();
 		}
 
 		public override void Tick()
 		{
-			if (_app.WebcamRecorderPrefab.IsExportComplete)
+			if (_app.WebcamRecorder.IsExportComplete)
 				_app.Transitions.FinishExport.Execute();
 		}
 	}

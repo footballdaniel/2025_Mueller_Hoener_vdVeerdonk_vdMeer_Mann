@@ -10,8 +10,7 @@ namespace App
 		
 		public override void Enter()
 		{
-			var presenter = new ExperimentPresenter(_app);
-			_app.UI.ExperimentUI.Set(presenter);
+
 		}
 	}
 }

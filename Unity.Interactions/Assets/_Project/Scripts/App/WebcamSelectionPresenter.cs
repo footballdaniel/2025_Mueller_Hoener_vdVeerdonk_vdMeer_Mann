@@ -5,19 +5,19 @@ namespace App
 {
 	public class WebcamSelectionPresenter
 	{
-		public WebcamSelectionPresenter(IRepository<WebCamConfiguration> webcamRepository, App app)
+		public WebcamSelectionPresenter(IRepository<IWebcamRecorder> webcamRepository, App app)
 		{
 			_app = app;
 
-			WebcamRepository = webcamRepository.GetAll();
+			Webcams = webcamRepository.GetAll();
 		}
 
-		public IEnumerable<WebCamConfiguration> WebcamRepository { get; private set; }
+		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }
 		
 
-		public void Select(WebCamConfiguration webcam)
+		public void Select(IWebcamRecorder webcam)
 		{
-			_app.WebCamConfiguration = webcam;	
+			_app.WebcamRecorder = webcam;	
 			_app.Transitions.StartRecording.Execute();
 		}
 

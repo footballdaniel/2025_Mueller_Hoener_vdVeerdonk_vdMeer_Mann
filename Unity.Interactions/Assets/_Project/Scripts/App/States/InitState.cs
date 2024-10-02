@@ -10,6 +10,8 @@
 
 		public override void Enter()
 		{
+			var presenter = new ExperimentViewModel(_app);
+			_app.UI.ExperimentUI.Set(presenter);
 		}
 
 		public override void Tick()

@@ -1,5 +1,4 @@
 using App.States;
-using Domain.VideoRecorder;
 
 namespace App
 {
@@ -11,8 +10,7 @@ namespace App
 
 		public override void Enter()
 		{
-			var availableWebCams = new WebcamRepository();
-			var presenter = new WebcamSelectionPresenter(availableWebCams, _app);
+			var presenter = new WebcamSelectionPresenter(_app.WebCamRecorders, _app);
 			_app.UI.WebcamSelectionUI.Set(presenter);
 			_app.UI.WebcamSelectionUI.Show();
 		}

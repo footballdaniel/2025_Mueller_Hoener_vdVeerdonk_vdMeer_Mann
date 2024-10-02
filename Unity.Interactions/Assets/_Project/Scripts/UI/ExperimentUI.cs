@@ -10,15 +10,38 @@ namespace UI
 	{
 		[SerializeField] TMP_Text _fpsText;
 		[SerializeField] Button _nextTrialButton;
+		[SerializeField] TMP_Text _progressText;
+		[SerializeField] Slider _progressSlider;
 
 		void Update()
 		{
 			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} /n FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
+
+			if (!_shouldUpdate)
+				return;
+
+			_progressSlider.maxValue = _newProgress.MaxValue;
+			_progressText.text = $"{_newProgress.Title}: {_newProgress.Task}";
+			_progressSlider.value = _newProgress.Value;
 		}
 
-		public void Set(ExperimentPresenter presenter)
+		public void Set(ExperimentViewModel viewModel)
 		{
-			_nextTrialButton.onClick.AddListener(presenter.NextTrial);
+			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
+			_viewModel = viewModel;
+
+			_viewModel.Progress.ProgressChanged += OnProgressChanged;
 		}
+
+
+		void OnProgressChanged(ProgressStatement progress)
+		{
+			_shouldUpdate = true;
+			_newProgress = progress;
+		}
+
+		ProgressStatement _newProgress;
+		bool _shouldUpdate;
+		ExperimentViewModel _viewModel;
 	}
 }

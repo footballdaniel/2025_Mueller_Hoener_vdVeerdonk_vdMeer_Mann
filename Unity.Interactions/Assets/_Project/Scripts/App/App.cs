@@ -4,10 +4,6 @@ using Domain.VideoRecorder;
 using UI;
 using UnityEngine;
 
-public class LoggerContext : ScriptableObject
-{
-	// This class can be empty or contain additional logging metadata
-}
 
 namespace App
 {
@@ -27,8 +23,6 @@ namespace App
 
 		[Header("Internal state")]
 		public IWebcamRecorder WebcamRecorder { get; set; }
-		public IWebcamRecorder WebcamRecorderPrefab { get; set; }
-		public WebCamConfiguration WebCamConfiguration { get; set; }
 		public Experiment Experiment { get; private set; }
 		public Trial CurrentTrial { get; set; }
 		public Opponent Opponent { get; set; }
@@ -36,7 +30,7 @@ namespace App
 
 		[Header("State Machine")]
 		public Transitions Transitions { get; private set; }
-		public StateMachine StateMachine { get; set; }
+		public StateMachine StateMachine { get; private set; }
 
 		void Start()
 		{
@@ -44,7 +38,7 @@ namespace App
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
-			WebcamRecorderFactory = ServiceLocator.Get<IFactory<IWebcamRecorder>>();
+			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
 		
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
@@ -81,7 +75,8 @@ namespace App
 			StateMachine.SetState(init);
 		}
 
-		public IFactory<IWebcamRecorder> WebcamRecorderFactory { get; set; }
+		public IRepository<IWebcamRecorder> WebCamRecorders { get; set; }
+
 
 		void Update()
 		{

@@ -11,11 +11,11 @@ namespace UI
 		
 		public void Set(WebcamSelectionPresenter presenter)
 		{
-			foreach (var webcam in presenter.WebcamRepository)
+			foreach (var webcam in presenter.Webcams)
 			{
-				var webcamConfig = Instantiate(_webcamConfigEntryPrefab, _webcamConfigRoot.transform);
-				webcamConfig.Set(webcam);
-				webcamConfig.Button.onClick.AddListener(() => presenter.Select(webcam));
+				var webcamElement = Instantiate(_webcamConfigEntryPrefab, _webcamConfigRoot.transform);
+				webcamElement.Set(webcam);
+				webcamElement.Button.onClick.AddListener(() => presenter.Select(webcam));
 			}
 		}
 	}
