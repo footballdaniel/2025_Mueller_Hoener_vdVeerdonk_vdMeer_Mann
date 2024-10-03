@@ -10,8 +10,8 @@ namespace App.States
 
         public override void Enter()
         {
-            Object.Destroy(_app.Ball.gameObject);
-            Object.Destroy(_app.Opponent.gameObject);
+            Object.Destroy(_app.Session.Ball.gameObject);
+            Object.Destroy(_app.Session.Opponent.gameObject);
         }
 
         public override void Tick()

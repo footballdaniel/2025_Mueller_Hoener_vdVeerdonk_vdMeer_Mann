@@ -7,7 +7,7 @@ namespace App
 		public Transition BeginNextTrial { get; set; }
 		public Transition StartRecording { get; set; }
 		public Transition ExportVideo { get; set; }
-		public Transition StartTrialWithRecording { get; set; }
+		public Transition StartTrialWithVideoRecording { get; set; }
 		public Transition EndTrial { get; set; }
 		public Transition WaitForNextTrial { get; set; }
 		public Transition FinishExport { get; set; }

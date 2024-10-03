@@ -3,12 +3,11 @@ using Domain.VideoRecorder;
 
 namespace App
 {
-	public class WebcamSelectionPresenter
+	public class WebcamSelectionViewModel
 	{
-		public WebcamSelectionPresenter(IRepository<IWebcamRecorder> webcamRepository, App app)
+		public WebcamSelectionViewModel(IRepository<IWebcamRecorder> webcamRepository, App app)
 		{
 			_app = app;
-
 			Webcams = webcamRepository.GetAll();
 		}
 
@@ -17,7 +16,7 @@ namespace App
 
 		public void Select(IWebcamRecorder webcam)
 		{
-			_app.WebcamRecorder = webcam;	
+			_app.Session.WebcamRecorder = webcam;	
 			_app.Transitions.StartRecording.Execute();
 		}
 
