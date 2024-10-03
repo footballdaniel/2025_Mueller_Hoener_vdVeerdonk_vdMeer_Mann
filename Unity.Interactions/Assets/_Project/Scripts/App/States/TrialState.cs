@@ -30,7 +30,7 @@ namespace App.States
 		{
 			_app.Session.CurrentTrial.Tick(Time.deltaTime);
 			
-			if (!(_app.Session.CurrentTrial.Duration > 3f))
+			if (!(_app.Session.CurrentTrial.Duration > 10f))
 				return;
 
 			if (!_app.RecordVideo)

@@ -17,7 +17,6 @@ namespace App
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
 		
-
 		[Header("State")]
 		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }

@@ -1,17 +1,26 @@
 using UnityEngine;
+using Random = System.Random;
 
 namespace Domain
 {
 	public class Opponent : MonoBehaviour
 	{
-		[SerializeField] float _maxSpeed = 5f;
-		[SerializeField] float _acceleration = 3f;
-		[SerializeField] float _interpersonalDistance = 3f;
-		[SerializeField] float _decelerationStartDistance = 5f;
+		[SerializeField] protected float _maxSpeed = 5f;
+		[SerializeField] protected float _acceleration = 3f;
+		[SerializeField] protected float _interpersonalDistance = 3.5f;
+		[SerializeField] protected float _decelerationStartDistance = 5f;
 
 		float _currentSpeed = 0f;
-		IUser _user;
+		bool _isGoingRight;
 		Vector3 _targetPosition;
+		IUser _user;
+
+		void Start()
+		{
+			// random boolean
+			var random = new Random();
+			_isGoingRight = random.Next(0, 2) == 0;
+		}
 
 		void Update()
 		{
@@ -23,12 +32,16 @@ namespace Domain
 
 			_targetPosition = userPosition - direction.normalized * _interpersonalDistance;
 
+			// add 0.5m to target position based on bool
+			if (_isGoingRight)
+				_targetPosition.z += 0.4f;
+			else
+				_targetPosition.z -= 0.4f;
+
 			if (distance > _interpersonalDistance)
 			{
 				if (distance > _decelerationStartDistance)
-				{
 					_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
-				}
 				else
 				{
 					var speedFactor = (distance - _interpersonalDistance) / (_decelerationStartDistance - _interpersonalDistance);
@@ -43,9 +56,7 @@ namespace Domain
 				transform.rotation = Quaternion.Euler(0, angle, 0);
 			}
 			else
-			{
 				_currentSpeed = 0;
-			}
 		}
 
 		public void Set(IUser user)
