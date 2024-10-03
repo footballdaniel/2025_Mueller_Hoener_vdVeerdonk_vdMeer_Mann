@@ -1,10 +1,12 @@
-﻿using Domain;
+﻿using System.Collections.Generic;
+using Domain;
 using Domain.VideoRecorder;
 
 namespace App
 {
 	public class SessionState
 	{
+		public List<Teammate> Teammates { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; }
 		public Experiment Experiment { get; private set; } = new();
 		public Trial CurrentTrial { get; set; }

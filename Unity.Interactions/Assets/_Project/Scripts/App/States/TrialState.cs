@@ -14,7 +14,7 @@ namespace App.States
 			_app.Session.CurrentTrial = _app.Session.Experiment.NextTrial();
 			_app.Session.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Session.Ball = Object.Instantiate(_app.BallPrefab);
-			_app.Session.Opponent.Set(_app.User);
+			_app.Session.Opponent.Set(_app.User, _app.Session.Teammates);
 
 
 			_app.DominantFoot.Passed += OnPassed;

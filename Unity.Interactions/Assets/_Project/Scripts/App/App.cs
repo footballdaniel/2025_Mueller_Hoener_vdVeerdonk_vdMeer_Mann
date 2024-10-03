@@ -13,6 +13,7 @@ namespace App
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; set; }
+		public IRepository<Teammate> TeammateRepository { get; set; }
 		[Header("Entities")] public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
@@ -24,6 +25,8 @@ namespace App
 		public StateMachine StateMachine { get; private set; }
 		public SessionState Session { get; private set; }
 
+
+
 		void Start()
 		{
 			Session = new SessionState();
@@ -33,6 +36,7 @@ namespace App
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
+			TeammateRepository = ServiceLocator.Get<IRepository<Teammate>>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();

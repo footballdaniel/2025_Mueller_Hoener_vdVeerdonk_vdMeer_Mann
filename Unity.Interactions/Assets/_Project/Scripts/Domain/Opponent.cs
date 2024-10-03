@@ -1,14 +1,17 @@
+using System.Collections.Generic;
+using App;
 using UnityEngine;
 using Random = System.Random;
 
 namespace Domain
 {
-	
+
+
 
 	#region Dynamic IPD
 
 	// with dynamic ipd
-	public class Opponent : MonoBehaviour
+	public class Opponent : MonoBehaviour, IOpponent
 	{
 		[SerializeField] protected float _maxSpeed = 5f;
 		[SerializeField] protected float _acceleration = 3f;
@@ -43,11 +46,11 @@ namespace Domain
 			// Calculate the desired position along the line at the specified interpersonal distance
 			_targetPosition = userPosition - targetToUserDirection * _interpersonalDistance;
 
-			// // Adjust target position slightly along z-axis based on _isGoingRight
-			// if (_isGoingRight)
-			//     _targetPosition.z += 0.4f;
-			// else
-			//     _targetPosition.z -= 0.4f;
+			// Adjust target position slightly along z-axis based on _isGoingRight
+			if (_isGoingRight)
+			    _targetPosition.z += 0.4f;
+			else
+			    _targetPosition.z -= 0.4f;
 
 			// Calculate movement direction and distance
 			var moveDirection = _targetPosition - opponentPosition;
@@ -86,12 +89,11 @@ namespace Domain
 		}
 		
 
-        public void Set(IUser user)
+		#endregion
+        public void Set(IUser user, List<Teammate> sessionTeammates)
         {
             _user = user;
         }
-        
-		#endregion
     }
 
 	//

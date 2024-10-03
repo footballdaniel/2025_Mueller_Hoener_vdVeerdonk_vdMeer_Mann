@@ -132,10 +132,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba9fb7a2b3b3aa4698a5685ef96dac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 5
-  _acceleration: 3
+  _maxSpeed: 6
+  _acceleration: 10
   _interpersonalDistance: 3
-  _decelerationStartDistance: 5
+  _decelerationStartDistance: 3.5
   _defendTarget: {fileID: 0}
 --- !u!1001 &967335535744263987
 PrefabInstance:
