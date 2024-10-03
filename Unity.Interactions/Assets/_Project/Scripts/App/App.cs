@@ -10,22 +10,24 @@ namespace App
 	{
 		[Header("Settings")]
 		[field: SerializeReference] public bool RecordVideo { get; private set; }
+
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; set; }
 		[Header("Entities")] public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
-		
+
 		[Header("State")]
 		public Transitions Transitions { get; private set; }
+
 		public StateMachine StateMachine { get; private set; }
 		public SessionState Session { get; private set; }
 
 		void Start()
 		{
 			Session = new SessionState();
-			
+
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
@@ -65,7 +67,6 @@ namespace App
 			// Start app
 			StateMachine.SetState(init);
 		}
-
 
 		void Update()
 		{
