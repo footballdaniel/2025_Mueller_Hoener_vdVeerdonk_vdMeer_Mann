@@ -7,10 +7,9 @@ namespace App
 		public WaitForNextTrialState(App app) : base(app)
 		{
 		}
-		
+
 		public override void Enter()
 		{
-
 		}
 	}
 }

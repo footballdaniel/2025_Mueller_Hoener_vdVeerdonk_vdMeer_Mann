@@ -17,13 +17,13 @@ namespace App.States
 			_app.TrialState.Opponent.Set(_app.User);
 
 
-			_app.DominantFoot.Passed += OnPassed;
+			_app.User.DominantFoot.Passed += OnPassed;
 		}
 
 		public override void Exit()
 		{
 			_hasPassed = false;
-			_app.DominantFoot.Passed -= OnPassed;
+			_app.User.DominantFoot.Passed -= OnPassed;
 		}
 
 		public override void Tick()
@@ -33,13 +33,13 @@ namespace App.States
 			if (!(_app.TrialState.CurrentTrial.Duration > 10f))
 				return;
 
-			switch (_app.RecordVideo)
+			switch (_app.ExperimentalCondition)
 			{
-				case false:
+				case ExperimentalCondition.Laboratory:
 					_app.Transitions.EndLabTrial.Execute();
 					break;
-				case true:
-					_app.Transitions.ExportVideoOfLabTrial.Execute();
+				case ExperimentalCondition.InSitu:
+					_app.Transitions.EndInSituTrial.Execute();
 					break;
 			}
 		}

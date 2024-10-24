@@ -13,15 +13,17 @@ namespace App
 		{
 			_app.TrialState.CurrentTrial = _app.TrialState.Experiment.NextTrial();
 			
-			
-
-			var viewModel = new InSituViewModel();
+			var viewModel = new InSituViewModel(_app.TrialState.WebcamRecorder);
 			_app.UI.InSituUI.Bind(viewModel);
 		}
 
 		public override void Tick()
 		{
+			// Saving
 			_app.TrialState.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
+			_app.TrialState.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
+			_app.TrialState.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
+			_app.TrialState.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 			
 			_app.TrialState.CurrentTrial.Tick(Time.deltaTime);
 
@@ -42,7 +44,6 @@ namespace App
 		public override void Exit()
 		{
 			_app.TrialState.CurrentTrial.Save();
-			_app.Transitions.EndInSituTrial.Execute();
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace App.States
+﻿namespace App.States
 {
 	internal class InitiateVideoRecorder : State
 	{
@@ -15,11 +13,13 @@ namespace App.States
 
 		public override void Tick()
 		{
-			if (_app.TrialState.WebcamRecorder.IsRecording)
-			{
-				Debug.Log("Recording");
+			if (!_app.TrialState.WebcamRecorder.IsRecording)
+				return;
+
+			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
+				_app.Transitions.NextInSituTrialWithVideoRecording.Execute();
+			else
 				_app.Transitions.NextLabTrialWithVideoRecording.Execute();
-			}
 		}
 	}
 }

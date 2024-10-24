@@ -12,15 +12,14 @@ namespace App
 		}
 
 		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }
-		
+
 
 		public void Select(IWebcamRecorder webcam)
 		{
-			_app.TrialState.WebcamRecorder = webcam;	
+			_app.TrialState.WebcamRecorder = webcam;
 			_app.Transitions.InitiateRecorder.Execute();
 		}
 
 		readonly App _app;
-
 	}
 }

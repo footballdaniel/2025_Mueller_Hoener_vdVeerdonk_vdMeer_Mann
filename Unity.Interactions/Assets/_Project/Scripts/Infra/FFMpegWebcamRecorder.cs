@@ -7,6 +7,20 @@ namespace Infra
 {
 	public class FFMpegWebcamRecorder : IWebcamRecorder
 	{
+		public Texture2D Frame => _texture2D;
+		
+		
+		string _frameFolderPath;
+		int _frameIndex = 0;
+		int _frameRate;
+		bool _isExportComplete;
+		bool _isrecording;
+		IProgress<int> _progress;
+		float _startTime;
+		Texture2D _texture2D;
+		float _updateTimer;
+		WebCamTexture _webcamTexture;
+
 		public FFMpegWebcamRecorder(string deviceName, int width, int height, IProgress<int> progress)
 		{
 			_frameRate = 10;
@@ -28,7 +42,7 @@ namespace Infra
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 			var fileName = $"output_video_{fileNameWithDateTime}.mp4";
 			var videoOutputPath = Path.Combine(Application.persistentDataPath, fileName);
-		
+
 
 			FFMpegExporter.ExportCompleted += OnExportCompleted;
 			FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _frameRate, _frameIndex, _progress);
@@ -73,24 +87,13 @@ namespace Infra
 
 		void SaveFrameAsPng()
 		{
-			var tex = new Texture2D(_webcamTexture.width, _webcamTexture.height);
-			tex.SetPixels32(_webcamTexture.GetPixels32());
-			tex.Apply();
+			_texture2D = new Texture2D(_webcamTexture.width, _webcamTexture.height);
+			_texture2D.SetPixels32(_webcamTexture.GetPixels32());
+			_texture2D.Apply();
 
-			var frameBytes = tex.EncodeToPNG();
+			var frameBytes = _texture2D.EncodeToPNG();
 			var fileName = Path.Combine(_frameFolderPath, $"frame_{_frameIndex:D6}.png");
 			File.WriteAllBytes(fileName, frameBytes);
 		}
-
-		string _frameFolderPath;
-
-		int _frameIndex = 0;
-		int _frameRate;
-		bool _isExportComplete;
-		bool _isrecording;
-		float _startTime;
-		float _updateTimer;
-		WebCamTexture _webcamTexture;
-		IProgress<int> _progress;
 	}
 }

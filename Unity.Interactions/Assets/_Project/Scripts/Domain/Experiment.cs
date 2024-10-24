@@ -9,6 +9,5 @@ namespace App
 		{
 			return new Trial(Time.timeSinceLevelLoad);
 		}
-	
 	}
 }

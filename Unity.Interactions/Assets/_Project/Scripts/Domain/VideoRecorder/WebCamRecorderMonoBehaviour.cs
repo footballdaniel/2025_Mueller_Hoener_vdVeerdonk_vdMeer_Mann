@@ -12,6 +12,7 @@ namespace Domain.VideoRecorder
 			_recorder = recorder;
 		}
 
+		public Texture2D Frame => _recorder.Frame;
 		public bool IsRecording => _recorder.IsRecording;
 		public bool IsExportComplete => _recorder.IsExportComplete;
 		public void StartRecording()

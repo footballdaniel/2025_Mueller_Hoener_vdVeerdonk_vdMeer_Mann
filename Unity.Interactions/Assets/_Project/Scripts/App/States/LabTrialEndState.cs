@@ -2,9 +2,9 @@
 
 namespace App.States
 {
-    internal class TrialEndState : State
+    internal class LabTrialEndState : State
     {
-        public TrialEndState(App app) : base(app)
+        public LabTrialEndState(App app) : base(app)
         {
         }
 

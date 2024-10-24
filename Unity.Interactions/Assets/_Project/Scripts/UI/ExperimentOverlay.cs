@@ -30,9 +30,9 @@ namespace UI
 		{
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
-			
+
 			_stopTrialButton.interactable = false;
-			
+
 			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;
 			viewModel.Progress.ProgressChanged += OnProgressChanged;
 		}

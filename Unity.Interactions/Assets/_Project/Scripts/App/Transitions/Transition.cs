@@ -4,16 +4,15 @@ namespace App
 {
 	public class Transition
 	{
-
 		public Transition(App app, State from, State to, IPredicate predicate = null)
 		{
 			_stateMachine = app.StateMachine;
 			_from = from;
 			_to = to;
-			
+
 			_predicate = predicate ?? new NoPredicate();
 		}
-		
+
 		public void Execute()
 		{
 			if (_stateMachine.CurrentState != _from)
