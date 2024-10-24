@@ -17,25 +17,27 @@ namespace App
 		public IRepository<Teammate> Teammates { get; set; }
 		[Header("Entities")] public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
+		public InSituOpponent InSituOpponent { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
 
 		[Header("State")]
 		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
-		public SessionState Session { get; private set; }
+		public TrialState TrialState { get; private set; }
 		
 
 		void Start()
 		{
-			Session = new SessionState();
+			TrialState = new TrialState();
 
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
-			DominantFoot = ServiceLocator.Get<DominantFoot>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
 			Teammates = ServiceLocator.Get<IRepository<Teammate>>();
+			DominantFoot = ServiceLocator.Get<DominantFoot>();
+			InSituOpponent = ServiceLocator.Get<InSituOpponent>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();

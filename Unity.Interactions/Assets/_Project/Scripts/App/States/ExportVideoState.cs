@@ -12,13 +12,13 @@ namespace App
 		{
 			ProgressIndicator.Instance.Display("Exporting...", "Frame export", 100);
 			
-			_app.Session.WebcamRecorder.StopRecording();
-			_app.Session.WebcamRecorder.Export();
+			_app.TrialState.WebcamRecorder.StopRecording();
+			_app.TrialState.WebcamRecorder.Export();
 		}
 
 		public override void Tick()
 		{
-			if (_app.Session.WebcamRecorder.IsExportComplete)
+			if (_app.TrialState.WebcamRecorder.IsExportComplete)
 				_app.Transitions.FinishExport.Execute();
 		}
 	}

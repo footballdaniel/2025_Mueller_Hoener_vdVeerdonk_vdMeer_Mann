@@ -11,7 +11,9 @@ namespace App
 
 		public override void Enter()
 		{
-			_app.Session.CurrentTrial = _app.Session.Experiment.NextTrial();
+			_app.TrialState.CurrentTrial = _app.TrialState.Experiment.NextTrial();
+			
+			
 
 			var viewModel = new InSituViewModel();
 			_app.UI.InSituUI.Bind(viewModel);
@@ -19,9 +21,11 @@ namespace App
 
 		public override void Tick()
 		{
-			_app.Session.CurrentTrial.Tick(Time.deltaTime);
+			_app.TrialState.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
+			
+			_app.TrialState.CurrentTrial.Tick(Time.deltaTime);
 
-			if (_app.Session.CurrentTrial.Duration < 5f)
+			if (_app.TrialState.CurrentTrial.Duration < 5f)
 				return;
 
 			switch (_app.RecordVideo)
@@ -33,6 +37,12 @@ namespace App
 					_app.Transitions.ExportVideoOfInSituTrial.Execute();
 					break;
 			}
+		}
+		
+		public override void Exit()
+		{
+			_app.TrialState.CurrentTrial.Save();
+			_app.Transitions.EndInSituTrial.Execute();
 		}
 	}
 }

@@ -90,7 +90,7 @@ namespace Domain
 		
 
 		#endregion
-        public void Set(IUser user, List<Teammate> sessionTeammates)
+        public void Set(IUser user)
         {
             _user = user;
         }

@@ -11,10 +11,10 @@ namespace App.States
 
 		public override void Enter()
 		{
-			_app.Session.CurrentTrial = _app.Session.Experiment.NextTrial();
-			_app.Session.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Session.Ball = Object.Instantiate(_app.BallPrefab);
-			_app.Session.Opponent.Set(_app.User, _app.Session.Teammates);
+			_app.TrialState.CurrentTrial = _app.TrialState.Experiment.NextTrial();
+			_app.TrialState.Opponent = Object.Instantiate(_app.OpponentPrefab);
+			_app.TrialState.Ball = Object.Instantiate(_app.BallPrefab);
+			_app.TrialState.Opponent.Set(_app.User);
 
 
 			_app.DominantFoot.Passed += OnPassed;
@@ -28,9 +28,9 @@ namespace App.States
 
 		public override void Tick()
 		{
-			_app.Session.CurrentTrial.Tick(Time.deltaTime);
+			_app.TrialState.CurrentTrial.Tick(Time.deltaTime);
 
-			if (!(_app.Session.CurrentTrial.Duration > 10f))
+			if (!(_app.TrialState.CurrentTrial.Duration > 10f))
 				return;
 
 			switch (_app.RecordVideo)
@@ -49,8 +49,8 @@ namespace App.States
 			if (_hasPassed) return;
 
 			_hasPassed = true;
-			_app.Session.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-			_app.Session.Ball.Set(pass);
+			_app.TrialState.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
+			_app.TrialState.Ball.Set(pass);
 		}
 
 		bool _hasPassed;

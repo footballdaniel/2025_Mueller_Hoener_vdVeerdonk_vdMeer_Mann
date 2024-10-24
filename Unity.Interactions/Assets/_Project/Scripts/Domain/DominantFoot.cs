@@ -1,11 +1,12 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Domain
 {
 	public class DominantFoot : MonoBehaviour
 	{
-		[Header("Dependencies"), SerializeField] XRTracker _dominantFoot;
+		[Header("Dependencies"), SerializeField] XRTracker _dominantFootTracker;
 		[SerializeField] Transform _targetLocation;
 
 		[field: SerializeReference] public float Speed { get; private set; }
@@ -20,7 +21,7 @@ namespace Domain
 
 		void Start()
 		{
-			transform.parent = _dominantFoot.gameObject.transform;
+			transform.parent = _dominantFootTracker.gameObject.transform;
 			_positionLastFrame = transform.position;
 		}
 

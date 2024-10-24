@@ -10,12 +10,12 @@ namespace App.States
 
 		public override void Enter()
 		{
-			_app.Session.WebcamRecorder.StartRecording();
+			_app.TrialState.WebcamRecorder.StartRecording();
 		}
 
 		public override void Tick()
 		{
-			if (_app.Session.WebcamRecorder.IsRecording)
+			if (_app.TrialState.WebcamRecorder.IsRecording)
 			{
 				Debug.Log("Recording");
 				_app.Transitions.NextLabTrialWithVideoRecording.Execute();
