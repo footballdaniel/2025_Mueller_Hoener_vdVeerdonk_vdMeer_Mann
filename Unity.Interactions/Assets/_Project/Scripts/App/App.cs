@@ -6,14 +6,22 @@ using UnityEngine;
 
 namespace App
 {
+	public enum ExperimentalCondition
+	{
+		InSitu,
+		Laboratory
+	}
+	
+	
 	public class App : MonoBehaviour
 	{
 		[Header("Settings")]
-		[field: SerializeReference] public bool RecordVideo { get; private set; }
+		public ExperimentalCondition ExperimentalCondition;
+		public bool RecordVideo;
 
 		[Header("Services")] public MainUI UI { get; private set; }
-		public IRepository<IWebcamRecorder> WebCamRecorders { get; set; }
-		public IRepository<Teammate> TeammateRepository { get; set; }
+		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
+		public IRepository<Teammate> Teammates { get; set; }
 		[Header("Entities")] public User User { get; private set; }
 		public DominantFoot DominantFoot { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
@@ -21,11 +29,9 @@ namespace App
 
 		[Header("State")]
 		public Transitions Transitions { get; private set; }
-
 		public StateMachine StateMachine { get; private set; }
 		public SessionState Session { get; private set; }
-
-
+		
 
 		void Start()
 		{
@@ -36,7 +42,7 @@ namespace App
 			User = ServiceLocator.Get<User>();
 			DominantFoot = ServiceLocator.Get<DominantFoot>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
-			TeammateRepository = ServiceLocator.Get<IRepository<Teammate>>();
+			Teammates = ServiceLocator.Get<IRepository<Teammate>>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
@@ -50,23 +56,27 @@ namespace App
 			var init = new InitState(this);
 			var webcamSelection = new SelectWebcamState(this);
 			var waitForNextTrial = new WaitForNextTrialState(this);
-			var startRecordingVideo = new StartRecordingVideo(this);
-			var trial = new TrialState(this);
-			var end = new TrialEndState(this);
+			var initiateRecorder = new InitiateVideoRecorder(this);
 			var export = new ExportVideoState(this);
+			// laboratoryTrials
+			var labTrial = new LabTrialState(this);
+			var labTrialEnd = new TrialEndState(this);
+			// in situ trials
+			var inSituTrial = new InSituTrialState(this);
 
-			// Flow for recording
+			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
-			Transitions.StartRecording = new Transition(this, webcamSelection, startRecordingVideo);
-			Transitions.StartTrialWithVideoRecording = new Transition(this, startRecordingVideo, trial);
-			Transitions.ExportVideo = new Transition(this, trial, export);
-			Transitions.FinishExport = new Transition(this, export, end);
-			Transitions.WaitForNextTrial = new Transition(this, end, waitForNextTrial);
+			Transitions.InitiateRecorder = new Transition(this, webcamSelection, initiateRecorder);
+			Transitions.StartLabTrialWithVideoRecording = new Transition(this, initiateRecorder, labTrial);
+			Transitions.StartInSituTrialWithVideoRecording = new Transition(this, initiateRecorder, inSituTrial);
+			Transitions.ExportVideo = new Transition(this, labTrial, export);
+			Transitions.FinishExport = new Transition(this, export, labTrialEnd);
+			Transitions.WaitForNextTrial = new Transition(this, labTrialEnd, waitForNextTrial);
 
 			// Flow without recording
 			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
-			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, trial);
-			Transitions.EndTrial = new Transition(this, trial, end);
+			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, labTrial);
+			Transitions.EndTrial = new Transition(this, labTrial, labTrialEnd);
 
 			// Start app
 			StateMachine.SetState(init);

@@ -2,9 +2,9 @@
 
 namespace App.States
 {
-	internal class StartRecordingVideo : State
+	internal class InitiateVideoRecorder : State
 	{
-		public StartRecordingVideo(App app) : base(app)
+		public InitiateVideoRecorder(App app) : base(app)
 		{
 		}
 
@@ -18,7 +18,7 @@ namespace App.States
 			if (_app.Session.WebcamRecorder.IsRecording)
 			{
 				Debug.Log("Recording");
-				_app.Transitions.StartTrialWithVideoRecording.Execute();
+				_app.Transitions.StartLabTrialWithVideoRecording.Execute();
 			}
 		}
 	}

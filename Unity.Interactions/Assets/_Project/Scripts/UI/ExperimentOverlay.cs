@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-	public class ExperimentUI : MonoBehaviour
+	public class ExperimentOverlay : MonoBehaviour
 	{
 		[SerializeField] TMP_Text _fpsText;
 		[SerializeField] Button _nextTrialButton;
@@ -15,7 +15,7 @@ namespace UI
 
 		void Update()
 		{
-			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} /n FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
+			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
 
 			if (!_shouldUpdate)
 				return;
@@ -28,9 +28,14 @@ namespace UI
 		public void Set(ExperimentViewModel viewModel)
 		{
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
-			_viewModel = viewModel;
+			
+			viewModel.TrialStatusChanged += OnTrialStatusStatusChanged;
+			viewModel.Progress.ProgressChanged += OnProgressChanged;
+		}
 
-			_viewModel.Progress.ProgressChanged += OnProgressChanged;
+		void OnTrialStatusStatusChanged(bool canStart)
+		{
+			_nextTrialButton.interactable = canStart;
 		}
 
 
@@ -42,6 +47,5 @@ namespace UI
 
 		ProgressStatement _newProgress;
 		bool _shouldUpdate;
-		ExperimentViewModel _viewModel;
 	}
 }

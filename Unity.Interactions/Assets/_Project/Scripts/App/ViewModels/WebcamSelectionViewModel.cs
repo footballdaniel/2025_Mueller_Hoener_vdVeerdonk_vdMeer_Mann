@@ -17,7 +17,7 @@ namespace App
 		public void Select(IWebcamRecorder webcam)
 		{
 			_app.Session.WebcamRecorder = webcam;	
-			_app.Transitions.StartRecording.Execute();
+			_app.Transitions.InitiateRecorder.Execute();
 		}
 
 		readonly App _app;

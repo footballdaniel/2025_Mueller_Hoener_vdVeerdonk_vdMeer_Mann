@@ -1,4 +1,6 @@
-﻿namespace App
+﻿using System;
+
+namespace App
 {
 	public class ExperimentViewModel
 	{
@@ -8,11 +10,12 @@
 		}
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
-		
-		public Observable<bool> CanStartNextTrial { get; set; } = new(false);
 
+		public event Action<bool> TrialStatusChanged;
+		
 		public void NextTrial()
 		{
+			TrialStatusChanged?.Invoke(false);
 			_app.Transitions.BeginNextTrial.Execute();
 		}
 

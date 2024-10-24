@@ -11,7 +11,7 @@
 		public override void Enter()
 		{
 			var presenter = new ExperimentViewModel(_app);
-			_app.UI.ExperimentUI.Set(presenter);
+			_app.UI.experimentOverlay.Set(presenter);
 		}
 
 		public override void Tick()

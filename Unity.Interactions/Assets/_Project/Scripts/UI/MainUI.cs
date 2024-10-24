@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI
 {
 	public class MainUI : MonoBehaviour
 	{
-		public ExperimentUI ExperimentUI;
+		[FormerlySerializedAs("ExperimentUI")] public ExperimentOverlay experimentOverlay;
 		public WebcamSelectionUI WebcamSelectionUI;
+		public InSituUI InSituUI;
 	}
 }

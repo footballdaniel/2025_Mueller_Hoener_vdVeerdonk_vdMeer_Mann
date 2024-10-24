@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace App.States
 {
-	internal class TrialState : State
+	internal class LabTrialState : State
 	{
-		public TrialState(App app) : base(app)
+		public LabTrialState(App app) : base(app)
 		{
 		}
 
