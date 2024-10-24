@@ -16,7 +16,7 @@ namespace App.States
 
         public override void Tick()
         {
-            _app.Transitions.WaitForNextTrial.Execute();
+            _app.Transitions.WaitForNextTrialLab.Execute();
         }
     }
 }

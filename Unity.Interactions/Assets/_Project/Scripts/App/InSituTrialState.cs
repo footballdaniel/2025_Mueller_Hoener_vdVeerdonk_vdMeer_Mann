@@ -13,32 +13,18 @@ namespace App
 		{
 			_app.TrialState.CurrentTrial = _app.TrialState.Experiment.NextTrial();
 			
-			var viewModel = new InSituViewModel(_app.TrialState.WebcamRecorder);
+			var viewModel = new InSituTrialViewModel(_app);
 			_app.UI.InSituUI.Bind(viewModel);
 		}
 
 		public override void Tick()
 		{
-			// Saving
 			_app.TrialState.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
 			_app.TrialState.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 			_app.TrialState.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 			_app.TrialState.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 			
 			_app.TrialState.CurrentTrial.Tick(Time.deltaTime);
-
-			if (_app.TrialState.CurrentTrial.Duration < 5f)
-				return;
-
-			switch (_app.RecordVideo)
-			{
-				case false:
-					_app.Transitions.EndInSituTrial.Execute();
-					break;
-				case true:
-					_app.Transitions.ExportVideoOfInSituTrial.Execute();
-					break;
-			}
 		}
 		
 		public override void Exit()

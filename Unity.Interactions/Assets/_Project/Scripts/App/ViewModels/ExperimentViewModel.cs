@@ -1,9 +1,9 @@
-﻿using System;
-
-namespace App
+﻿namespace App
 {
 	public class ExperimentViewModel
 	{
+		readonly App _app;
+
 		public ExperimentViewModel(App app)
 		{
 			_app = app;
@@ -11,29 +11,43 @@ namespace App
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
 
-		public Observable<bool> CanStartNextTrial { get; } = new(false);
-		
+		public Observable<bool> CanStartNextTrial { get; } = new(true);
+
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
-			
+
 			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
 				_app.Transitions.NextLabTrialWithoutRecording.Execute();
 			else
 				_app.Transitions.NextInSituTrialWithoutRecording.Execute();
 		}
 
-		readonly App _app;
-
 		public void StopTrial()
 		{
-			if (CanStartNextTrial.Value == true)
+			if (CanStartNextTrial.Value != false)
+				return;
+
+			switch (_app)
 			{
-				if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
+				case { ExperimentalCondition: ExperimentalCondition.Laboratory, RecordVideo: true }:
+					_app.Transitions.ExportVideoOfLabTrial.Execute();
+					break;
+
+				case { ExperimentalCondition: ExperimentalCondition.Laboratory, RecordVideo: false }:
 					_app.Transitions.EndLabTrial.Execute();
-				if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
+					break;
+
+				case { ExperimentalCondition: ExperimentalCondition.InSitu, RecordVideo: true }:
+					_app.Transitions.ExportVideoOfInSituTrial.Execute();
+					break;
+
+				case { ExperimentalCondition: ExperimentalCondition.InSitu, RecordVideo: false }:
 					_app.Transitions.EndInSituTrial.Execute();
+					break;
 			}
+				
+			CanStartNextTrial.Value = true;
 		}
 	}
 }

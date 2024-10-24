@@ -10,7 +10,6 @@ namespace App
 	{
 		[Header("Settings")]
 		public ExperimentalCondition ExperimentalCondition;
-
 		public bool RecordVideo;
 
 		[Header("Services")] public MainUI UI { get; private set; }
@@ -58,28 +57,27 @@ namespace App
 			var labTrialEnd = new LabTrialEndState(this);
 			// in situ trials
 			var inSituTrial = new InSituTrialState(this);
-			var inSituEnd = new InSituTrialEndState(this);
+			var inSituTrialEnd = new InSituTrialEndState(this);
 
 			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
 			Transitions.InitiateRecorder = new Transition(this, webcamSelection, initiateRecorder);
-			Transitions.NextLabTrialWithVideoRecording = new Transition(this, initiateRecorder, labTrial);
-			Transitions.NextInSituTrialWithVideoRecording = new Transition(this, initiateRecorder, inSituTrial);
-			Transitions.ExportVideo = new Transition(this, labTrial, export);
+			Transitions.NextLabTrialWithVideoRecording = new Transition(this, initiateRecorder, waitForNextTrial);
+			Transitions.NextInSituTrialWithVideoRecording = new Transition(this, initiateRecorder, waitForNextTrial);
+			Transitions.ExportVideoOfLabTrial = new Transition(this, labTrial, export);
 			Transitions.ExportVideoOfInSituTrial = new Transition(this, inSituTrial, export);
 			Transitions.EndTrialLab = new Transition(this, export, labTrialEnd);
-			Transitions.EndTrialInSitu = new Transition(this, export, inSituEnd);
-			Transitions.WaitForNextTrial = new Transition(this, labTrialEnd, waitForNextTrial);
+			Transitions.EndInSituTrialAfterExporting = new Transition(this, export, inSituTrialEnd);
+			Transitions.WaitForNextTrialLab = new Transition(this, labTrialEnd, waitForNextTrial);
+			Transitions.WaitForNextTrialInSitu = new Transition(this, inSituTrialEnd, waitForNextTrial);
 
 			// Flow without recording
 			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
 			Transitions.NextLabTrialWithoutRecording = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.NextInSituTrialWithoutRecording = new Transition(this, waitForNextTrial, inSituTrial);
-
 			Transitions.EndLabTrial = new Transition(this, labTrial, labTrialEnd);
 			Transitions.EndLabTrialAfterExporting = new Transition(this, export, labTrialEnd);
 			Transitions.EndInSituTrial = new Transition(this, inSituTrial, waitForNextTrial);
-			Transitions.EndInSituTrialAfterExporting = new Transition(this, export, inSituEnd);
 
 			// Start app
 			StateMachine.SetState(init);

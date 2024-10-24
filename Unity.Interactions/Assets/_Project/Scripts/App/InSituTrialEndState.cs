@@ -10,7 +10,7 @@ namespace App
 		
 		public override void Enter()
 		{
-			_app.Transitions.WaitForNextTrial.Execute();
+			_app.Transitions.WaitForNextTrialInSitu.Execute();
 		}
 	}
 }

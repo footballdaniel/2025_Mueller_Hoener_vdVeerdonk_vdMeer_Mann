@@ -36,6 +36,7 @@ public static class FFMpegExporter
 		process.EnableRaisingEvents = true;
 		process.Exited += (sender, args) =>
 		{
+			progress?.Report(0);
 			process.WaitForExit();
 			ExportCompleted?.Invoke();
 		};

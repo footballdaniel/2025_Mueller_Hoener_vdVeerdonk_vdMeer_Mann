@@ -13,10 +13,10 @@ namespace UI
 			_cameraFeed.gameObject.SetActive(false);
 		}
 
-		public void Bind(InSituViewModel viewModel)
+		public void Bind(InSituTrialViewModel trialViewModel)
 		{
 			_cameraFeed.gameObject.SetActive(true);
-			_cameraFeed.texture = viewModel.Frame;
+			_cameraFeed.texture = trialViewModel.Frame;
 		}
 	}
 }
