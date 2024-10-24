@@ -33,10 +33,19 @@ namespace App.States
 			if (!(_app.Session.CurrentTrial.Duration > 10f))
 				return;
 
-			if (!_app.RecordVideo)
-				_app.Transitions.EndTrial.Execute();
-			else
-				_app.Transitions.ExportVideo.Execute();
+			switch ((_app.RecordVideo, _app.ExperimentalCondition))
+			{
+				case (false, _):
+					_app.Transitions.EndTrial.Execute();
+					break;
+				case (true, ExperimentalCondition.InSitu):
+					_app.Transitions.NextInSituTrialWithVideoRecording.Execute();
+					break;
+				case (true, _):
+					_app.Transitions.ExportVideoOfLabTrial.Execute();
+					break;
+			}
+
 		}
 
 		void OnPassed(Pass pass)

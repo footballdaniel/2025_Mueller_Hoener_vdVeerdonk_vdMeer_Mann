@@ -16,7 +16,11 @@ namespace App
 		public void NextTrial()
 		{
 			TrialStatusChanged?.Invoke(false);
-			_app.Transitions.BeginNextTrial.Execute();
+			
+			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
+				_app.Transitions.NextLabTrialWithoutRecording.Execute();
+			else
+				_app.Transitions.NextInSituTrialWithoutRecording.Execute();
 		}
 
 		readonly App _app;

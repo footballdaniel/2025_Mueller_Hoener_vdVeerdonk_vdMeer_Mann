@@ -18,7 +18,7 @@ namespace App.States
 			if (_app.Session.WebcamRecorder.IsRecording)
 			{
 				Debug.Log("Recording");
-				_app.Transitions.StartLabTrialWithVideoRecording.Execute();
+				_app.Transitions.NextLabTrialWithVideoRecording.Execute();
 			}
 		}
 	}

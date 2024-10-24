@@ -67,15 +67,18 @@ namespace App
 			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
 			Transitions.InitiateRecorder = new Transition(this, webcamSelection, initiateRecorder);
-			Transitions.StartLabTrialWithVideoRecording = new Transition(this, initiateRecorder, labTrial);
-			Transitions.StartInSituTrialWithVideoRecording = new Transition(this, initiateRecorder, inSituTrial);
-			Transitions.ExportVideo = new Transition(this, labTrial, export);
+			Transitions.NextLabTrialWithVideoRecording = new Transition(this, initiateRecorder, labTrial);
+			Transitions.NextInSituTrialWithVideoRecording = new Transition(this, initiateRecorder, inSituTrial);
+			Transitions.ExportVideoOfLabTrial = new Transition(this, labTrial, export);
+			Transitions.ExportVideoOfInSituTrial = new Transition(this, inSituTrial, export);
 			Transitions.FinishExport = new Transition(this, export, labTrialEnd);
 			Transitions.WaitForNextTrial = new Transition(this, labTrialEnd, waitForNextTrial);
 
 			// Flow without recording
 			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);
-			Transitions.BeginNextTrial = new Transition(this, waitForNextTrial, labTrial);
+			Transitions.NextLabTrialWithoutRecording = new Transition(this, waitForNextTrial, labTrial);
+			Transitions.NextInSituTrialWithoutRecording = new Transition(this, waitForNextTrial, inSituTrial);
+			
 			Transitions.EndTrial = new Transition(this, labTrial, labTrialEnd);
 
 			// Start app
