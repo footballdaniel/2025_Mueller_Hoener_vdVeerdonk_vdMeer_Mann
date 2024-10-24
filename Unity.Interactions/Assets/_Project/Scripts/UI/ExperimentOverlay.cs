@@ -10,6 +10,7 @@ namespace UI
 	{
 		[SerializeField] TMP_Text _fpsText;
 		[SerializeField] Button _nextTrialButton;
+		[SerializeField] Button _stopTrialButton;
 		[SerializeField] TMP_Text _progressText;
 		[SerializeField] Slider _progressSlider;
 
@@ -28,13 +29,17 @@ namespace UI
 		public void Set(ExperimentViewModel viewModel)
 		{
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
+			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
 			
-			viewModel.TrialStatusChanged += OnTrialStatusStatusChanged;
+			_stopTrialButton.interactable = false;
+			
+			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;
 			viewModel.Progress.ProgressChanged += OnProgressChanged;
 		}
 
-		void OnTrialStatusStatusChanged(bool canStart)
+		void OnCanStartNextTrialChanged(bool canStart)
 		{
+			_stopTrialButton.interactable = !canStart;
 			_nextTrialButton.interactable = canStart;
 		}
 

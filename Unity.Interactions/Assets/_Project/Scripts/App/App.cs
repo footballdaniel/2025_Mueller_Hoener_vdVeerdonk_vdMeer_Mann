@@ -6,13 +6,6 @@ using UnityEngine;
 
 namespace App
 {
-	public enum ExperimentalCondition
-	{
-		InSitu,
-		Laboratory
-	}
-	
-	
 	public class App : MonoBehaviour
 	{
 		[Header("Settings")]
@@ -79,7 +72,8 @@ namespace App
 			Transitions.NextLabTrialWithoutRecording = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.NextInSituTrialWithoutRecording = new Transition(this, waitForNextTrial, inSituTrial);
 			
-			Transitions.EndTrial = new Transition(this, labTrial, labTrialEnd);
+			Transitions.EndLabTrial = new Transition(this, labTrial, labTrialEnd);
+			Transitions.EndInSituTrial = new Transition(this, inSituTrial, waitForNextTrial);
 
 			// Start app
 			StateMachine.SetState(init);

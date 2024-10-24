@@ -11,11 +11,11 @@ namespace App
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
 
-		public event Action<bool> TrialStatusChanged;
+		public Observable<bool> CanStartNextTrial { get; } = new(false);
 		
 		public void NextTrial()
 		{
-			TrialStatusChanged?.Invoke(false);
+			CanStartNextTrial.Value = false;
 			
 			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
 				_app.Transitions.NextLabTrialWithoutRecording.Execute();
@@ -24,5 +24,16 @@ namespace App
 		}
 
 		readonly App _app;
+
+		public void StopTrial()
+		{
+			if (CanStartNextTrial.Value == true)
+			{
+				if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
+					_app.Transitions.EndLabTrial.Execute();
+				if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
+					_app.Transitions.EndInSituTrial.Execute();
+			}
+		}
 	}
 }

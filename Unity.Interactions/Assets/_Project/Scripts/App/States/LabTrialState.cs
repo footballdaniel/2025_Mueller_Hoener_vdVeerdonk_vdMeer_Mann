@@ -29,23 +29,19 @@ namespace App.States
 		public override void Tick()
 		{
 			_app.Session.CurrentTrial.Tick(Time.deltaTime);
-			
+
 			if (!(_app.Session.CurrentTrial.Duration > 10f))
 				return;
 
-			switch ((_app.RecordVideo, _app.ExperimentalCondition))
+			switch (_app.RecordVideo)
 			{
-				case (false, _):
-					_app.Transitions.EndTrial.Execute();
+				case false:
+					_app.Transitions.EndLabTrial.Execute();
 					break;
-				case (true, ExperimentalCondition.InSitu):
-					_app.Transitions.NextInSituTrialWithVideoRecording.Execute();
-					break;
-				case (true, _):
+				case true:
 					_app.Transitions.ExportVideoOfLabTrial.Execute();
 					break;
 			}
-
 		}
 
 		void OnPassed(Pass pass)
