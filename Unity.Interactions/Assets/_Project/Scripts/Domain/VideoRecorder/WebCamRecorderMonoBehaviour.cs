@@ -30,9 +30,9 @@ namespace Domain.VideoRecorder
 			_recorder.StopRecording();
 		}
 
-		public void Export()
+		public void Export(int trialNumber)
 		{
-			_recorder.Export();
+			_recorder.Export(trialNumber);
 		}
 
 		public WebcamInfo Info => _recorder.Info;

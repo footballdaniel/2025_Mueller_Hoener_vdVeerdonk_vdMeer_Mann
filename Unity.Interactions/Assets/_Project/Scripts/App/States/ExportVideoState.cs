@@ -13,7 +13,7 @@ namespace App
 			ProgressIndicator.Instance.Display("Exporting...", "Frame export", 100);
 
 			_app.Experiment.WebcamRecorder.StopRecording();
-			_app.Experiment.WebcamRecorder.Export();
+			_app.Experiment.WebcamRecorder.Export(_app.Experiment.CurrentTrial.TrialNumber);
 		}
 
 		public override void Tick()

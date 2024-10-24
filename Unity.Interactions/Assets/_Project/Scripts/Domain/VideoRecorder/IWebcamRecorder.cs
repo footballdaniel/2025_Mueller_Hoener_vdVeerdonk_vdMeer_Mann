@@ -9,7 +9,7 @@ namespace Domain.VideoRecorder
 		bool IsExportComplete { get; }
 		void StartRecording();
 		void StopRecording();
-		void Export();
+		void Export(int trialNumber);
 
 		public WebcamInfo Info { get; }
 	}

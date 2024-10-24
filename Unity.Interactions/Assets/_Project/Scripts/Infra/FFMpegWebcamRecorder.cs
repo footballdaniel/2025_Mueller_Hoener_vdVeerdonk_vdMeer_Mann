@@ -37,10 +37,10 @@ namespace Infra
 			_webcamTexture.Stop();
 		}
 
-		public void Export()
+		public void Export(int trialNumber)
 		{
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-			var fileName = $"output_video_{fileNameWithDateTime}.mp4";
+			var fileName = $"trial_{trialNumber}_{fileNameWithDateTime}.mp4";
 			var videoOutputPath = Path.Combine(Application.persistentDataPath, fileName);
 
 

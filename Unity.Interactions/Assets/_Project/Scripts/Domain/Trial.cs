@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -9,12 +10,14 @@ namespace Domain
 	{
 		readonly List<float> _timestamps;
 
-		public Trial(float startTime)
+		public Trial(int trialNumber, float startTime)
 		{
 			_timestamps = new List<float>();
 			StartTime = startTime;
+			TrialNumber = trialNumber;
 		}
 
+		public int TrialNumber { get; }
 		public List<Vector3> OpponentHipPositions { get; } = new();
 		public float StartTime { get; }
 		public float Duration { get; private set; }
@@ -32,9 +35,11 @@ namespace Domain
 		{
 			var jsonSettings = new JsonSerializerSettings();
 			jsonSettings.Converters.Add(new Vector3Converter());
+			jsonSettings.Formatting = Formatting.Indented;
 
 			var jsonData = JsonConvert.SerializeObject(this, jsonSettings);
-			var path = Path.Combine(Application.persistentDataPath, "trial_data.json");
+			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+			var path = Path.Combine(Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
 			File.WriteAllText(path, jsonData);
 		}
 	}
