@@ -16,7 +16,7 @@ namespace App
 
 		public void Select(IWebcamRecorder webcam)
 		{
-			_app.TrialState.WebcamRecorder = webcam;
+			_app.Experiment.WebcamRecorder = webcam;
 			_app.Transitions.InitiateRecorder.Execute();
 		}
 

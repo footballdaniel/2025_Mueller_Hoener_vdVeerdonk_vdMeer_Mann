@@ -21,15 +21,13 @@ namespace App
 		public Ball BallPrefab { get; private set; }
 
 		[Header("State")]
+		public Experiment Experiment { get; set; }
 		public Transitions Transitions { get; private set; }
-
 		public StateMachine StateMachine { get; private set; }
-		public TrialState TrialState { get; private set; }
-
 
 		void Start()
 		{
-			TrialState = new TrialState();
+			Experiment = new Experiment();
 
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
@@ -82,6 +80,7 @@ namespace App
 			// Start app
 			StateMachine.SetState(init);
 		}
+
 
 		void Update()
 		{

@@ -8,12 +8,12 @@
 
 		public override void Enter()
 		{
-			_app.TrialState.WebcamRecorder.StartRecording();
+			_app.Experiment.WebcamRecorder.StartRecording();
 		}
 
 		public override void Tick()
 		{
-			if (!_app.TrialState.WebcamRecorder.IsRecording)
+			if (!_app.Experiment.WebcamRecorder.IsRecording)
 				return;
 
 			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)

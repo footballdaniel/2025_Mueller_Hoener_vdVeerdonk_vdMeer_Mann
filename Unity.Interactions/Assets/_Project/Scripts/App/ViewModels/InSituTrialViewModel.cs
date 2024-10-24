@@ -13,7 +13,7 @@ namespace App
 			_app = app;
 		}
 
-		public Texture2D Frame => _app.TrialState.WebcamRecorder?.Frame ?? Texture2D.blackTexture;
+		public Texture2D Frame => _app.Experiment.WebcamRecorder?.Frame ?? Texture2D.blackTexture;
 
 		public void StopTrial()
 		{

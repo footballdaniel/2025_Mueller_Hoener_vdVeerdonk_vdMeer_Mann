@@ -11,7 +11,7 @@ namespace App
 
 		public override void Enter()
 		{
-			_app.TrialState.CurrentTrial = _app.TrialState.Experiment.NextTrial();
+			_app.Experiment.NextTrial();
 			
 			var viewModel = new InSituTrialViewModel(_app);
 			_app.UI.InSituUI.Bind(viewModel);
@@ -19,17 +19,17 @@ namespace App
 
 		public override void Tick()
 		{
-			_app.TrialState.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
-			_app.TrialState.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
-			_app.TrialState.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
-			_app.TrialState.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
+			_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
+			_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
+			_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
+			_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 			
-			_app.TrialState.CurrentTrial.Tick(Time.deltaTime);
+			_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
 		}
 		
 		public override void Exit()
 		{
-			_app.TrialState.CurrentTrial.Save();
+			_app.Experiment.CurrentTrial.Save();
 		}
 	}
 }
