@@ -15,8 +15,7 @@ namespace App.States
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Ball = Object.Instantiate(_app.BallPrefab);
 			_app.Experiment.Opponent.Set(_app.User);
-
-
+			
 			_app.User.DominantFoot.Passed += OnPassed;
 		}
 
@@ -38,19 +37,6 @@ namespace App.States
 				_updateTimer -= deltaTime;
 				_app.Experiment.WebcamRecorder.Tick();
 				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
-			}
-
-			if (!(_app.Experiment.CurrentTrial.Duration > 10f))
-				return;
-
-			switch (_app.ExperimentalCondition)
-			{
-				case ExperimentalCondition.Laboratory:
-					_app.Transitions.EndLabTrial.Execute();
-					break;
-				case ExperimentalCondition.InSitu:
-					_app.Transitions.EndInSituTrial.Execute();
-					break;
 			}
 		}
 

@@ -5,8 +5,6 @@ namespace App
 {
 	internal class InSituTrialState : State
 	{
-		float _updateTimer;
-
 		public InSituTrialState(App app) : base(app)
 		{
 		}
@@ -14,9 +12,14 @@ namespace App
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
-			
+
 			var viewModel = new InSituTrialViewModel(_app);
 			_app.UI.InSituUI.Bind(viewModel);
+		}
+
+		public override void Exit()
+		{
+			_app.Experiment.CurrentTrial.Save();
 		}
 
 		public override void Tick()
@@ -25,8 +28,6 @@ namespace App
 			_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 			_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 			_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
-			
-
 
 			var frameRateHz = 10f;
 			var deltaTime = 1f / frameRateHz;
@@ -39,12 +40,8 @@ namespace App
 				_app.Experiment.WebcamRecorder.Tick();
 				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
 			}
-			
 		}
-		
-		public override void Exit()
-		{
-			_app.Experiment.CurrentTrial.Save();
-		}
+
+		float _updateTimer;
 	}
 }
