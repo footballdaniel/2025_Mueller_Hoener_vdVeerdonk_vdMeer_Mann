@@ -17,6 +17,7 @@ namespace Domain
 			TrialNumber = trialNumber;
 		}
 
+		public int NumberOfFrames => _timestamps.Count;
 		public int TrialNumber { get; }
 		public List<Vector3> OpponentHipPositions { get; } = new();
 		public float StartTime { get; }

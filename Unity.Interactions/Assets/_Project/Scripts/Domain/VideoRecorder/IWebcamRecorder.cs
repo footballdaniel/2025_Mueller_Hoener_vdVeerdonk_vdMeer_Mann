@@ -7,11 +7,12 @@ namespace Domain.VideoRecorder
 		Texture2D Frame { get; }
 		bool IsRecording { get; }
 		bool IsExportComplete { get; }
+		public WebcamInfo Info { get; }
+		void Tick();
 		void StartRecording();
 		void StopRecording();
 		void Export(int trialNumber);
-
-		public WebcamInfo Info { get; }
+		void RecordWith(float appRecordingFrameRateHz);
 	}
 
 	public record WebcamInfo(string DeviceName, int Width, int Height);

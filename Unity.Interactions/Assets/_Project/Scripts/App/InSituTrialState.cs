@@ -5,6 +5,8 @@ namespace App
 {
 	internal class InSituTrialState : State
 	{
+		float _updateTimer;
+
 		public InSituTrialState(App app) : base(app)
 		{
 		}
@@ -24,7 +26,20 @@ namespace App
 			_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 			_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 			
-			_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
+
+
+			var frameRateHz = 10f;
+			var deltaTime = 1f / frameRateHz;
+			_updateTimer += Time.fixedDeltaTime;
+			var epsilon = 0.0001f;
+
+			if (_updateTimer >= deltaTime - epsilon)
+			{
+				_updateTimer -= deltaTime;
+				_app.Experiment.WebcamRecorder.Tick();
+				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
+			}
+			
 		}
 		
 		public override void Exit()

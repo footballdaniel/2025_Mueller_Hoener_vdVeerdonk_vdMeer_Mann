@@ -27,7 +27,7 @@ namespace Domain.VideoRecorder
 			_recorders = new List<IWebcamRecorder>();
 			foreach (var setting in uniqueSettings)
 			{
-				var recorder = new FFMpegWebcamRecorder(setting.DeviceName, setting.Width, setting.Height, 10f, ProgressIndicator.Instance);
+				var recorder = new FFMpegWebcamRecorder(setting.DeviceName, setting.Width, setting.Height, ProgressIndicator.Instance);
 				var go = new GameObject("WebcamRecorder");
 				var recorderMonoBehaviour = go.AddComponent<WebCamRecorderMonoBehaviour>();
 				recorderMonoBehaviour.Set(recorder);

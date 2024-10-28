@@ -35,6 +35,11 @@ namespace Domain.VideoRecorder
 			_recorder.Export(trialNumber);
 		}
 
+		public void RecordWith(float appRecordingFrameRateHz)
+		{
+			_recorder.RecordWith(appRecordingFrameRateHz);
+		}
+
 		public WebcamInfo Info => _recorder.Info;
 	}
 }

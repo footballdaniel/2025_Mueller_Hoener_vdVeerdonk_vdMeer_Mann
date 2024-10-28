@@ -28,7 +28,17 @@ namespace App.States
 
 		public override void Tick()
 		{
-			_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
+			var frameRateHz = 10f;
+			var deltaTime = 1f / frameRateHz;
+			_updateTimer += Time.fixedDeltaTime;
+			var epsilon = 0.0001f;
+
+			if (_updateTimer >= deltaTime - epsilon)
+			{
+				_updateTimer -= deltaTime;
+				_app.Experiment.WebcamRecorder.Tick();
+				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
+			}
 
 			if (!(_app.Experiment.CurrentTrial.Duration > 10f))
 				return;
@@ -54,5 +64,6 @@ namespace App.States
 		}
 
 		bool _hasPassed;
+		float _updateTimer;
 	}
 }

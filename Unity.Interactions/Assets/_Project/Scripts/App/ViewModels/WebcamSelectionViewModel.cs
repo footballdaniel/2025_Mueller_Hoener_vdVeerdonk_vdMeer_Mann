@@ -17,6 +17,7 @@ namespace App
 		public void Select(IWebcamRecorder webcam)
 		{
 			_app.Experiment.WebcamRecorder = webcam;
+			_app.Experiment.WebcamRecorder.RecordWith(_app.RecordingFrameRateHz);
 			_app.Transitions.InitiateRecorder.Execute();
 		}
 

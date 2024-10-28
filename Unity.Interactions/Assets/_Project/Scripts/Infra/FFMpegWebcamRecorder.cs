@@ -8,12 +8,12 @@ namespace Infra
 	public class FFMpegWebcamRecorder : IWebcamRecorder
 	{
 
-		public FFMpegWebcamRecorder(string deviceName, int width, int height, float exportFramerate, IProgress<int> progress)
+		public FFMpegWebcamRecorder(string deviceName, int width, int height,  IProgress<int> progress)
 		{
 			Info = new WebcamInfo(deviceName, width, height);
 			_progress = progress;
-			_exportFramerate = exportFramerate;
-			
+			_exportFramerate = 10f;
+
 			_frameFolderPath = Path.Combine(Application.persistentDataPath, "CapturedFrames");
 
 			if (!Directory.Exists(_frameFolderPath))
@@ -40,18 +40,23 @@ namespace Infra
 			FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _exportFramerate, _frameIndex, _progress);
 		}
 
+		public void RecordWith(float appRecordingFrameRateHz)
+		{
+			_exportFramerate = appRecordingFrameRateHz;
+		}
+
 		public WebcamInfo Info { get; private set; }
 
 		public void StartRecording()
 		{
-			_webcamTexture = new WebCamTexture(Info.DeviceName, Info.Width, Info.Height, 10);
+			_webcamTexture = new WebCamTexture(Info.DeviceName, Info.Width, Info.Height, (int)_exportFramerate);
 			_webcamTexture.Play();
-
 		}
 
 		public void Tick()
 		{
 			SaveFrameAsPng();
+			_frameIndex++;
 		}
 
 		void OnExportCompleted()
@@ -71,14 +76,13 @@ namespace Infra
 			File.WriteAllBytes(fileName, frameBytes);
 		}
 
-
-		string _frameFolderPath;
+		float _exportFramerate;
+		readonly string _frameFolderPath;
+		readonly IProgress<int> _progress;
 		int _frameIndex;
 		bool _isExportComplete;
-		IProgress<int> _progress;
 		Texture2D _texture2D;
 		float _updateTimer;
 		WebCamTexture _webcamTexture;
-		float _exportFramerate;
 	}
 }

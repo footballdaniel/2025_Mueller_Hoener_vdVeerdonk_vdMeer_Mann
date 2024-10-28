@@ -11,6 +11,7 @@ namespace App
 		[Header("Settings")]
 		public ExperimentalCondition ExperimentalCondition;
 		public bool RecordVideo;
+		public float RecordingFrameRateHz = 10f;
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
