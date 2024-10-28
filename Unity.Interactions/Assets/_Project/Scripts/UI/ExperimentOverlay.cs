@@ -11,6 +11,8 @@ namespace UI
 		[SerializeField] TMP_Text _fpsText;
 		[SerializeField] Button _nextTrialButton;
 		[SerializeField] Button _stopTrialButton;
+		[SerializeField] Button _showDataButton;
+		[SerializeField] Button _exitButton;
 		[SerializeField] TMP_Text _progressText;
 		[SerializeField] Slider _progressSlider;
 
@@ -30,6 +32,8 @@ namespace UI
 		{
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
+			_showDataButton.onClick.AddListener(viewModel.ShowData);
+			_exitButton.onClick.AddListener(viewModel.Exit);
 
 			_stopTrialButton.interactable = false;
 

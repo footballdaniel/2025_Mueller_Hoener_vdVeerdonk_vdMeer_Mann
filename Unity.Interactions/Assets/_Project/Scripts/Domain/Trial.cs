@@ -10,18 +10,16 @@ namespace Domain
 	{
 		readonly List<float> _timestamps;
 
-		public Trial(int trialNumber, float startTime)
+		public Trial(int trialNumber)
 		{
 			_timestamps = new List<float>();
-			StartTime = startTime;
 			TrialNumber = trialNumber;
 		}
 
 		public int NumberOfFrames => _timestamps.Count;
 		public int TrialNumber { get; }
-		public List<Vector3> OpponentHipPositions { get; } = new();
-		public float StartTime { get; }
 		public float Duration { get; private set; }
+		public List<Vector3> OpponentHipPositions { get; } = new();
 		public List<Vector3> UserHeadPositions { get; set; } = new();
 		public List<Vector3> UserDominantFootPositions { get; set; } = new();
 		public List<Vector3> UserNonDominantFootPositions { get; set; } = new();

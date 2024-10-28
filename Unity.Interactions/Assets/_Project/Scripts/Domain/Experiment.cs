@@ -15,7 +15,7 @@ namespace App
 		public void NextTrial()
 		{
 			_currentTrialIndex++;
-			CurrentTrial =  new Trial(_currentTrialIndex, Time.timeSinceLevelLoad);
+			CurrentTrial =  new Trial(_currentTrialIndex);
 		}
 	}
 }

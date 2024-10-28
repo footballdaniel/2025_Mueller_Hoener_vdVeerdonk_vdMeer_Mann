@@ -1,4 +1,6 @@
-﻿namespace App
+﻿using UnityEngine;
+
+namespace App
 {
 	public class ExperimentViewModel
 	{
@@ -48,6 +50,21 @@
 			}
 				
 			CanStartNextTrial.Value = true;
+		}
+
+		public void ShowData()
+		{
+			var path = Application.persistentDataPath;
+			var uri = new System.Uri(path);
+			Application.OpenURL(uri.AbsoluteUri);
+		}
+
+		public void Exit()
+		{
+			if (Application.isEditor)
+				UnityEditor.EditorApplication.isPlaying = false;
+			else
+				Application.Quit();
 		}
 	}
 }
