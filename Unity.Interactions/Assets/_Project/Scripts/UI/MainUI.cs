@@ -8,5 +8,6 @@ namespace UI
 		[FormerlySerializedAs("ExperimentUI")] public ExperimentOverlay experimentOverlay;
 		public WebcamSelectionUI WebcamSelectionUI;
 		public InSituUI InSituUI;
+		public XRStatusUI XRStatusUI;
 	}
 }

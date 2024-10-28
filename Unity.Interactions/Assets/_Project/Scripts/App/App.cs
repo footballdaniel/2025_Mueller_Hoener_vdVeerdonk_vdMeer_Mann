@@ -3,6 +3,7 @@ using Domain;
 using Domain.VideoRecorder;
 using UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace App
 {
@@ -10,12 +11,12 @@ namespace App
 	{
 		[Header("Settings")]
 		public ExperimentalCondition ExperimentalCondition;
+
 		public bool RecordVideo;
 		public float RecordingFrameRateHz = 10f;
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
-		public IRepository<Teammate> Teammates { get; set; }
 		[Header("Entities")] public User User { get; private set; }
 		public InSituOpponent InSituOpponent { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
@@ -23,6 +24,7 @@ namespace App
 
 		[Header("State")]
 		public Experiment Experiment { get; set; }
+
 		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 
@@ -34,7 +36,6 @@ namespace App
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
-			Teammates = ServiceLocator.Get<IRepository<Teammate>>();
 			InSituOpponent = ServiceLocator.Get<InSituOpponent>();
 
 			// Prefabs
@@ -46,6 +47,7 @@ namespace App
 			Transitions = new Transitions();
 
 			// States
+			var xrStartupState = new XRStartupState(this);
 			var init = new InitState(this);
 			var webcamSelection = new SelectWebcamState(this);
 			var waitForNextTrial = new WaitForNextTrialState(this);
@@ -57,6 +59,9 @@ namespace App
 			// in situ trials
 			var inSituTrial = new InSituTrialState(this);
 			var inSituTrialEnd = new InSituTrialEndState(this);
+			
+			// Flow for starting app
+			Transitions.Init = new Transition(this, xrStartupState, init);
 
 			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
@@ -79,13 +84,17 @@ namespace App
 			Transitions.EndInSituTrial = new Transition(this, inSituTrial, waitForNextTrial);
 
 			// Start app
-			StateMachine.SetState(init);
+			StateMachine.SetState(xrStartupState);
 		}
-
-
+		
 		void Update()
 		{
 			StateMachine.Tick();
+			
+			// Cheats to transition between states
+			if (Keyboard.current.digit1Key.wasPressedThisFrame)
+				Transitions.Init.Execute();
 		}
 	}
+
 }

@@ -12,7 +12,6 @@ namespace App
 		}
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
-
 		public Observable<bool> CanStartNextTrial { get; } = new(true);
 
 		public void NextTrial()

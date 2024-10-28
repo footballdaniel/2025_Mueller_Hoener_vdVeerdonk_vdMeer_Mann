@@ -1,6 +1,5 @@
 using Domain;
 using Domain.VideoRecorder;
-using UnityEngine;
 
 namespace App
 {

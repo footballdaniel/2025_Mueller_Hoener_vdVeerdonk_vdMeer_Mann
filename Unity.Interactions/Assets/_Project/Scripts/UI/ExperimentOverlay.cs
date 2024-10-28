@@ -9,6 +9,7 @@ namespace UI
 	public class ExperimentOverlay : MonoBehaviour
 	{
 		[SerializeField] TMP_Text _fpsText;
+		[SerializeField] TMP_Text _xrStatusText;
 		[SerializeField] Button _nextTrialButton;
 		[SerializeField] Button _stopTrialButton;
 		[SerializeField] Button _showDataButton;
@@ -28,7 +29,7 @@ namespace UI
 			_progressSlider.value = _newProgress.Value;
 		}
 
-		public void Set(ExperimentViewModel viewModel)
+		public void Bind(ExperimentViewModel viewModel)
 		{
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);

@@ -10,8 +10,8 @@
 
 		public override void Enter()
 		{
-			var presenter = new ExperimentViewModel(_app);
-			_app.UI.experimentOverlay.Set(presenter);
+			var experimentViewModel = new ExperimentViewModel(_app);
+			_app.UI.experimentOverlay.Bind(experimentViewModel);
 			
 			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
 				_app.UI.InSituUI.Show();

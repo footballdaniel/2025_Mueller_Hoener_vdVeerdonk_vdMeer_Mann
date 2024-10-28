@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using App;
 using UnityEngine;
 using Random = System.Random;
 
 namespace Domain
 {
-
 
 
 	#region Dynamic IPD
@@ -48,9 +46,9 @@ namespace Domain
 
 			// Adjust target position slightly along z-axis based on _isGoingRight
 			if (_isGoingRight)
-			    _targetPosition.z += 0.4f;
+				_targetPosition.z += 0.4f;
 			else
-			    _targetPosition.z -= 0.4f;
+				_targetPosition.z -= 0.4f;
 
 			// Calculate movement direction and distance
 			var moveDirection = _targetPosition - opponentPosition;
@@ -60,9 +58,7 @@ namespace Domain
 			{
 				// Acceleration and deceleration logic
 				if (distance > _decelerationStartDistance)
-				{
 					_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
-				}
 				else
 				{
 					var speedFactor = (distance - 0.1f) / (_decelerationStartDistance - 0.1f);
@@ -76,25 +72,24 @@ namespace Domain
 
 				// Rotate the opponent to face the user
 				var lookDirection = userPosition - opponentPosition;
+
 				if (lookDirection.sqrMagnitude > 0.001f)
 				{
-					Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+					var targetRotation = Quaternion.LookRotation(lookDirection);
 					transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
 				}
 			}
 			else
-			{
 				_currentSpeed = 0;
-			}
 		}
-		
 
 		#endregion
-        public void Set(IUser user)
-        {
-            _user = user;
-        }
-    }
+
+		public void Set(IUser user)
+		{
+			_user = user;
+		}
+	}
 
 	//
 	// #region Static
