@@ -1,4 +1,5 @@
-﻿using App;
+﻿using System;
+using App;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,16 +8,19 @@ namespace UI
 	public class InSituUI : UIScreen
 	{
 		[SerializeField] RawImage _cameraFeed;
+		InSituTrialViewModel _viewModel;
 
-		void Start()
+		void Update()
 		{
-			_cameraFeed.gameObject.SetActive(false);
+			if (_viewModel == null) return;
+			
+			_cameraFeed.texture = _viewModel.Frame;
 		}
 
-		public void Bind(InSituTrialViewModel trialViewModel)
+		public void Bind(InSituTrialViewModel viewModel)
 		{
 			_cameraFeed.gameObject.SetActive(true);
-			_cameraFeed.texture = trialViewModel.Frame;
+			_viewModel = viewModel;
 		}
 	}
 }

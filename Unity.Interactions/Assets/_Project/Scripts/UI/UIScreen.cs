@@ -1,11 +1,10 @@
-using System;
 using UnityEngine;
 
 namespace UI
 {
 	public abstract class UIScreen : MonoBehaviour
 	{
-		void Start()
+		void Awake()
 		{
 			Hide();
 		}

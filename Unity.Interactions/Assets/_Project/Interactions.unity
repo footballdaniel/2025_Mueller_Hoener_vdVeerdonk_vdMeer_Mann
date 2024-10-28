@@ -3424,6 +3424,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ExperimentalCondition: 0
   RecordVideo: 1
+  RecordingFrameRateHz: 10
 --- !u!1 &1856460593
 GameObject:
   m_ObjectHideFlags: 0
