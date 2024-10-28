@@ -12,6 +12,9 @@
 		{
 			var presenter = new ExperimentViewModel(_app);
 			_app.UI.experimentOverlay.Set(presenter);
+			
+			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
+				_app.UI.InSituUI.Show();
 		}
 
 		public override void Tick()
