@@ -20,7 +20,7 @@ namespace Domain.VideoRecorder
 			_recorder.StartRecording();
 		}
 
-		public void FixedUpdate()
+		public void Tick()
 		{
 			_recorder.Tick();
 		}
