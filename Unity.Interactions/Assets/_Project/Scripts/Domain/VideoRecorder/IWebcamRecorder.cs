@@ -5,7 +5,6 @@ namespace Domain.VideoRecorder
 	public interface IWebcamRecorder
 	{
 		Texture2D Frame { get; }
-		bool IsRecording { get; }
 		bool IsExportComplete { get; }
 		public WebcamInfo Info { get; }
 		void Tick();

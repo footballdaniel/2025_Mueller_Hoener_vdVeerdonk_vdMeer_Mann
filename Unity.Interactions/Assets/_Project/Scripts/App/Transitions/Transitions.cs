@@ -16,7 +16,6 @@ namespace App
 		public Transition ExportVideoOfInSituTrial { get; set; }
 		public Transition EndInSituTrial { get; set; }
 		public Transition EndLabTrialAfterExporting { get; set; }
-		public Transition EndInSituTrialAfterExporting { get; set; }
 		public Transition WaitForNextTrialInSitu { get; set; }
 		public Transition Init { get; set; }
 	}
