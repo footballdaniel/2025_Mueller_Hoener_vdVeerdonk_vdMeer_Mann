@@ -8,15 +8,15 @@ namespace Domain
 {
 	public class Trial
 	{
-		readonly List<float> _timestamps;
 
 		public Trial(int trialNumber)
 		{
-			_timestamps = new List<float>();
+			Timestamp = new List<float>();
 			TrialNumber = trialNumber;
 		}
 
-		public int NumberOfFrames => _timestamps.Count;
+		public int NumberOfFrames => Timestamp.Count;
+		public  List<float> Timestamp { get; }
 		public int TrialNumber { get; }
 		public float Duration { get; private set; }
 		public List<Vector3> OpponentHipPositions { get; } = new();
@@ -27,7 +27,7 @@ namespace Domain
 		public void Tick(float deltaTime)
 		{
 			Duration += deltaTime;
-			_timestamps.Add(Duration);
+			Timestamp.Add(Duration);
 		}
 
 		public void Save()
