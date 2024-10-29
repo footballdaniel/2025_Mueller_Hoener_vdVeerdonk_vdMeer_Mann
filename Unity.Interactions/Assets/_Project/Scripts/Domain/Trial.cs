@@ -9,14 +9,16 @@ namespace Domain
 	public class Trial
 	{
 
-		public Trial(int trialNumber)
+		public Trial(int trialNumber, int frameRateHz)
 		{
-			Timestamp = new List<float>();
+			Timestamps = new List<float>();
 			TrialNumber = trialNumber;
+			FrameRateHz = frameRateHz;
 		}
 
-		public int NumberOfFrames => Timestamp.Count;
-		public  List<float> Timestamp { get; }
+		public int FrameRateHz { get; private set; }
+		public int NumberOfFrames => Timestamps.Count;
+		public  List<float> Timestamps { get; }
 		public int TrialNumber { get; }
 		public float Duration { get; private set; }
 		public List<Vector3> OpponentHipPositions { get; } = new();
@@ -27,7 +29,7 @@ namespace Domain
 		public void Tick(float deltaTime)
 		{
 			Duration += deltaTime;
-			Timestamp.Add(Duration);
+			Timestamps.Add(Duration);
 		}
 
 		public void Save()

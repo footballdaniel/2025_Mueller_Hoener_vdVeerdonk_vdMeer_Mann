@@ -1,6 +1,7 @@
 {
   "NumberOfFrames": 115,
-  "Timestamp": [
+  "FrameRateHz": 20,
+  "Timestamps": [
     0.05,
     0.1,
     0.15,

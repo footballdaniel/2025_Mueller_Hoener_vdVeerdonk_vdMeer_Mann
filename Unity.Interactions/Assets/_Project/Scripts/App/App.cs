@@ -13,7 +13,7 @@ namespace App
 		public ExperimentalCondition ExperimentalCondition;
 
 		public bool RecordVideo;
-		public float RecordingFrameRateHz = 10f;
+		public int RecordingFrameRateHz = 10;
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
@@ -30,7 +30,7 @@ namespace App
 
 		void Start()
 		{
-			Experiment = new Experiment();
+			Experiment = new Experiment(RecordingFrameRateHz);
 
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
