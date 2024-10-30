@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace App
 {
@@ -47,22 +48,24 @@ namespace App
 					_app.Transitions.EndInSituTrial.Execute();
 					break;
 			}
-				
+
 			CanStartNextTrial.Value = true;
 		}
 
 		public void ShowData()
 		{
 			var path = Application.persistentDataPath;
-			var uri = new System.Uri(path);
+			var uri = new Uri(path);
 			Application.OpenURL(uri.AbsoluteUri);
 		}
 
 		public void Exit()
 		{
+#if UNITY_EDITOR
 			if (Application.isEditor)
 				UnityEditor.EditorApplication.isPlaying = false;
 			else
+#endif
 				Application.Quit();
 		}
 	}

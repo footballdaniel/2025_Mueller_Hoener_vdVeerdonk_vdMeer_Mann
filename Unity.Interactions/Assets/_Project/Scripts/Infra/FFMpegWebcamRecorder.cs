@@ -15,13 +15,9 @@ namespace Infra
 			_exportFramerate = 10f;
 
 			_frameFolderPath = Path.Combine(Application.persistentDataPath, "CapturedFrames");
-
-			if (!Directory.Exists(_frameFolderPath))
-				Directory.CreateDirectory(_frameFolderPath);
 		}
 
 		public Texture2D Frame => _texture2D;
-		public bool IsRecording => _webcamTexture is { isPlaying: true };
 		public bool IsExportComplete => _isExportComplete;
 
 		public void StopRecording()
@@ -49,6 +45,15 @@ namespace Infra
 
 		public void StartRecording()
 		{
+			_frameIndex = 0;
+			
+			if (Directory.Exists(_frameFolderPath))
+				Directory.Delete(_frameFolderPath, true);
+			
+			Directory.CreateDirectory(_frameFolderPath);
+			
+			
+			_isExportComplete = false;
 			_webcamTexture = new WebCamTexture(Info.DeviceName, Info.Width, Info.Height, (int)_exportFramerate);
 			_webcamTexture.Play();
 		}
@@ -82,7 +87,6 @@ namespace Infra
 		int _frameIndex;
 		bool _isExportComplete;
 		Texture2D _texture2D;
-		float _updateTimer;
 		WebCamTexture _webcamTexture;
 	}
 }

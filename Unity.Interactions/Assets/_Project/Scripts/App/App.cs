@@ -58,7 +58,6 @@ namespace App
 			var labTrialEnd = new LabTrialEndState(this);
 			// in situ trials
 			var inSituTrial = new InSituTrialState(this);
-			var inSituTrialEnd = new InSituTrialEndState(this);
 			
 			// Flow for starting app
 			Transitions.Init = new Transition(this, xrStartupState, init);
@@ -71,9 +70,8 @@ namespace App
 			Transitions.ExportVideoOfLabTrial = new Transition(this, labTrial, export);
 			Transitions.ExportVideoOfInSituTrial = new Transition(this, inSituTrial, export);
 			Transitions.EndTrialLab = new Transition(this, export, labTrialEnd);
-			Transitions.EndInSituTrialAfterExporting = new Transition(this, export, inSituTrialEnd);
-			Transitions.WaitForNextTrialLab = new Transition(this, labTrialEnd, waitForNextTrial);
-			Transitions.WaitForNextTrialInSitu = new Transition(this, inSituTrialEnd, waitForNextTrial);
+			Transitions.WaitForNextTrialInSitu = new Transition(this, export, initiateRecorder);
+			Transitions.WaitForNextTrialLab = new Transition(this, labTrialEnd, initiateRecorder);
 
 			// Flow without recording
 			Transitions.BeginExperiment = new Transition(this, init, waitForNextTrial);

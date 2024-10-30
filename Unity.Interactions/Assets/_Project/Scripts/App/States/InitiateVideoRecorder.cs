@@ -13,9 +13,6 @@
 
 		public override void Tick()
 		{
-			if (!_app.Experiment.WebcamRecorder.IsRecording)
-				return;
-
 			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
 				_app.Transitions.NextInSituTrialWithVideoRecording.Execute();
 			else

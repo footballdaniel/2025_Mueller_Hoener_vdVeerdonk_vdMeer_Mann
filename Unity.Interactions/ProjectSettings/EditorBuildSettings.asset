@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Packages/com.vu.powerwall/Samples/Powerwall/Powerwall.unity
     guid: 0f725d4b13e510c438bc636ee68c5704
   - enabled: 1

@@ -558,7 +558,7 @@ Transform:
   m_GameObject: {fileID: 212727357}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.9652007, y: -0.58746564, z: 1.519614}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -869,7 +869,7 @@ Transform:
   m_GameObject: {fileID: 370643114}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.9652007, y: 0.59746563, z: -1.519614}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4137,7 +4137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ExperimentalCondition: 0
   RecordVideo: 1
-  RecordingFrameRateHz: 20
+  RecordingFrameRateHz: 10
 --- !u!1 &1856460593
 GameObject:
   m_ObjectHideFlags: 0
@@ -4216,7 +4216,7 @@ Transform:
   m_GameObject: {fileID: 1932555422}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.9652007, y: -0.58746564, z: 1.519614}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4688,7 +4688,7 @@ Transform:
   m_GameObject: {fileID: 9153610036144007010}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.9652007, y: -0.58746564, z: 1.519614}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -28,7 +28,7 @@ namespace App
 					_app.Transitions.EndLabTrialAfterExporting.Execute();
 					break;
 				case ExperimentalCondition.InSitu:
-					_app.Transitions.EndInSituTrialAfterExporting.Execute();
+					_app.Transitions.WaitForNextTrialInSitu.Execute();
 					break;
 			}
 		}

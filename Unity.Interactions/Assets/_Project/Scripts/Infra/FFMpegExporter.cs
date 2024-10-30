@@ -38,6 +38,7 @@ public static class FFMpegExporter
 		{
 			progress?.Report(0);
 			process.WaitForExit();
+			process.Close();
 			ExportCompleted?.Invoke();
 		};
 	}
