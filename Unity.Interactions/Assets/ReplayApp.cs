@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Domain;
 using Newtonsoft.Json;
@@ -6,6 +7,8 @@ using UnityEngine.Video;
 
 public class ReplayApp : MonoBehaviour
 {
+	public Goal LeftGoal;
+	public Goal RightGoal;
 	public GameObject Ball;
 	public GameObject UserHead;
 	public GameObject NonDominantFoot;
@@ -48,24 +51,23 @@ public class ReplayApp : MonoBehaviour
 			jsonSettings.Converters.Add(new SideEnumConverter());
 			_trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
 
-			var frameEvents = CsvParser.ParseCsv(csvFile);
-
-
-			Debug.Log(VideoPlayer.timeReference);
+			_frameEvents = CsvParser.ParseCsv(csvFile);
+			_ballController = new BallController(Ball, _frameEvents, _trial);
+			_goalController = new GoalController(_frameEvents, LeftGoal, RightGoal);
 		}
 	}
 
 	void Update()
 	{
 		FrameIndex = Mathf.Clamp(FrameIndex, 0, _trial.NumberOfFrames - 1);
-
-
 		VideoPlayer.frame = FrameIndex;
 
 		if (VideoPlayer.isPlaying)
 			VideoPlayer.Pause();
 		VideoPlayer.Play();
 
+		_ballController.Tick(FrameIndex);
+		_goalController.Tick(FrameIndex);
 
 		// Update object positions based on frame index
 		DominantFoot.transform.position = _trial.UserDominantFootPositions[FrameIndex];
@@ -74,6 +76,9 @@ public class ReplayApp : MonoBehaviour
 		UserHead.transform.position = _trial.UserHeadPositions[FrameIndex];
 	}
 
+	BallController _ballController;
+	List<FrameEvent> _frameEvents;
 	Trial _trial;
 	bool _videoReady;
+	GoalController _goalController;
 }
