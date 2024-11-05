@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.recorder": "5.1.1",
     "com.unity.ai.navigation": "2.0.4",
     "com.unity.cinemachine": "3.1.2",
     "com.unity.ide.rider": "3.0.34",

@@ -9,7 +9,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"picker_window_position_offset.075BCD15" = "-716;-50.4;1064;778.4"
+	"picker_window_position_offset.075BCD15" = "-193;-56;1064;778"
 	"picker_visibility_flags.075BCD15" = "264"
 	"picker_item_size.075BCD15" = "32"
 	"picker_inspector.075BCD15" = "0"
@@ -64,6 +64,16 @@ providers = {
 	presets_provider = {
 		active = false
 		priority = -10
+		defaultAction = null
+	}
+	archetype = {
+		active = true
+		priority = 2500
+		defaultAction = null
+	}
+	journal = {
+		active = true
+		priority = 2500
 		defaultAction = null
 	}
 }

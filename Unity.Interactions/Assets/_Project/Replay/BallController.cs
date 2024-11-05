@@ -14,7 +14,7 @@ public class BallController
 		_dominantSide = _trial.DominantFoot;
 	}
 
-	public void Tick(int frameIndex)
+	public void Tick(int frameIndex, float interpolationFactor)
 	{
 		var previousEvent = _frameEvents.LastOrDefault(e => e.FrameIndex <= frameIndex) ?? _frameEvents.First();
 		var nextEvent = _frameEvents.FirstOrDefault(e => e.FrameIndex > frameIndex) ?? _frameEvents.Last();
@@ -23,16 +23,10 @@ public class BallController
 		var ballAtNextEvent = GetBallPositionAtEvent(nextEvent);
 
 		var t = previousEvent.FrameIndex == nextEvent.FrameIndex
-			? 0 // Avoid division by zero when the events are the same
-			: (frameIndex - previousEvent.FrameIndex) / (float)(nextEvent.FrameIndex - previousEvent.FrameIndex);
+			? interpolationFactor
+			: Mathf.Lerp(0, 1, (frameIndex - previousEvent.FrameIndex + interpolationFactor) / (nextEvent.FrameIndex - previousEvent.FrameIndex));
 
-
-		if (previousEvent.EventType == EventType.Pass)
-			_ball.gameObject.SetActive(false);
-		else
-			_ball.gameObject.SetActive(true);
-
-
+		_ball.gameObject.SetActive(previousEvent.EventType != EventType.Pass);
 		_ball.transform.position = Vector3.Lerp(ballAtPreviousEvent, ballAtNextEvent, t);
 	}
 
