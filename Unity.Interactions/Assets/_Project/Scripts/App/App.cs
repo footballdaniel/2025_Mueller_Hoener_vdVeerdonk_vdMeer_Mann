@@ -1,4 +1,5 @@
 using App.States;
+using DefaultNamespace;
 using Domain;
 using Domain.VideoRecorder;
 using UI;
@@ -14,6 +15,7 @@ namespace App
 
 		public bool RecordVideo;
 		public int RecordingFrameRateHz = 10;
+		public Side DominantFootSide;
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
@@ -30,7 +32,7 @@ namespace App
 
 		void Start()
 		{
-			Experiment = new Experiment(RecordingFrameRateHz);
+			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide);
 
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();

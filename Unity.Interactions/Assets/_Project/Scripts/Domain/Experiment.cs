@@ -1,3 +1,4 @@
+using DefaultNamespace;
 using Domain;
 using Domain.VideoRecorder;
 
@@ -5,11 +6,13 @@ namespace App
 {
 	public class Experiment
 	{
-		public Experiment(int frameRateHz)
+		public Experiment(int frameRateHz, Side dominantFoot)
 		{
 			FrameRateHz = frameRateHz;
+			DominantFoot = dominantFoot;
 		}
 
+		public Side DominantFoot { get; set; }
 		public int FrameRateHz { get; private set; }
 		public IWebcamRecorder WebcamRecorder { get; set; }
 		public Opponent Opponent { get; set; }
@@ -19,7 +22,7 @@ namespace App
 		public void NextTrial()
 		{
 			_currentTrialIndex++;
-			CurrentTrial = new Trial(_currentTrialIndex, FrameRateHz);
+			CurrentTrial = new Trial(_currentTrialIndex, FrameRateHz, DominantFoot);
 		}
 
 		int _currentTrialIndex;

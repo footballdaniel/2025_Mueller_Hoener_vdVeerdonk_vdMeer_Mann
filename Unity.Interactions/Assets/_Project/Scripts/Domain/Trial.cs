@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using DefaultNamespace;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,28 +10,24 @@ namespace Domain
 	public class Trial
 	{
 
-		public Trial(int trialNumber, int frameRateHz)
+		public Trial(int trialNumber, int frameRateHz, Side dominantFoot)
 		{
 			Timestamps = new List<float>();
 			TrialNumber = trialNumber;
 			FrameRateHz = frameRateHz;
+			DominantFoot = dominantFoot;
 		}
 
+		public Side DominantFoot { get; private set; }
 		public int FrameRateHz { get; private set; }
 		public int NumberOfFrames => Timestamps.Count;
-		public  List<float> Timestamps { get; }
+		public List<float> Timestamps { get; }
 		public int TrialNumber { get; }
 		public float Duration { get; private set; }
 		public List<Vector3> OpponentHipPositions { get; } = new();
 		public List<Vector3> UserHeadPositions { get; set; } = new();
 		public List<Vector3> UserDominantFootPositions { get; set; } = new();
 		public List<Vector3> UserNonDominantFootPositions { get; set; } = new();
-
-		public void Tick(float deltaTime)
-		{
-			Duration += deltaTime;
-			Timestamps.Add(Duration);
-		}
 
 		public void Save()
 		{
@@ -42,6 +39,12 @@ namespace Domain
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 			var path = Path.Combine(Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
 			File.WriteAllText(path, jsonData);
+		}
+
+		public void Tick(float deltaTime)
+		{
+			Duration += deltaTime;
+			Timestamps.Add(Duration);
 		}
 	}
 }
