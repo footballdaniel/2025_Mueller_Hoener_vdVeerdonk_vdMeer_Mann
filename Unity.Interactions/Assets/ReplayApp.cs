@@ -3,12 +3,11 @@ using System.IO;
 using Domain;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Video;
 
 public class ReplayApp : MonoBehaviour
 {
-	public Slider Slider;
+	public ReplayUI ReplayUI;
 	public Goal LeftGoal;
 	public Goal RightGoal;
 	public GameObject Ball;
@@ -16,76 +15,93 @@ public class ReplayApp : MonoBehaviour
 	public GameObject NonDominantFoot;
 	public GameObject DominantFoot;
 	public GameObject Opponent;
-	public int FrameIndex;
 
 	public VideoPlayer VideoPlayer;
 	public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_3"; // Forward slashes
 
+	public int NumberOfFrames => _trial.NumberOfFrames;
+
 	void Start()
 	{
-		Slider.onValueChanged.AddListener(value => FrameIndex = (int)value);
-		
-		
 		// Use Directory.GetFiles with forward slashes
 		var csvFiles = Directory.GetFiles(DataPath, "*.csv");
 
-		foreach (var csvFile in csvFiles)
+		var csvFile = csvFiles[0];
+
+		Debug.Log("Found csv file: " + csvFile);
+
+		var jsonFile = Path.ChangeExtension(csvFile, ".json");
+		var mp4File = Path.ChangeExtension(csvFile, ".mp4");
+
+		var jsonFileExists = File.Exists(jsonFile);
+		var mp4FileExists = File.Exists(mp4File);
+
+		if (!jsonFileExists || !mp4FileExists)
 		{
-			Debug.Log("Found csv file: " + csvFile);
-
-			// Construct paths using Path.Combine to handle separators
-			var jsonFile = Path.Combine(Path.GetDirectoryName(csvFile), Path.GetFileNameWithoutExtension(csvFile) + ".json");
-			var mp4File = Path.Combine(Path.GetDirectoryName(csvFile), Path.GetFileNameWithoutExtension(csvFile) + ".mp4");
-
-			var jsonFileExists = File.Exists(jsonFile);
-			var mp4FileExists = File.Exists(mp4File);
-
-			if (!jsonFileExists || !mp4FileExists)
-			{
-				Debug.LogError("Missing json or mp4 file for: " + csvFile);
-				continue;
-			}
-
-			VideoPlayer.url = mp4File;
-			VideoPlayer.Prepare();
-
-			var json = File.ReadAllText(jsonFile);
-
-			var jsonSettings = new JsonSerializerSettings();
-			jsonSettings.Converters.Add(new Vector3Converter());
-			jsonSettings.Converters.Add(new SideEnumConverter());
-			_trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
-
-			_frameEvents = CsvParser.ParseCsv(csvFile);
-			_ballController = new BallController(Ball, _frameEvents, _trial);
-			_goalController = new GoalController(_frameEvents, LeftGoal, RightGoal);
-			
-			Slider.maxValue = _trial.NumberOfFrames - 1;
+			Debug.LogError("Missing json or mp4 file for: " + csvFile);
+			return;
 		}
+
+		VideoPlayer.url = mp4File;
+		VideoPlayer.Prepare();
+
+		var json = File.ReadAllText(jsonFile);
+
+		var jsonSettings = new JsonSerializerSettings();
+		jsonSettings.Converters.Add(new Vector3Converter());
+		jsonSettings.Converters.Add(new SideEnumConverter());
+		_trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
+
+		_frameEvents = CsvParser.ParseCsv(csvFile);
+		_ballController = new BallController(Ball, _frameEvents, _trial);
+		_goalController = new GoalController(_frameEvents, LeftGoal, RightGoal);
+		
+		ReplayUI.Set(this);
 	}
 
 	void Update()
 	{
-		FrameIndex = Mathf.Clamp(FrameIndex, 0, _trial.NumberOfFrames - 1);
-		VideoPlayer.frame = FrameIndex;
+		if (_isPlaying)
+		{
+			_currentTimeStamp += Time.deltaTime;
+			var recordingFrameRate = _trial.FrameRateHz;
+			_currentFrameIndex = Mathf.FloorToInt(_currentTimeStamp * recordingFrameRate);
+		}
+		
+		_currentFrameIndex = Mathf.Clamp(_currentFrameIndex, 0, _trial.NumberOfFrames - 1);
+		VideoPlayer.frame = _currentFrameIndex;
 
 		if (VideoPlayer.isPlaying)
 			VideoPlayer.Pause();
 		VideoPlayer.Play();
 
-		_ballController.Tick(FrameIndex);
-		_goalController.Tick(FrameIndex);
+		_ballController.Tick(_currentFrameIndex);
+		_goalController.Tick(_currentFrameIndex);
+		
+		DominantFoot.transform.position = _trial.UserDominantFootPositions[_currentFrameIndex];
+		NonDominantFoot.transform.position = _trial.UserNonDominantFootPositions[_currentFrameIndex];
+		Opponent.transform.position = _trial.OpponentHipPositions[_currentFrameIndex];
+		UserHead.transform.position = _trial.UserHeadPositions[_currentFrameIndex];
+	}
 
-		// Update object positions based on frame index
-		DominantFoot.transform.position = _trial.UserDominantFootPositions[FrameIndex];
-		NonDominantFoot.transform.position = _trial.UserNonDominantFootPositions[FrameIndex];
-		Opponent.transform.position = _trial.OpponentHipPositions[FrameIndex];
-		UserHead.transform.position = _trial.UserHeadPositions[FrameIndex];
+	public void ShowFrame(int value)
+	{
+		_currentFrameIndex = value;
+		var frameRate = _trial.FrameRateHz;
+		_currentTimeStamp = _currentFrameIndex / (float)frameRate;
+	}
+
+	public void TogglePlayPause()
+	{
+		_isPlaying = !_isPlaying;
 	}
 
 	BallController _ballController;
+	int _currentFrameIndex;
 	List<FrameEvent> _frameEvents;
+	GoalController _goalController;
+	bool _isPlaying;
 	Trial _trial;
 	bool _videoReady;
-	GoalController _goalController;
+	float _currentTimeStamp;
 }
