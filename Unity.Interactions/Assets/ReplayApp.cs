@@ -3,10 +3,12 @@ using System.IO;
 using Domain;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Video;
 
 public class ReplayApp : MonoBehaviour
 {
+	public Slider Slider;
 	public Goal LeftGoal;
 	public Goal RightGoal;
 	public GameObject Ball;
@@ -21,6 +23,9 @@ public class ReplayApp : MonoBehaviour
 
 	void Start()
 	{
+		Slider.onValueChanged.AddListener(value => FrameIndex = (int)value);
+		
+		
 		// Use Directory.GetFiles with forward slashes
 		var csvFiles = Directory.GetFiles(DataPath, "*.csv");
 
@@ -54,6 +59,8 @@ public class ReplayApp : MonoBehaviour
 			_frameEvents = CsvParser.ParseCsv(csvFile);
 			_ballController = new BallController(Ball, _frameEvents, _trial);
 			_goalController = new GoalController(_frameEvents, LeftGoal, RightGoal);
+			
+			Slider.maxValue = _trial.NumberOfFrames - 1;
 		}
 	}
 

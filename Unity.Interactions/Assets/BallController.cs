@@ -26,6 +26,13 @@ public class BallController
 			? 0 // Avoid division by zero when the events are the same
 			: (frameIndex - previousEvent.FrameIndex) / (float)(nextEvent.FrameIndex - previousEvent.FrameIndex);
 
+
+		if (previousEvent.EventType == EventType.Pass)
+			_ball.gameObject.SetActive(false);
+		else
+			_ball.gameObject.SetActive(true);
+
+
 		_ball.transform.position = Vector3.Lerp(ballAtPreviousEvent, ballAtNextEvent, t);
 	}
 
