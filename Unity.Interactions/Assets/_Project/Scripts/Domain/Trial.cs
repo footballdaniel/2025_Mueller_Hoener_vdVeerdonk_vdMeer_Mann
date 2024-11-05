@@ -33,6 +33,7 @@ namespace Domain
 		{
 			var jsonSettings = new JsonSerializerSettings();
 			jsonSettings.Converters.Add(new Vector3Converter());
+			jsonSettings.Converters.Add(new SideEnumConverter());
 			jsonSettings.Formatting = Formatting.Indented;
 
 			var jsonData = JsonConvert.SerializeObject(this, jsonSettings);

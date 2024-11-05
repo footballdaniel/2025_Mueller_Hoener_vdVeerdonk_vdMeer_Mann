@@ -1,6 +1,7 @@
 {
   "FrameRateHz": 10,
   "NumberOfFrames": 319,
+  "DominantFoot": "Right",
   "Timestamps": [
     0.1,
     0.2,

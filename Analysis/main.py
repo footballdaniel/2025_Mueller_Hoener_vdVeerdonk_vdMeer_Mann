@@ -3,7 +3,7 @@ import glob
 from src.manual_annotations import process_file
 
 # Define the path to your data files
-data_path = "../Data/Pilot_2/*.csv"
+data_path = "../Data/Pilot_3/*.csv"
 
 # Process all CSV files in the specified directory
 files = glob.glob(data_path)

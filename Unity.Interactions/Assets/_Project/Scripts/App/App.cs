@@ -10,23 +10,17 @@ namespace App
 {
 	public class App : MonoBehaviour
 	{
-		[Header("Settings")]
-		public ExperimentalCondition ExperimentalCondition;
-
+		[Header("Settings")] public ExperimentalCondition ExperimentalCondition;
 		public bool RecordVideo;
 		public int RecordingFrameRateHz = 10;
 		public Side DominantFootSide;
-
 		[Header("Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
 		[Header("Entities")] public User User { get; private set; }
 		public InSituOpponent InSituOpponent { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
-
-		[Header("State")]
-		public Experiment Experiment { get; set; }
-
+		[Header("State")] public Experiment Experiment { get; set; }
 		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 
@@ -60,7 +54,7 @@ namespace App
 			var labTrialEnd = new LabTrialEndState(this);
 			// in situ trials
 			var inSituTrial = new InSituTrialState(this);
-			
+
 			// Flow for starting app
 			Transitions.Init = new Transition(this, xrStartupState, init);
 
@@ -86,11 +80,11 @@ namespace App
 			// Start app
 			StateMachine.SetState(xrStartupState);
 		}
-		
+
 		void Update()
 		{
 			StateMachine.Tick();
-			
+
 			// Cheats to transition between states
 			if (Keyboard.current.digit1Key.wasPressedThisFrame)
 				Transitions.Init.Execute();
