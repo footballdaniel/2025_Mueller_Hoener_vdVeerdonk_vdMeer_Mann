@@ -4,6 +4,7 @@ from typing import List
 
 from src.domain import PassEvent, Foot, Trial, Position
 
+
 def read_pass_events_from_csv(file_path: str) -> List[PassEvent]:
     events = []
     with open(file_path, newline='') as csvfile:
