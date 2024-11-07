@@ -35,12 +35,17 @@ def predict_passes(features, label):
         for feature in features:
             input_tensor = feature_to_input_tensor(feature).unsqueeze(0).to(device)
             output = model(input_tensor)
-            prediction = (output >= 0.5).float().item()
+            # Apply sigmoid to convert logits to probabilities
+            probabilities = torch.sigmoid(output).squeeze()
+            prediction = (probabilities >= 0.5).float().item()
             predictions.append(prediction)
-            print(f'Actual label: {label}, Predicted label: {prediction}')
+            print(f'Actual label: {label}, Predicted label: {prediction}, Probability: {probabilities.item():.4f}')
     return predictions
 
 
 # Predict for passes (label=1) and non-passes (label=0)
+print("Predictions for Passes:")
 predicted_passes = predict_passes(passes, label=1)
+
+print("\nPredictions for Non-Passes:")
 predicted_non_passes = predict_passes(non_passes, label=0)

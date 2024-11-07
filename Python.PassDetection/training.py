@@ -4,6 +4,7 @@ import pickle
 
 import torch
 import torch.nn as nn
+from torch import sigmoid
 from torch.utils.data import random_split, DataLoader
 
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
@@ -57,12 +58,11 @@ combined_dataset = full_dataset + augmented_passes
 
 # Save some to folder
 with open('10_sample_passes.pkl', 'wb') as f:
-    pickle.dump(combined_dataset[:10], f)
+    pickle.dump(augmented_passes[:10], f)
 # save 10 non-passes
 non_passes = [sample for sample in combined_dataset if not sample.is_a_pass]
 with open('10_sample_non_passes.pkl', 'wb') as f:
     pickle.dump(non_passes[:10], f)
-
 
 """PYTORCH DATASET"""
 torch.manual_seed(42)  # Set the seed
@@ -74,6 +74,28 @@ batch_size = 32
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
+# Count positive and negative samples in combined_dataset
+num_positive = sum(1 for feature in combined_dataset if feature.is_a_pass)
+num_negative = sum(1 for feature in combined_dataset if not feature.is_a_pass)
+print(f"Total samples: {len(combined_dataset)}")
+print(f"Positive samples: {num_positive}")
+print(f"Negative samples: {num_negative}")
+
+# For the training and validation sets
+# Since train_dataset and val_dataset are Subset objects, we can access the indices
+train_indices = train_dataset.indices
+val_indices = val_dataset.indices
+
+# Count positive and negative samples in the training set
+train_positive = sum(1 for idx in train_indices if dataset.features[idx].is_a_pass)
+train_negative = len(train_indices) - train_positive
+print(f"Training set - Positive: {train_positive}, Negative: {train_negative}")
+
+# Count positive and negative samples in the validation set
+val_positive = sum(1 for idx in val_indices if dataset.features[idx].is_a_pass)
+val_negative = len(val_indices) - val_positive
+print(f"Validation set - Positive: {val_positive}, Negative: {val_negative}")
+
 # Model parameters
 input_size = 12
 hidden_size = 64
@@ -83,7 +105,7 @@ num_epochs = 50  # Increase because early stopping will determine the actual num
 
 # Initialize model, loss function, optimizer
 model = PassDetectionModel(input_size, hidden_size, num_layers)
-criterion = nn.BCELoss()
+criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Early stopping parameters
@@ -96,7 +118,9 @@ early_stop = False
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
+epoch_index = 0
 for epoch in range(num_epochs):
+    epoch_index = epoch
     if early_stop:
         print("Early stopping")
         break
@@ -138,23 +162,22 @@ for epoch in range(num_epochs):
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
         epochs_no_improve = 0
-
-        # Save the best model
-        checkpoint = {
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'num_layers': num_layers,
-            'epoch': epoch,
-            'loss': avg_val_loss
-        }
-        torch.save(checkpoint, 'pass_detection_model.pth')
     else:
         epochs_no_improve += 1
         if epochs_no_improve >= patience:
             print(f'Early stopping at epoch {epoch + 1}')
             early_stop = True
+
+# Save the best model
+checkpoint = {
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'input_size': input_size,
+    'hidden_size': hidden_size,
+    'num_layers': num_layers,
+    'epoch': epoch_index,
+}
+torch.save(checkpoint, 'pass_detection_model.pth')
 
 """EVALUATION"""
 # Validation
@@ -192,3 +215,42 @@ print(f"Brier Score: {brier_score:.4f}")
 # Calculate precision, recall, F1 score
 precision, recall, f1 = calculate_classification_metrics(torch.tensor(all_labels), torch.tensor(all_predictions))
 print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
+
+"""EVALUATE FIRST BATCH FOR SANITY"""
+with torch.no_grad():
+    for inputs, labels in val_loader:
+        inputs = inputs.to(device)
+        labels = labels.to(device).view(-1, 1)
+        outputs = model(inputs)
+        probabilities = sigmoid(outputs).squeeze()
+        predicted = (probabilities >= 0.5).float()
+        # Print some outputs and labels
+        print(f"Probabilities: {probabilities[:5]}")
+        print(f"Predicted labels: {predicted[:5]}")
+        print(f"Actual labels: {labels.squeeze()[:5]}")
+        # Break after first batch for brevity
+        break
+
+"""EXPORT ONNX"""
+# Define the output file name
+onnx_file_path = "pass_detection_model.onnx"
+# Ensure the model is on the CPU
+model.to('cpu')
+# Export the model
+sequence_length = 10  # same as training data
+dummy_input = torch.randn(batch_size, sequence_length, input_size)
+# Export the model
+torch.onnx.export(
+    model,  # Model being run
+    dummy_input,  # Model input (or a tuple for multiple inputs)
+    onnx_file_path,  # Where to save the model
+    export_params=True,  # Store the trained parameter weights inside the model file
+    opset_version=11,  # ONNX version to export to (11 is widely supported)
+    do_constant_folding=True,  # Whether to execute constant folding for optimization
+    input_names=['input'],  # Model's input names
+    output_names=['output'],  # Model's output names
+    dynamic_axes={
+        'input': {0: 'batch_size', 1: 'sequence_length'},  # Variable batch size and sequence length
+        'output': {0: 'batch_size'}  # Variable batch size
+    }
+)
