@@ -6,9 +6,11 @@ import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
+from src.io.torch_serializer import serialize_data
+from src.nn.brier import calculate_brier_score
+from src.nn.f1 import calculate_classification_metrics
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
-from src.plots import plot_feature
 from src.training_data_sampler import DataSampler
 
 # Use glob to find all CSV files
@@ -25,8 +27,6 @@ for filename in glob.iglob(pattern, recursive=True):
     trial = read_trial_from_json(json_filename)
     pass_events = read_pass_events_from_csv(filename)
     trial.pass_events.extend(pass_events)  # Append the events to the Trial
-
-    print("Trial instance created successfully:", trial)
     trials.append(trial)
 
 """SAMPLER"""
@@ -54,12 +54,12 @@ for feature in full_dataset:
             swapped_rotated_feature = swapped_feature.rotate_around_y(angle)
             augmented_passes.append(swapped_rotated_feature)
 
-
 combined_dataset = full_dataset + augmented_passes
+serialize_data(combined_dataset, 'combined_dataset.pth')
 
 
 """PYTORCH DATASET"""
-# Initialize dataset and DataLoaders
+torch.manual_seed(42)  # Set the seed
 dataset = PassDataset(combined_dataset)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
@@ -108,7 +108,7 @@ for epoch in range(num_epochs):
         total_loss += loss.item() * inputs.size(0)
 
     avg_loss = total_loss / len(train_loader.dataset)
-    print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}")
+    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
     # Validation
     model.eval()
@@ -147,5 +147,42 @@ for epoch in range(num_epochs):
     else:
         epochs_no_improve += 1
         if epochs_no_improve >= patience:
-            print(f'Early stopping at epoch {epoch+1}')
+            print(f'Early stopping at epoch {epoch + 1}')
             early_stop = True
+
+"""EVALUATION"""
+# Validation
+model.eval()
+total_val_loss = 0
+correct = 0
+all_labels = []
+all_predictions = []
+all_probabilities = []
+
+with torch.no_grad():
+    for inputs, labels in val_loader:
+        inputs = inputs.to(device)
+        labels = labels.to(device).view(-1, 1)
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        total_val_loss += loss.item() * inputs.size(0)
+        probabilities = outputs.squeeze()
+        predicted = (probabilities >= 0.5).float()
+        correct += (predicted == labels.squeeze()).sum().item()
+
+        # Collect labels and predictions for metrics
+        all_labels.extend(labels.squeeze().cpu())
+        all_predictions.extend(predicted.cpu())
+        all_probabilities.extend(probabilities.cpu())
+
+avg_val_loss = total_val_loss / len(val_loader.dataset)
+accuracy = correct / len(val_loader.dataset)
+print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
+
+# Calculate Brier score
+brier_score = calculate_brier_score(torch.tensor(all_labels), torch.tensor(all_probabilities))
+print(f"Brier Score: {brier_score:.4f}")
+
+# Calculate precision, recall, F1 score
+precision, recall, f1 = calculate_classification_metrics(torch.tensor(all_labels), torch.tensor(all_predictions))
+print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
