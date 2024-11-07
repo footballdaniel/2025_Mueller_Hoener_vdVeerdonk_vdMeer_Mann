@@ -1,0 +1,12 @@
+great, now i want to create a machine learning model that learns to predict if there is a pass in a sample.
+
+@dataclass
+class PositionAndVelocityFeature:
+    is_a_pass: bool
+    zeroed_position_dominant_foot: List[Position]
+    offset_dominant_foot_to_non_dominant_foot: List[Position]
+    velocities_dominant_foot: List[Position]
+    velocities_non_dominant_foot: List[Position]
+An easy way would be to train a NN, but i dont have a lot of data (3000 samples, only 50 contain a "true").
+
+What models are good to learn from sparse data?
