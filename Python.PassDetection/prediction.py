@@ -1,3 +1,5 @@
+import pickle
+
 import torch
 from torch import device
 
@@ -13,19 +15,32 @@ hidden_size = checkpoint['hidden_size']
 num_layers = checkpoint['num_layers']
 
 # Reconstruct the model
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = PassDetectionModel(input_size, hidden_size, num_layers)
 model.load_state_dict(checkpoint['model_state_dict'])
 model.to(device)
 model.eval()
 
+# Load data samples
+with open('10_sample_passes.pkl', 'rb') as f:
+    passes = pickle.load(f)
+with open('10_sample_non_passes.pkl', 'rb') as f:
+    non_passes = pickle.load(f)
 
-# Prepare an input sample
-# Assume 'new_feature' is an instance of PositionAndVelocityFeature
-input_tensor = feature_to_input_tensor(new_feature).unsqueeze(0)  # Add batch dimension
-input_tensor = input_tensor.to(device)
 
-# Make a prediction
-with torch.no_grad():
-    output = model(input_tensor)
-    prediction = (output >= 0.5).float().item()
-    print(f'Predicted label: {prediction}')
+# Function to predict and print results for a list of features
+def predict_passes(features, label):
+    predictions = []
+    with torch.no_grad():
+        for feature in features:
+            input_tensor = feature_to_input_tensor(feature).unsqueeze(0).to(device)
+            output = model(input_tensor)
+            prediction = (output >= 0.5).float().item()
+            predictions.append(prediction)
+            print(f'Actual label: {label}, Predicted label: {prediction}')
+    return predictions
+
+
+# Predict for passes (label=1) and non-passes (label=0)
+predicted_passes = predict_passes(passes, label=1)
+predicted_non_passes = predict_passes(non_passes, label=0)

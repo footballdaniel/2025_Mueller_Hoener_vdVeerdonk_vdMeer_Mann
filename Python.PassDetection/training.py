@@ -1,12 +1,12 @@
 import glob
 import os
+import pickle
 
 import torch
 import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
-from src.io.torch_serializer import serialize_data
 from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
 from src.nn.lstm_model import PassDetectionModel
@@ -40,7 +40,6 @@ full_dataset = sampler.generate_dataset()
 rotation_angles = [angle for angle in range(5, 360, 10)]
 augmented_passes = []
 for feature in full_dataset:
-    augmented_passes.append(feature)  # Include the original feature
 
     if feature.is_a_pass:
         for angle in rotation_angles:
@@ -55,7 +54,14 @@ for feature in full_dataset:
             augmented_passes.append(swapped_rotated_feature)
 
 combined_dataset = full_dataset + augmented_passes
-serialize_data(combined_dataset, 'combined_dataset.pth')
+
+# Save some to folder
+with open('10_sample_passes.pkl', 'wb') as f:
+    pickle.dump(combined_dataset[:10], f)
+# save 10 non-passes
+non_passes = [sample for sample in combined_dataset if not sample.is_a_pass]
+with open('10_sample_non_passes.pkl', 'wb') as f:
+    pickle.dump(non_passes[:10], f)
 
 
 """PYTORCH DATASET"""

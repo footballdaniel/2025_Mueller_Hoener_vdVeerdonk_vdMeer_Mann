@@ -1,3 +1,4 @@
+*.pkl
 *.pth
 plots/
 # Custom defines
