@@ -7,7 +7,8 @@ import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
 from src.feature_engineer import FeatureEngineer
-from src.features import VelocitiesNonDominantFootCalculator, VelocitiesDominantFootCalculator
+from src.features import VelocitiesNonDominantFootCalculator, VelocitiesDominantFootCalculator, \
+    OffsetDominantFootToNonDominantFootCalculator, ZeroedPositionDominantFootCalculator
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
@@ -18,7 +19,7 @@ from src.trial_labeler import Labels
 
 
 """Reading Trials"""
-pattern = "data/**/*.csv"
+pattern = "../Data/Pilot_4/**/*.csv"
 
 trials = []
 for filename in glob.iglob(pattern, recursive=True):
@@ -39,15 +40,10 @@ augmented_samples = Augmentor.augment(labeled_samples)
 
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
-velocity_non_dominant_foot = VelocitiesNonDominantFootCalculator()
-velocity_dominant_foot = VelocitiesDominantFootCalculator()
-offset_dominant_foot_to_non_dominant_foot = VelocitiesDominantFootCalculator()
-zeroed_dominant_foot_positions = VelocitiesDominantFootCalculator()
-
-engineer.add_feature(velocity_non_dominant_foot)
-engineer.add_feature(velocity_dominant_foot)
-engineer.add_feature(offset_dominant_foot_to_non_dominant_foot)
-engineer.add_feature(zeroed_dominant_foot_positions)
+engineer.add_feature(ZeroedPositionDominantFootCalculator())
+engineer.add_feature(OffsetDominantFootToNonDominantFootCalculator())
+engineer.add_feature(VelocitiesDominantFootCalculator())
+engineer.add_feature(VelocitiesNonDominantFootCalculator())
 
 calculated_features = engineer.engineer_features(augmented_samples)
 

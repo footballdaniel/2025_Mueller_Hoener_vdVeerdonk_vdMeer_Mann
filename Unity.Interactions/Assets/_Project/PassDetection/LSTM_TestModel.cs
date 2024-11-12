@@ -5,7 +5,7 @@ using Debug = UnityEngine.Debug;
 
 namespace PassDetection
 {
-	public class LSTM_Model : MonoBehaviour
+	public class LSTM_TestModel : MonoBehaviour
 	{
 		[SerializeField]
 		ModelAsset _modelAsset;

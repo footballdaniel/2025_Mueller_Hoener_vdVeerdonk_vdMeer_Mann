@@ -8,7 +8,7 @@ namespace PassDetection
     {
         [SerializeField] Button _evaluateButton;
         [SerializeField] TMP_Text _resultText;
-        [SerializeField] LSTM_Model _lstmModel;
+        [SerializeField] LSTM_TestModel _lstmTestModel;
     
         void Start()
         {
@@ -17,7 +17,7 @@ namespace PassDetection
 
         void OnEvaluateButtonClicked()
         {
-            var result = _lstmModel.Evaluate();
+            var result = _lstmTestModel.Evaluate();
             _resultText.SetText($"Prediction Probability: {result*100:F1}%");
         }
     }
