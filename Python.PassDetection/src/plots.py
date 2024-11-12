@@ -2,10 +2,10 @@ import os
 
 import matplotlib.pyplot as plt
 
-from src.domain import LabeledTrial
+from src.domain import Sample
 
 
-def plot_labeled_trial(trial: LabeledTrial, save_dir: str, filename: str):
+def plot_labeled_trial(trial: Sample, save_dir: str, filename: str):
     # Create the save directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
 

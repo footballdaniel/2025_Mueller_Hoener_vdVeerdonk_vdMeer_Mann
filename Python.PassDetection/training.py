@@ -13,10 +13,11 @@ from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
-from src.trial_augmenter import TrialAugmenter
-from src.trial_labeler import TrialLabeler
+from src.trial_augmenter import Augmentor
+from src.trial_labeler import Labels
 
-# Use glob to find all CSV files
+
+"""Reading Trials"""
 pattern = "data/**/*.csv"
 
 trials = []
@@ -33,8 +34,8 @@ for filename in glob.iglob(pattern, recursive=True):
     trials.append(trial)
 
 """SAMPLING AND AUGMENTATION"""
-labeled_trials = TrialLabeler.generate_dataset(trials)
-augmented_trials = TrialAugmenter.augment(labeled_trials)
+labeled_samples = Labels.generate(trials)
+augmented_samples = Augmentor.augment(labeled_samples)
 
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
@@ -48,18 +49,18 @@ engineer.add_feature(velocity_dominant_foot)
 engineer.add_feature(offset_dominant_foot_to_non_dominant_foot)
 engineer.add_feature(zeroed_dominant_foot_positions)
 
-calculated_features = engineer.engineer_features(augmented_trials)
+calculated_features = engineer.engineer_features(augmented_samples)
 
 
 # # Save some to folder
 # with open('10_sample_passes.pkl', 'wb') as f:
 #     pickle.dump(augmented_trials[:10], f)
 # # save 10 non-passes
-# non_passes = [sample for sample in labeled_trials if not sample.is_a_pass]
+# non_passes = [sample for sample in labeled_samples if not sample.is_a_pass]
 # with open('10_sample_non_passes.pkl', 'wb') as f:
 #     pickle.dump(non_passes[:10], f)
 #
-# for sample in labeled_trials:
+# for sample in labeled_samples:
 #     plot_labeled_trial(sample, 'plots', f'{sample.trial_number}_{round(sample.timestamps[0],2)}_{sample.is_a_pass}.png')
 
 """SPLIT PYTORCH DATASET"""
@@ -73,9 +74,9 @@ training_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 validation_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Count positive and negative samples in combined_dataset
-num_positive = sum(1 for feature in augmented_trials if feature.is_a_pass)
-num_negative = sum(1 for feature in augmented_trials if not feature.is_a_pass)
-print(f"Total samples: {len(augmented_trials)}")
+num_positive = sum(1 for feature in augmented_samples if feature.is_a_pass)
+num_negative = sum(1 for feature in augmented_samples if not feature.is_a_pass)
+print(f"Total samples: {len(augmented_samples)}")
 print(f"Positive samples: {num_positive}")
 print(f"Negative samples: {num_negative}")
 

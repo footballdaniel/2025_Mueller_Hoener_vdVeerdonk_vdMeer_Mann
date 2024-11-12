@@ -1,7 +1,6 @@
 import abc
 import math
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
@@ -31,16 +30,14 @@ class Position:
         cos_theta = math.cos(angle_radians)
         sin_theta = math.sin(angle_radians)
         x_new = self.x * cos_theta + self.z * sin_theta
-        y_new = self.y
         z_new = -self.x * sin_theta + self.z * cos_theta
-        return Position(x=x_new, y=y_new, z=z_new)
+        return Position(x=x_new, y=self.y, z=z_new)
 
 
 @dataclass
 class PassEvent:
     frame_number: int
     foot: Foot
-
 
 @dataclass
 class Trial:
@@ -53,70 +50,67 @@ class Trial:
     user_non_dominant_foot_positions: List[Position]
     pass_events: List[PassEvent] = field(default_factory=list)
 
-    def mirror(self):
-        mirrored = Trial(
-            frame_rate_hz=self.frame_rate_hz,
-            number_of_frames=self.number_of_frames,
-            timestamps=self.timestamps,
-            trial_number=self.trial_number,
-            duration=self.duration,
-            user_dominant_foot_positions=[
-                pos.mirror_x() for pos in self.user_dominant_foot_positions
-            ],
-            user_non_dominant_foot_positions=[
-                pos.mirror_x() for pos in self.user_non_dominant_foot_positions
-            ],
-            pass_events=[
-                PassEvent(frame_number=event.frame_number, foot=event.foot.mirror())
-                for event in self.pass_events
-            ]
-        )
-        return mirrored
-
-    def rotate_around_y(self, angle_degrees: float):
-        """Rotate all positions in the trial around the y-axis by the given angle."""
-        rotated = Trial(
-            frame_rate_hz=self.frame_rate_hz,
-            number_of_frames=self.number_of_frames,
-            timestamps=self.timestamps,
-            trial_number=self.trial_number,
-            duration=self.duration,
-            user_dominant_foot_positions=[
-                pos.rotate_around_y(angle_degrees) for pos in self.user_dominant_foot_positions
-            ],
-            user_non_dominant_foot_positions=[
-                pos.rotate_around_y(angle_degrees) for pos in self.user_non_dominant_foot_positions
-            ],
-            pass_events=self.pass_events  # Pass events are unchanged by rotation
-        )
-        return rotated
-
-    def swap_feet(self):
-        """Swap the dominant and non-dominant foot data."""
-        swapped = Trial(
-            frame_rate_hz=self.frame_rate_hz,
-            number_of_frames=self.number_of_frames,
-            timestamps=self.timestamps,
-            trial_number=self.trial_number,
-            duration=self.duration,
-            user_dominant_foot_positions=self.user_non_dominant_foot_positions.copy(),
-            user_non_dominant_foot_positions=self.user_dominant_foot_positions.copy(),
-            pass_events=[
-                PassEvent(frame_number=event.frame_number, foot=event.foot.mirror())
-                for event in self.pass_events
-            ]
-        )
-        return swapped
-
 
 @dataclass
-class LabeledTrial(Trial):
+class Sample:
+    frame_rate_hz: int
+    number_of_frames: int
+    timestamps: List[float]
+    trial_number: int
+    duration: float
+    user_dominant_foot_positions: List[Position]
+    user_non_dominant_foot_positions: List[Position]
     is_a_pass: bool = False
     pass_id: Optional[int] = None
 
+    @staticmethod
+    def mirror(sample: 'Sample') -> 'Sample':
+        """Return a mirrored version of the given sample."""
+        return Sample(
+            frame_rate_hz=sample.frame_rate_hz,
+            number_of_frames=sample.number_of_frames,
+            timestamps=sample.timestamps,
+            trial_number=sample.trial_number,
+            duration=sample.duration,
+            user_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_dominant_foot_positions],
+            user_non_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_non_dominant_foot_positions],
+            is_a_pass=sample.is_a_pass,
+            pass_id=sample.pass_id
+        )
+
+    @staticmethod
+    def rotate_around_y(sample: 'Sample', angle_degrees: float) -> 'Sample':
+        """Return a rotated version of the sample around the y-axis."""
+        return Sample(
+            frame_rate_hz=sample.frame_rate_hz,
+            number_of_frames=sample.number_of_frames,
+            timestamps=sample.timestamps,
+            trial_number=sample.trial_number,
+            duration=sample.duration,
+            user_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_dominant_foot_positions],
+            user_non_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_non_dominant_foot_positions],
+            is_a_pass=sample.is_a_pass,
+            pass_id=sample.pass_id
+        )
+
+    @staticmethod
+    def swap_feet(sample: 'Sample') -> 'Sample':
+        """Return a version of the sample with dominant and non-dominant foot positions swapped."""
+        return Sample(
+            frame_rate_hz=sample.frame_rate_hz,
+            number_of_frames=sample.number_of_frames,
+            timestamps=sample.timestamps,
+            trial_number=sample.trial_number,
+            duration=sample.duration,
+            user_dominant_foot_positions=sample.user_non_dominant_foot_positions.copy(),
+            user_non_dominant_foot_positions=sample.user_dominant_foot_positions.copy(),
+            is_a_pass=sample.is_a_pass,
+            pass_id=sample.pass_id
+        )
+
 
 @dataclass
-class AugmentedLabeledTrial(LabeledTrial):
+class AugmentedLabeledSample(Sample):
     rotation_angle: Optional[float] = None
 
 
@@ -130,7 +124,7 @@ class Feature:
 
 
 @dataclass
-class CalculatedFeatures:
+class CalculatedSample:
     features: List[Feature]
     outcome: int  # Binary outcome (e.g., 0 or 1 indicating pass or no pass)
 
@@ -143,6 +137,6 @@ class FeatureCalculator(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def calculate(self, trial: Trial) -> List[Feature]:
+    def calculate(self, sample: Sample) -> List[Feature]:
         """Calculate the feature for a given trial."""
         ...

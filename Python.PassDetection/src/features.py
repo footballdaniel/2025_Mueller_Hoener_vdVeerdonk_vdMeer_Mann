@@ -1,6 +1,6 @@
 from typing import List
 
-from src.domain import FeatureCalculator, AugmentedLabeledTrial, Feature, Position
+from src.domain import FeatureCalculator, AugmentedLabeledSample, Feature, Position
 
 
 class ZeroedPositionDominantFootCalculator(FeatureCalculator):
@@ -8,7 +8,7 @@ class ZeroedPositionDominantFootCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledTrial) -> List[Feature]:
+    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
         dominant_positions = trial.user_dominant_foot_positions
         origin = dominant_positions[0]
         zeroed_positions = [
@@ -30,7 +30,7 @@ class OffsetDominantFootToNonDominantFootCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledTrial) -> List[Feature]:
+    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
         dominant_positions = trial.user_dominant_foot_positions
         non_dominant_positions = trial.user_non_dominant_foot_positions
         offsets = [
@@ -57,7 +57,7 @@ class VelocitiesDominantFootCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledTrial) -> List[Feature]:
+    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
         dominant_positions = trial.user_dominant_foot_positions
         timestamps = trial.timestamps
         velocities = []
@@ -89,7 +89,7 @@ class VelocitiesNonDominantFootCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledTrial) -> List[Feature]:
+    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
         non_dominant_positions = trial.user_non_dominant_foot_positions
         timestamps = trial.timestamps
         velocities = []

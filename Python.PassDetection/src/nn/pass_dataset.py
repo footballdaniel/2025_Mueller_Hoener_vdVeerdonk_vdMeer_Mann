@@ -5,13 +5,12 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from src.domain import FeatureCalculator, CalculatedFeatures
+from src.domain import FeatureCalculator, CalculatedSample
 
 
 @dataclass
 class PassDataset(Dataset):
-    calculated_features: List[CalculatedFeatures]
-
+    calculated_features: List[CalculatedSample]
 
     def __len__(self) -> int:
         return len(self.calculated_features)
@@ -29,4 +28,3 @@ class PassDataset(Dataset):
         label = torch.tensor(trial.outcome, dtype=torch.float32)
 
         return input_tensor, label
-

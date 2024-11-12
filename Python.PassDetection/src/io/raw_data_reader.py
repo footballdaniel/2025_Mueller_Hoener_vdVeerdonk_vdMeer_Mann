@@ -2,7 +2,7 @@ import csv
 import json
 from typing import List
 
-from src.domain import PassEvent, Foot, Trial, Position
+from src.domain import PassEvent, Foot, Position, Trial
 
 
 def read_pass_events_from_csv(file_path: str) -> List[PassEvent]:
@@ -20,7 +20,6 @@ def read_pass_events_from_csv(file_path: str) -> List[PassEvent]:
 def read_trial_from_json(file_path: str) -> Trial:
     with open(file_path, "r") as f:
         data = json.load(f)
-        # Manually mapping PascalCase to snake_case
         trial = Trial(
             frame_rate_hz=data['FrameRateHz'],
             number_of_frames=data['NumberOfFrames'],
