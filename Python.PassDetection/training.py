@@ -73,14 +73,6 @@ print(f"Total samples: {len(augmented_trials)}")
 print(f"Positive samples: {num_positive}")
 print(f"Negative samples: {num_negative}")
 
-train_positive = sum(1 for idx in train_dataset.indices if train_dataset[idx].is_a_pass)
-train_negative = len(train_dataset.indices) - train_positive
-print(f"Training set - Positive: {train_positive}, Negative: {train_negative}")
-
-val_positive = sum(1 for idx in val_dataset.indices if val_dataset[idx].is_a_pass)
-val_negative = len(val_dataset.indices) - val_positive
-print(f"Validation set - Positive: {val_positive}, Negative: {val_negative}")
-
 # Model parameters
 input_size = dataset.input_size
 hidden_size = 64

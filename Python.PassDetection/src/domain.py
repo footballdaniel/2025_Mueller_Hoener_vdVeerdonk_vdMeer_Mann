@@ -119,7 +119,7 @@ class LabeledTrial(Trial):
 class AugmentedLabeledTrial(LabeledTrial):
     rotation_angle: Optional[float] = None
 
-
+@dataclass
 class Feature:
     name: str
     values: List[float]
@@ -133,9 +133,9 @@ class FeatureCalculator(abc.ABC):
     @abc.abstractmethod
     def size(self) -> int:
         """Return the size of the feature this calculator produces."""
-        pass
+        ...
 
     @abc.abstractmethod
-    def calculate(self, trial: Trial) -> Feature:
+    def calculate(self, trial: Trial) -> List[Feature]:
         """Calculate the feature for a given trial."""
-        pass
+        ...

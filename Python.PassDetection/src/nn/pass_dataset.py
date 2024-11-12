@@ -26,11 +26,14 @@ class PassDataset(Dataset):
         features = []
 
         for feature_calculator in self.feature_calculators:
-            feature = feature_calculator.calculate(trial)
-            features.append(feature)
+            calculated_features = feature_calculator.calculate(trial)
+            features.extend(calculated_features)
 
         input_tensor = torch.stack(
-            [torch.tensor(feature.values, dtype=torch.float32) for feature in features]
+            [
+                torch.tensor(feature.values, dtype=torch.float32) for feature in features
+            ],
+            dim=1
         )
 
         label = torch.tensor(int(trial.is_a_pass), dtype=torch.float32)
