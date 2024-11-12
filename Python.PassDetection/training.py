@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
+from src.feature_engineer import FeatureEngineer
 from src.features import VelocitiesNonDominantFootCalculator, VelocitiesDominantFootCalculator
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.brier import calculate_brier_score
@@ -34,17 +35,21 @@ for filename in glob.iglob(pattern, recursive=True):
 """SAMPLING AND AUGMENTATION"""
 labeled_trials = TrialLabeler.generate_dataset(trials)
 augmented_trials = TrialAugmenter.augment(labeled_trials)
-dataset = PassDataset(augmented_trials)
 
+"""FEATURE ENGINEERING"""
+engineer = FeatureEngineer()
 velocity_non_dominant_foot = VelocitiesNonDominantFootCalculator()
 velocity_dominant_foot = VelocitiesDominantFootCalculator()
 offset_dominant_foot_to_non_dominant_foot = VelocitiesDominantFootCalculator()
 zeroed_dominant_foot_positions = VelocitiesDominantFootCalculator()
 
-dataset.add_feature(velocity_non_dominant_foot)
-dataset.add_feature(velocity_dominant_foot)
-dataset.add_feature(offset_dominant_foot_to_non_dominant_foot)
-dataset.add_feature(zeroed_dominant_foot_positions)
+engineer.add_feature(velocity_non_dominant_foot)
+engineer.add_feature(velocity_dominant_foot)
+engineer.add_feature(offset_dominant_foot_to_non_dominant_foot)
+engineer.add_feature(zeroed_dominant_foot_positions)
+
+calculated_features = engineer.engineer_features(augmented_trials)
+
 
 # # Save some to folder
 # with open('10_sample_passes.pkl', 'wb') as f:
@@ -58,6 +63,7 @@ dataset.add_feature(zeroed_dominant_foot_positions)
 #     plot_labeled_trial(sample, 'plots', f'{sample.trial_number}_{round(sample.timestamps[0],2)}_{sample.is_a_pass}.png')
 
 """SPLIT PYTORCH DATASET"""
+dataset = PassDataset(calculated_features)
 torch.manual_seed(42)  # Set the seed
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size

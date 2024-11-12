@@ -119,6 +119,7 @@ class LabeledTrial(Trial):
 class AugmentedLabeledTrial(LabeledTrial):
     rotation_angle: Optional[float] = None
 
+
 @dataclass
 class Feature:
     name: str
@@ -126,6 +127,12 @@ class Feature:
 
     def to_tensor(self) -> torch.Tensor:
         return torch.tensor(self.values, dtype=torch.float32)
+
+
+@dataclass
+class CalculatedFeatures:
+    features: List[Feature]
+    outcome: int  # Binary outcome (e.g., 0 or 1 indicating pass or no pass)
 
 
 class FeatureCalculator(abc.ABC):
