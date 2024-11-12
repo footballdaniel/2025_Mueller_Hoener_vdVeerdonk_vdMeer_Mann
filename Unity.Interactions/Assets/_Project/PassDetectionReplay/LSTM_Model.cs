@@ -1,33 +1,29 @@
-using System.Diagnostics;
+using System;
 using System.Linq;
 using _Project.Interactions.Scripts.Domain;
 using Unity.Sentis;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace PassDetection
 {
-	public class LSTM_Model : MonoBehaviour
+	public class LSTM_Model : IDisposable
 	{
-		[SerializeField]
-		ModelAsset _modelAsset;
-
-
-		void Start()
+		public LSTM_Model(ModelAsset asset, Trial trial)
 		{
-			var model = ModelLoader.Load(_modelAsset);
+			var model = ModelLoader.Load(asset);
 			_worker = new Worker(model, BackendType.GPUCompute);
-		}
-
-		public void Bind(Trial trial)
-		{
 			_trial = trial;
 		}
 
+		public void Dispose()
+		{
+			_input?.Dispose();
+			_worker?.Dispose();
+		}
+
+
 		public float EvaluateTrialAtTime(float timeSinceTrialStart)
 		{
-			
-			
 			var features0 = ZeroedPositionDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
 			var features1 = OffsetDominantFootToNonDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
 			var features2 = VelocitiesDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
@@ -60,12 +56,7 @@ namespace PassDetection
 			return result;
 		}
 
-
-		void OnDestroy()
-		{
-			_input.Dispose();
-			_worker.Dispose();
-		}
+		readonly ModelAsset _asset;
 
 		Tensor _input;
 		Trial _trial;

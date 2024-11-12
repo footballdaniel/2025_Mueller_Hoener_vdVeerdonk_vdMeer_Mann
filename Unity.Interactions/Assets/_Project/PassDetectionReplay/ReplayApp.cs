@@ -6,6 +6,7 @@ using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetectionReplay;
 using Newtonsoft.Json;
 using PassDetection;
+using Unity.Sentis;
 using UnityEngine;
 using UnityEngine.Video;
 using Vector3 = System.Numerics.Vector3;
@@ -14,7 +15,7 @@ namespace PassDetectionReplay
 {
     public class ReplayApp : MonoBehaviour
     {
-        public LSTM_Model LSTM_Model;
+        public ModelAsset ModelAsset;
         public ReplayUI ReplayUI;
         public VideoPlayer VideoPlayer;
         public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4"; // Forward slashes
@@ -23,6 +24,7 @@ namespace PassDetectionReplay
         float _currentTimeStamp;
         int _currentFrameIndex;
         float _lastPrediction;
+        LSTM_Model _lstmModel;
 
         public int NumberOfFrames => _trial.NumberOfFrames;
         public int CurrentFrameIndex => _currentFrameIndex;
@@ -55,7 +57,7 @@ namespace PassDetectionReplay
                 jsonSettings.Converters.Add(new SideEnumConverter());
                 _trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
                 
-                LSTM_Model.Bind(_trial);
+                _lstmModel = new LSTM_Model(ModelAsset, _trial);
 
                 ReplayUI.Set(this);
         }
@@ -76,14 +78,7 @@ namespace PassDetectionReplay
                 VideoPlayer.Pause();
             VideoPlayer.Play();
             
-            _lastPrediction = LSTM_Model.EvaluateTrialAtTime(_currentTimeStamp);
-            
-            
-            
-            // DominantFoot.transform.position = Vector3.Lerp(DominantFoot.transform.position, _trial.UserDominantFootPositions[_currentFrameIndex], t);
-            // NonDominantFoot.transform.position = Vector3.Lerp(NonDominantFoot.transform.position, _trial.UserNonDominantFootPositions[_currentFrameIndex], t);
-            // Opponent.transform.position = Vector3.Lerp(Opponent.transform.position, _trial.OpponentHipPositions[_currentFrameIndex], t);
-            // UserHead.transform.position = Vector3.Lerp(UserHead.transform.position, _trial.UserHeadPositions[_currentFrameIndex], t);
+            _lastPrediction = _lstmModel.EvaluateTrialAtTime(_currentTimeStamp);
         }
         
         
@@ -97,6 +92,11 @@ namespace PassDetectionReplay
         public void TogglePlayPause()
         {
             _isPlaying = !_isPlaying;
+        }
+
+        void OnDestroy()
+        {
+            _lstmModel.Dispose();
         }
     }
 }
