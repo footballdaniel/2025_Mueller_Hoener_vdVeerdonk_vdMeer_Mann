@@ -6,9 +6,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
-from src.feature_engineer import FeatureEngineer
-from src.features import VelocitiesNonDominantFootCalculator, VelocitiesDominantFootCalculator, \
-    OffsetDominantFootToNonDominantFootCalculator, ZeroedPositionDominantFootCalculator
+from src.features.feature_engineer import FeatureEngineer
+from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
+from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
+from src.features.foot_offset import FootOffsetCalculator
+from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
@@ -19,7 +21,7 @@ from src.trial_labeler import Labels
 
 
 """Reading Trials"""
-pattern = "../Data/Pilot_4/**/*.csv"
+pattern = "../Data/Pilot_3/**/*.csv"
 
 trials = []
 for filename in glob.iglob(pattern, recursive=True):
@@ -41,7 +43,7 @@ augmented_samples = Augmentor.augment(labeled_samples)
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
 engineer.add_feature(ZeroedPositionDominantFootCalculator())
-engineer.add_feature(OffsetDominantFootToNonDominantFootCalculator())
+engineer.add_feature(FootOffsetCalculator())
 engineer.add_feature(VelocitiesDominantFootCalculator())
 engineer.add_feature(VelocitiesNonDominantFootCalculator())
 
@@ -81,7 +83,7 @@ input_size = engineer.input_size
 hidden_size = 64
 num_layers = 2
 learning_rate = 0.001
-num_epochs = 50  # Increase because early stopping will determine the actual number of epochs
+num_epochs = 1000
 
 # Initialize model, loss function, optimizer
 model = PassDetectionModel(input_size, hidden_size, num_layers)

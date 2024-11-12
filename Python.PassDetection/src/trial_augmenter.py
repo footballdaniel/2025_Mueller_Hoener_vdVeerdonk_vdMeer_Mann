@@ -17,10 +17,9 @@ class Augmentor:
                 rotation_angle=0
             ))
 
-            if trial.is_a_pass:
-                Augmentor.add_rotated_passes(augmented_trials, trial, rotation_angles)
-                Augmentor.add_swapped_feet_pass(augmented_trials, trial)
-                Augmentor.add_swapped_and_rotated_passes(augmented_trials, trial, rotation_angles)
+            Augmentor.add_rotated_passes(augmented_trials, trial, rotation_angles)
+            Augmentor.add_swapped_feet_pass(augmented_trials, trial)
+            Augmentor.add_swapped_and_rotated_passes(augmented_trials, trial, rotation_angles)
 
         return augmented_trials
 
