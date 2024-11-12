@@ -51,7 +51,6 @@ namespace PassDetectionReplay
                 VideoPlayer.Prepare();
 
                 var json = File.ReadAllText(jsonFile);
-
                 var jsonSettings = new JsonSerializerSettings();
                 jsonSettings.Converters.Add(new Vector3Converter());
                 jsonSettings.Converters.Add(new SideEnumConverter());
