@@ -70,6 +70,41 @@ class Trial:
         )
         return mirrored
 
+    def rotate_around_y(self, angle_degrees: float):
+        """Rotate all positions in the trial around the y-axis by the given angle."""
+        rotated = Trial(
+            frame_rate_hz=self.frame_rate_hz,
+            number_of_frames=self.number_of_frames,
+            timestamps=self.timestamps,
+            trial_number=self.trial_number,
+            duration=self.duration,
+            user_dominant_foot_positions=[
+                pos.rotate_around_y(angle_degrees) for pos in self.user_dominant_foot_positions
+            ],
+            user_non_dominant_foot_positions=[
+                pos.rotate_around_y(angle_degrees) for pos in self.user_non_dominant_foot_positions
+            ],
+            pass_events=self.pass_events  # Pass events are unchanged by rotation
+        )
+        return rotated
+
+    def swap_feet(self):
+        """Swap the dominant and non-dominant foot data."""
+        swapped = Trial(
+            frame_rate_hz=self.frame_rate_hz,
+            number_of_frames=self.number_of_frames,
+            timestamps=self.timestamps,
+            trial_number=self.trial_number,
+            duration=self.duration,
+            user_dominant_foot_positions=self.user_non_dominant_foot_positions.copy(),
+            user_non_dominant_foot_positions=self.user_dominant_foot_positions.copy(),
+            pass_events=[
+                PassEvent(frame_number=event.frame_number, foot=event.foot.mirror())
+                for event in self.pass_events
+            ]
+        )
+        return swapped
+
 
 @dataclass
 class LabeledTrial(Trial):

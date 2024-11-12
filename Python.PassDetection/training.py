@@ -7,12 +7,14 @@ import torch
 import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
+from src.domain import LabeledTrial
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
-from src.training_data_sampler import TrialLabeler
+from src.trial_augmenter import TrialAugmenter
+from src.trial_labeler import TrialLabeler
 
 # Use glob to find all CSV files
 pattern = "data/**/*.csv"
@@ -33,29 +35,17 @@ for filename in glob.iglob(pattern, recursive=True):
 
 """SAMPLER"""
 
-full_dataset = TrialLabeler.generate_dataset(trials)
-# for sample in full_dataset:
-#     plot_feature(sample, 'plots', f'{sample.trial_number}_{sample.start_time}_{sample.is_a_pass}.png')
+labeled_trials = TrialLabeler.generate_dataset(trials)
+augmented_trials = TrialAugmenter.augment(labeled_trials)
+
+for sample in labeled_trials:
+    plot_feature(sample, 'plots', f'{sample.trial_number}_{sample.start_time}_{sample.is_a_pass}.png')
+
+
 
 
 """AUGMENTATION"""
-rotation_angles = [angle for angle in range(5, 360, 10)]
-augmented_passes = []
-for feature in full_dataset:
 
-    if feature.is_a_pass:
-        for angle in rotation_angles:
-            rotated_feature = feature.rotate_around_y(angle)
-            augmented_passes.append(rotated_feature)
-
-        swapped_feature = feature.swap_feet()
-        augmented_passes.append(swapped_feature)
-
-        for angle in rotation_angles:
-            swapped_rotated_feature = swapped_feature.rotate_around_y(angle)
-            augmented_passes.append(swapped_rotated_feature)
-
-combined_dataset = full_dataset + augmented_passes
 
 # Save some to folder
 with open('10_sample_passes.pkl', 'wb') as f:
