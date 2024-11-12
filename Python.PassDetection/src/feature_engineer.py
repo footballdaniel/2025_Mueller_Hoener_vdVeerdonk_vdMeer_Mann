@@ -21,3 +21,8 @@ class FeatureEngineer:
             outcome = int(trial.is_a_pass)
             calculated_features_list.append(CalculatedFeatures(features=features, outcome=outcome))
         return calculated_features_list
+
+    @property
+    def input_size(self) -> int:
+        # Sum the sizes of each feature calculator to get the input size
+        return sum(feature.size for feature in self.feature_calculators)

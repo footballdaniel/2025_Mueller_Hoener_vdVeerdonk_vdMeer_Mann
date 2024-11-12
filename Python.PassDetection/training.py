@@ -80,7 +80,7 @@ print(f"Positive samples: {num_positive}")
 print(f"Negative samples: {num_negative}")
 
 # Model parameters
-input_size = dataset.input_size
+input_size = engineer.input_size
 hidden_size = 64
 num_layers = 2
 learning_rate = 0.001

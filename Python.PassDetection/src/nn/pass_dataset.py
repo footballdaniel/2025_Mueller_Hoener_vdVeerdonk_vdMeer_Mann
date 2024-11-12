@@ -11,7 +11,7 @@ from src.domain import FeatureCalculator, CalculatedFeatures
 @dataclass
 class PassDataset(Dataset):
     calculated_features: List[CalculatedFeatures]
-    feature_calculators: List[FeatureCalculator] = field(default_factory=list)
+
 
     def __len__(self) -> int:
         return len(self.calculated_features)
@@ -30,7 +30,3 @@ class PassDataset(Dataset):
 
         return input_tensor, label
 
-    @property
-    def input_size(self) -> int:
-        # Sum the sizes of each feature calculator to get the input size
-        return sum(feature.size for feature in self.feature_calculators)
