@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 
 class Foot(Enum):
@@ -69,3 +69,32 @@ class Trial:
             ]
         )
         return mirrored
+
+
+@dataclass
+class LabeledTrial(Trial):
+    is_a_pass: bool = False
+    pass_id: Optional[int] = None
+
+
+@dataclass
+class AugmentedLabeledTrial(LabeledTrial):
+    rotation_angle: Optional[float] = None
+
+
+@dataclass
+class Feature:
+    name: str
+    values: List[float]
+
+    @property
+    def size(self):
+        return len(self.values)
+
+
+@dataclass
+class Features:
+    features: List[Feature] = field(default_factory=list)
+
+    def add(self, feature: Feature):
+        self.features.append(feature)

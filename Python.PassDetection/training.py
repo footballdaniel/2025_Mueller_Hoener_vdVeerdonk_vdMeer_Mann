@@ -5,7 +5,6 @@ import pickle
 import onnx
 import torch
 import torch.nn as nn
-from torch import sigmoid
 from torch.utils.data import random_split, DataLoader
 
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
@@ -13,7 +12,7 @@ from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
-from src.training_data_sampler import DataSampler
+from src.training_data_sampler import TrialLabeler
 
 # Use glob to find all CSV files
 pattern = "data/**/*.csv"
@@ -31,9 +30,10 @@ for filename in glob.iglob(pattern, recursive=True):
     trial.pass_events.extend(pass_events)  # Append the events to the Trial
     trials.append(trial)
 
+
 """SAMPLER"""
-sampler = DataSampler(trials)
-full_dataset = sampler.generate_dataset()
+
+full_dataset = TrialLabeler.generate_dataset(trials)
 # for sample in full_dataset:
 #     plot_feature(sample, 'plots', f'{sample.trial_number}_{sample.start_time}_{sample.is_a_pass}.png')
 
