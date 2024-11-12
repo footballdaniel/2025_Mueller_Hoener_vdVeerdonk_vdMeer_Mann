@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -10,5 +11,6 @@ class PassDetectionModel(nn.Module):
     def forward(self, x):
         lstm_out, _ = self.lstm(x)
         out = lstm_out[:, -1, :]
-        out = self.fc(out)  # No sigmoid activation here
-        return out  # Output logits
+        out = self.fc(out)
+        out = torch.sigmoid(out)
+        return out

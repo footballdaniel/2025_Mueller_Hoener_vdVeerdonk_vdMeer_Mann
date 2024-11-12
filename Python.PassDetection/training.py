@@ -2,6 +2,7 @@ import glob
 import os
 import pickle
 
+import onnx
 import torch
 import torch.nn as nn
 from torch import sigmoid
@@ -105,7 +106,7 @@ num_epochs = 50  # Increase because early stopping will determine the actual num
 
 # Initialize model, loss function, optimizer
 model = PassDetectionModel(input_size, hidden_size, num_layers)
-criterion = nn.BCEWithLogitsLoss()
+criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Early stopping parameters
@@ -216,41 +217,68 @@ print(f"Brier Score: {brier_score:.4f}")
 precision, recall, f1 = calculate_classification_metrics(torch.tensor(all_labels), torch.tensor(all_predictions))
 print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
 
-"""EVALUATE FIRST BATCH FOR SANITY"""
+
+"""RUN MODEL ON FIRST BATCH FOR SANITY CHECK"""
 with torch.no_grad():
     for inputs, labels in val_loader:
         inputs = inputs.to(device)
-        labels = labels.to(device).view(-1, 1)
+        labels = labels.to(device)
         outputs = model(inputs)
-        probabilities = sigmoid(outputs).squeeze()
+        probabilities = outputs.squeeze()
         predicted = (probabilities >= 0.5).float()
-        # Print some outputs and labels
         print(f"Probabilities: {probabilities[:5]}")
         print(f"Predicted labels: {predicted[:5]}")
         print(f"Actual labels: {labels.squeeze()[:5]}")
-        # Break after first batch for brevity
+        # Only print first batch, continue to export
         break
 
 """EXPORT ONNX"""
-# Define the output file name
+# Path for ONNX file
 onnx_file_path = "pass_detection_model.onnx"
-# Ensure the model is on the CPU
 model.to('cpu')
-# Export the model
-sequence_length = 10  # same as training data
-dummy_input = torch.randn(batch_size, sequence_length, input_size)
-# Export the model
+model.eval()
+
+# Grab only the first sample from the first batch of val_loader for export
+example_input = inputs[0:1].cpu()  # First sample with batch size 1
+
+# Evaluate the model with this single sample input (First sample from data)
+with torch.no_grad():
+    example_output = model(example_input)
+    example_output_values = example_output.squeeze().tolist()
+
+    print(f"Example input shape: {example_input.shape}")
+    print(f"Example output shape: {example_output.shape}")
+
+    print(f"Example input: {example_input}")
+    print(f"Example output: {example_output_values}")
+
+# Export the model using the first sample as the dummy input
 torch.onnx.export(
-    model,  # Model being run
-    dummy_input,  # Model input (or a tuple for multiple inputs)
-    onnx_file_path,  # Where to save the model
-    export_params=True,  # Store the trained parameter weights inside the model file
-    opset_version=11,  # ONNX version to export to (11 is widely supported)
-    do_constant_folding=True,  # Whether to execute constant folding for optimization
-    input_names=['input'],  # Model's input names
-    output_names=['output'],  # Model's output names
+    model,
+    example_input,
+    onnx_file_path,
+    export_params=True,
+    opset_version=11,
+    do_constant_folding=True,
+    input_names=['input'],
+    output_names=['output'],
     dynamic_axes={
-        'input': {0: 'batch_size', 1: 'sequence_length'},  # Variable batch size and sequence length
-        'output': {0: 'batch_size'}  # Variable batch size
+        'input': {0: 'batch_size', 1: 'sequence_length'},
+        'output': {0: 'batch_size'}
     }
 )
+
+# Load the exported ONNX model and add metadata
+onnx_model = onnx.load(onnx_file_path)
+
+# Adding metadata for example input and output
+metadata_props = onnx_model.metadata_props.add()
+metadata_props.key = "example_input"
+metadata_props.value = str(example_input.tolist())  # Store example input as string
+
+metadata_props = onnx_model.metadata_props.add()
+metadata_props.key = "example_output"
+metadata_props.value = str(example_output_values)  # Store example output as string
+
+# Save the modified model with added metadata
+onnx.save(onnx_model, onnx_file_path)
