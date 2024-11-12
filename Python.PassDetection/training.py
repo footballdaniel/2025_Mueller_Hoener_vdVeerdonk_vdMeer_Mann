@@ -1,13 +1,12 @@
 import glob
 import os
-import pickle
 
 import onnx
 import torch
 import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
-from src.domain import LabeledTrial
+from src.features import VelocitiesNonDominantFootCalculator, VelocitiesDominantFootCalculator
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.brier import calculate_brier_score
 from src.nn.f1 import calculate_classification_metrics
@@ -32,63 +31,58 @@ for filename in glob.iglob(pattern, recursive=True):
     trial.pass_events.extend(pass_events)  # Append the events to the Trial
     trials.append(trial)
 
-
-"""SAMPLER"""
-
+"""SAMPLING AND AUGMENTATION"""
 labeled_trials = TrialLabeler.generate_dataset(trials)
 augmented_trials = TrialAugmenter.augment(labeled_trials)
+dataset = PassDataset(augmented_trials)
 
-for sample in labeled_trials:
-    plot_feature(sample, 'plots', f'{sample.trial_number}_{sample.start_time}_{sample.is_a_pass}.png')
+velocity_non_dominant_foot = VelocitiesNonDominantFootCalculator()
+velocity_dominant_foot = VelocitiesDominantFootCalculator()
+offset_dominant_foot_to_non_dominant_foot = VelocitiesDominantFootCalculator()
+zeroed_dominant_foot_positions = VelocitiesDominantFootCalculator()
 
+dataset.add_feature(velocity_non_dominant_foot)
+dataset.add_feature(velocity_dominant_foot)
+dataset.add_feature(offset_dominant_foot_to_non_dominant_foot)
+dataset.add_feature(zeroed_dominant_foot_positions)
 
+# # Save some to folder
+# with open('10_sample_passes.pkl', 'wb') as f:
+#     pickle.dump(augmented_trials[:10], f)
+# # save 10 non-passes
+# non_passes = [sample for sample in labeled_trials if not sample.is_a_pass]
+# with open('10_sample_non_passes.pkl', 'wb') as f:
+#     pickle.dump(non_passes[:10], f)
+#
+# for sample in labeled_trials:
+#     plot_labeled_trial(sample, 'plots', f'{sample.trial_number}_{round(sample.timestamps[0],2)}_{sample.is_a_pass}.png')
 
-
-"""AUGMENTATION"""
-
-
-# Save some to folder
-with open('10_sample_passes.pkl', 'wb') as f:
-    pickle.dump(augmented_passes[:10], f)
-# save 10 non-passes
-non_passes = [sample for sample in combined_dataset if not sample.is_a_pass]
-with open('10_sample_non_passes.pkl', 'wb') as f:
-    pickle.dump(non_passes[:10], f)
-
-"""PYTORCH DATASET"""
+"""SPLIT PYTORCH DATASET"""
 torch.manual_seed(42)  # Set the seed
-dataset = PassDataset(combined_dataset)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 batch_size = 32
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+training_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+validation_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Count positive and negative samples in combined_dataset
-num_positive = sum(1 for feature in combined_dataset if feature.is_a_pass)
-num_negative = sum(1 for feature in combined_dataset if not feature.is_a_pass)
-print(f"Total samples: {len(combined_dataset)}")
+num_positive = sum(1 for feature in augmented_trials if feature.is_a_pass)
+num_negative = sum(1 for feature in augmented_trials if not feature.is_a_pass)
+print(f"Total samples: {len(augmented_trials)}")
 print(f"Positive samples: {num_positive}")
 print(f"Negative samples: {num_negative}")
 
-# For the training and validation sets
-# Since train_dataset and val_dataset are Subset objects, we can access the indices
-train_indices = train_dataset.indices
-val_indices = val_dataset.indices
-
-# Count positive and negative samples in the training set
-train_positive = sum(1 for idx in train_indices if dataset.features[idx].is_a_pass)
-train_negative = len(train_indices) - train_positive
+train_positive = sum(1 for idx in train_dataset.indices if train_dataset[idx].is_a_pass)
+train_negative = len(train_dataset.indices) - train_positive
 print(f"Training set - Positive: {train_positive}, Negative: {train_negative}")
 
-# Count positive and negative samples in the validation set
-val_positive = sum(1 for idx in val_indices if dataset.features[idx].is_a_pass)
-val_negative = len(val_indices) - val_positive
+val_positive = sum(1 for idx in val_dataset.indices if val_dataset[idx].is_a_pass)
+val_negative = len(val_dataset.indices) - val_positive
 print(f"Validation set - Positive: {val_positive}, Negative: {val_negative}")
 
 # Model parameters
-input_size = 12
+input_size = dataset.input_size
 hidden_size = 64
 num_layers = 2
 learning_rate = 0.001
@@ -118,7 +112,7 @@ for epoch in range(num_epochs):
 
     model.train()
     total_loss = 0
-    for inputs, labels in train_loader:
+    for inputs, labels in training_loader:
         inputs = inputs.to(device)
         labels = labels.to(device).view(-1, 1)
         optimizer.zero_grad()
@@ -128,7 +122,7 @@ for epoch in range(num_epochs):
         optimizer.step()
         total_loss += loss.item() * inputs.size(0)
 
-    avg_loss = total_loss / len(train_loader.dataset)
+    avg_loss = total_loss / len(training_loader.dataset)
     print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
     # Validation
@@ -136,7 +130,7 @@ for epoch in range(num_epochs):
     total_val_loss = 0
     correct = 0
     with torch.no_grad():
-        for inputs, labels in val_loader:
+        for inputs, labels in validation_loader:
             inputs = inputs.to(device)
             labels = labels.to(device).view(-1, 1)
             outputs = model(inputs)
@@ -145,8 +139,8 @@ for epoch in range(num_epochs):
             predicted = (outputs >= 0.5).float()
             correct += (predicted == labels).sum().item()
 
-    avg_val_loss = total_val_loss / len(val_loader.dataset)
-    accuracy = correct / len(val_loader.dataset)
+    avg_val_loss = total_val_loss / len(validation_loader.dataset)
+    accuracy = correct / len(validation_loader.dataset)
     print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
     # Check for improvement
@@ -180,7 +174,7 @@ all_predictions = []
 all_probabilities = []
 
 with torch.no_grad():
-    for inputs, labels in val_loader:
+    for inputs, labels in validation_loader:
         inputs = inputs.to(device)
         labels = labels.to(device).view(-1, 1)
         outputs = model(inputs)
@@ -195,8 +189,8 @@ with torch.no_grad():
         all_predictions.extend(predicted.cpu())
         all_probabilities.extend(probabilities.cpu())
 
-avg_val_loss = total_val_loss / len(val_loader.dataset)
-accuracy = correct / len(val_loader.dataset)
+avg_val_loss = total_val_loss / len(validation_loader.dataset)
+accuracy = correct / len(validation_loader.dataset)
 print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
 # Calculate Brier score
@@ -207,10 +201,9 @@ print(f"Brier Score: {brier_score:.4f}")
 precision, recall, f1 = calculate_classification_metrics(torch.tensor(all_labels), torch.tensor(all_predictions))
 print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
 
-
 """RUN MODEL ON FIRST BATCH FOR SANITY CHECK"""
 with torch.no_grad():
-    for inputs, labels in val_loader:
+    for inputs, labels in validation_loader:
         inputs = inputs.to(device)
         labels = labels.to(device)
         outputs = model(inputs)

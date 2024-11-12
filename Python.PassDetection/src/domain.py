@@ -1,8 +1,11 @@
+import abc
 import math
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
 from typing import List, Optional
+
+import torch
 
 
 class Foot(Enum):
@@ -117,19 +120,22 @@ class AugmentedLabeledTrial(LabeledTrial):
     rotation_angle: Optional[float] = None
 
 
-@dataclass
 class Feature:
     name: str
     values: List[float]
 
+    def to_tensor(self) -> torch.Tensor:
+        return torch.tensor(self.values, dtype=torch.float32)
+
+
+class FeatureCalculator(abc.ABC):
     @property
-    def size(self):
-        return len(self.values)
+    @abc.abstractmethod
+    def size(self) -> int:
+        """Return the size of the feature this calculator produces."""
+        pass
 
-
-@dataclass
-class Features:
-    features: List[Feature] = field(default_factory=list)
-
-    def add(self, feature: Feature):
-        self.features.append(feature)
+    @abc.abstractmethod
+    def calculate(self, trial: Trial) -> Feature:
+        """Calculate the feature for a given trial."""
+        pass
