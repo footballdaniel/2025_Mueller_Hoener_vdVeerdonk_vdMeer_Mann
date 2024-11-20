@@ -62,9 +62,10 @@ class Sample:
     user_non_dominant_foot_positions: List[Position]
     is_a_pass: bool = False
     pass_id: Optional[int] = None
+    pass_probability: Optional[float] = None
 
     @staticmethod
-    def mirror(sample: 'Sample') -> 'Sample':
+    def mirror(sample: Sample) -> Sample:
         """Return a mirrored version of the given sample."""
         return Sample(
             frame_rate_hz=sample.frame_rate_hz,
@@ -79,7 +80,7 @@ class Sample:
         )
 
     @staticmethod
-    def rotate_around_y(sample: 'Sample', angle_degrees: float) -> 'Sample':
+    def rotate_around_y(sample: Sample, angle_degrees: float) -> Sample:
         """Return a rotated version of the sample around the y-axis."""
         return Sample(
             frame_rate_hz=sample.frame_rate_hz,
@@ -94,7 +95,7 @@ class Sample:
         )
 
     @staticmethod
-    def swap_feet(sample: 'Sample') -> 'Sample':
+    def swap_feet(sample: Sample) -> Sample:
         """Return a version of the sample with dominant and non-dominant foot positions swapped."""
         return Sample(
             frame_rate_hz=sample.frame_rate_hz,
