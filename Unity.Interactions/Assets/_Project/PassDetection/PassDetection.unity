@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 121979483}
   - component: {fileID: 121979484}
   m_Layer: 0
-  m_Name: ModelEvaluator
+  m_Name: Scripts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -562,7 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _evaluateButton: {fileID: 919459512}
   _resultText: {fileID: 402624668}
-  _lstmTestModel: {fileID: 0}
+  _lstmTestModel: {fileID: 121979484}
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0

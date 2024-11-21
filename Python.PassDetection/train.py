@@ -9,7 +9,7 @@ import onnx
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import Subset, DataLoader
 
 from src.domain import Split
 from src.features.feature_engineer import FeatureEngineer
@@ -17,6 +17,7 @@ from src.features.foot_offset import FootOffsetCalculator
 from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
 from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
 from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
+from src.io.enum_encoder import CustomEncoder
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
 from src.nn.accuracy import prediction_accuracy
 from src.nn.brier import prediction_brier
@@ -58,27 +59,33 @@ engineer.add_feature(VelocitiesNonDominantFootCalculator())
 
 calculated_features = engineer.engineer_features(augmented_samples)
 
-"""SPLIT PYTORCH DATASET"""
+# SPLIT PYTORCH DATASET
 dataset = PassDataset(calculated_features)
 torch.manual_seed(42)  # Set the seed
 train_size = int(0.8 * len(dataset))
 validation_size = len(dataset) - train_size
-train_dataset, validation_dataset = random_split(dataset, [train_size, validation_size])
+train_indices, val_indices = torch.utils.data.random_split(range(len(dataset)), [train_size, validation_size])
+
+for i in train_indices:
+    dataset.samples[i].split = Split.TRAIN
+for i in val_indices:
+    dataset.samples[i].split = Split.VALIDATION
+
+# Create Subset datasets for training and validation
+train_dataset = Subset(dataset, train_indices)
+validation_dataset = Subset(dataset, val_indices)
+
+positive_training = sum(1 for sample in dataset.samples if sample.split == Split.TRAIN and sample.is_a_pass)
+negative_training = sum(1 for sample in dataset.samples if sample.split == Split.TRAIN and not sample.is_a_pass)
+positive_validation = sum(1 for sample in dataset.samples if sample.split == Split.VALIDATION and sample.is_a_pass)
+negative_validation = sum(1 for sample in dataset.samples if sample.split == Split.VALIDATION and not sample.is_a_pass)
+print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
+print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
+
+# DataLoaders (if needed for further processing)
 batch_size = 32
 training_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
-
-for i in train_dataset:
-    dataset.samples[i].split = Split.TRAIN
-for i in validation_dataset:
-    dataset.samples[i].split = Split.VALIDATION
-
-positive_samples_training_set = sum(1 for sample in train_dataset if sample.is_a_pass)
-negative_samples_training_set = sum(1 for sample in train_dataset if not sample.is_a_pass)
-positive_samples_validation_set = sum(1 for sample in validation_dataset if sample.is_a_pass)
-negative_samples_validation_set = sum(1 for sample in validation_dataset if not sample.is_a_pass)
-print(f"Training set: {len(train_dataset)} samples with {positive_samples_training_set} positive and {negative_samples_training_set} negative samples")
-print(f"Validation set: {len(validation_dataset)} samples with {positive_samples_validation_set} positive and {negative_samples_validation_set} negative samples")
 
 """MODEL"""
 input_size = engineer.input_size
@@ -97,7 +104,6 @@ best_val_loss = float('inf')
 epochs_no_improve = 0
 early_stop = False
 
-
 """TRAINING"""
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
@@ -106,6 +112,10 @@ epoch_index = 0
 for epoch in range(num_epochs):
     epoch_index = epoch
     if early_stop:
+        break
+
+    if epoch_index == 2:
+        print("Early stopping at epoch 2")
         break
 
     model.train()
@@ -184,7 +194,7 @@ with open('dataset.pkl', 'wb') as f:
     pickle.dump(dataset.samples, f)
 
 with open('dataset.json', 'w') as f:
-    json.dump([asdict(sample) for sample in dataset.samples], f, indent=4)
+    json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
 
 """PLOT SAMPLES"""
 for idx, sample in enumerate(dataset.samples):

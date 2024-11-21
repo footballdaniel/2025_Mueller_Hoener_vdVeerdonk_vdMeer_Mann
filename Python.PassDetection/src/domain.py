@@ -135,16 +135,17 @@ class Feature:
 
 
 class Split(Enum):
-    TRAIN = 0
-    VALIDATION = 1
-    TEST = 2
+    UNASSIGNED = 0
+    TRAIN = 1
+    VALIDATION = 2
+    TEST = 3
 
 
 @dataclass
 class SampleWithFeatures(AugmentedLabeledSample):
     features: List[Feature] = field(default_factory=list)
     output: int = 0
-    split: Split = Split.TRAIN
+    split: Split = Split.UNASSIGNED
 
 
 class FeatureCalculator(abc.ABC):
