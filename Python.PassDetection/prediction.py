@@ -1,51 +1,37 @@
 import pickle
+from typing import List
 
+import onnxruntime as ort
 import torch
-from torch import device
 
-from src.nn.lstm_model import PassDetectionModel
-from src.nn.tensor_conversion import feature_to_input_tensor
+from src.domain import SampleWithFeatures
 
-# Load the checkpoint
-checkpoint = torch.load('pass_detection_model.pth')
-
-# Extract model parameters
-input_size = checkpoint['input_size']
-hidden_size = checkpoint['hidden_size']
-num_layers = checkpoint['num_layers']
-
-# Reconstruct the model
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = PassDetectionModel(input_size, hidden_size, num_layers)
-model.load_state_dict(checkpoint['model_state_dict'])
-model.to(device)
-model.eval()
+# Load the ONNX model
+onnx_model_path = 'pass_detection_model.onnx'
+onnx_session = ort.InferenceSession(onnx_model_path)
 
 # Load data samples
-with open('10_sample_passes.pkl', 'rb') as f:
-    passes = pickle.load(f)
-with open('10_sample_non_passes.pkl', 'rb') as f:
-    non_passes = pickle.load(f)
+with open('dataset.pkl', 'rb') as f:
+    samples: List[SampleWithFeatures] = pickle.load(f)
 
 
-# Function to predict and print results for a list of features
-def predict_passes(features, label):
-    predictions = []
-    with torch.no_grad():
-        for feature in features:
-            input_tensor = feature_to_input_tensor(feature).unsqueeze(0).to(device)
-            output = model(input_tensor)
-            # Apply sigmoid to convert logits to probabilities
-            probabilities = torch.sigmoid(output).squeeze()
-            prediction = (probabilities >= 0.5).float().item()
-            predictions.append(prediction)
-            print(f'Actual label: {label}, Predicted label: {prediction}, Probability: {probabilities.item():.4f}')
-    return predictions
+def predict_probability_onnx(features):
+    features_as_tensors = [feature.to_tensor() for feature in features]
+    input_tensor = torch.stack(features_as_tensors, dim=1).unsqueeze(0)  # Add batch dimension
+
+    # import pandas as pd
+    # input_tensor_df = pd.DataFrame(input_tensor.squeeze(0).cpu().numpy()).round(2)
+    # input_tensor_df.to_csv('input_tensor.csv', index=False)
+
+    input_numpy = input_tensor.cpu().numpy()
+    onnx_inputs = {onnx_session.get_inputs()[0].name: input_numpy}
+    onnx_outputs = onnx_session.run(None, onnx_inputs)
+
+    probability = onnx_outputs[0].squeeze()
+    return float(probability)
 
 
-# Predict for passes (label=1) and non-passes (label=0)
-print("Predictions for Passes:")
-predicted_passes = predict_passes(passes, label=1)
-
-print("\nPredictions for Non-Passes:")
-predicted_non_passes = predict_passes(non_passes, label=0)
+for sample in samples:
+    predicted_probability = predict_probability_onnx(sample.features)
+    print(
+        f"Sample {sample.trial_number} - Predicted Probability: {predicted_probability:.2f}, Actual: {sample.pass_probability}")

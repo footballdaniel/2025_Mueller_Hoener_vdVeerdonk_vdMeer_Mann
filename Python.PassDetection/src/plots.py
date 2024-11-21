@@ -20,7 +20,7 @@ def plot_sample_with_features(sample: SampleWithFeatures) -> plt.Figure:
     # Main title
     pass_text = 'Pass' if sample.is_a_pass else 'No Pass'
     fig.suptitle(
-        f"Trial Number: {sample.trial_number} - {pass_text}\n"
+        f"Split: {sample.split.name.lower()} Trial Number: {sample.trial_number} - {pass_text} \n"
         f"Start: {start_time}s, End: {end_time}s, {prediction}",
         fontsize=16
     )

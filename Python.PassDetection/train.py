@@ -114,10 +114,6 @@ for epoch in range(num_epochs):
     if early_stop:
         break
 
-    if epoch_index == 2:
-        print("Early stopping at epoch 2")
-        break
-
     model.train()
     total_loss = 0
     for inputs, labels in training_loader:
@@ -181,7 +177,7 @@ with torch.no_grad():
         input_tensor = input_tensor.unsqueeze(0).to(device)
         output = model(input_tensor)
         probability = output.item()
-        sample.pass_probability = probability
+        sample.pass_probability = round(probability,3)
 
 print(f"Brier Score: {prediction_brier(dataset.samples):.4f}")
 print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
@@ -236,10 +232,6 @@ torch.onnx.export(
     do_constant_folding=True,
     input_names=['input'],
     output_names=['output'],
-    dynamic_axes={
-        'input': {0: 'batch_size', 1: 'sequence_length'},
-        'output': {0: 'batch_size'}
-    }
 )
 
 onnx_model = onnx.load(onnx_file_path)

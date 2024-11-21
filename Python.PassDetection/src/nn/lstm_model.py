@@ -5,19 +5,14 @@ import torch.nn as nn
 class PassDetectionModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers):
         super(PassDetectionModel, self).__init__()
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, 1)
+        self.fc = nn.Linear(hidden_size, 1)  # Output layer for binary classification
+        self.h0 = nn.Parameter(torch.zeros(num_layers, 1, hidden_size))
+        self.c0 = nn.Parameter(torch.zeros(num_layers, 1, hidden_size))
 
     def forward(self, x):
-        # Automatically initialize states to zeros
-        batch_size = x.size(0)
-        h0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(x.device)
-        c0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(x.device)
-
-        # Forward propagate LSTM
-        lstm_out, _ = self.lstm(x, (h0, c0))
+        lstm_out, _ = self.lstm(x)
         out = lstm_out[:, -1, :]
         out = self.fc(out)
-        return torch.sigmoid(out)
+        out = torch.sigmoid(out)
+        return out
