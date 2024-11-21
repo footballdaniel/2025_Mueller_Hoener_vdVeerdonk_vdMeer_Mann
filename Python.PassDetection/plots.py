@@ -16,9 +16,6 @@ os.makedirs(plot_dir, exist_ok=True)
 
 for idx, sample in enumerate(samples):
 
-    if sample.pass_event.is_a_pass:
-        print(sample.pass_event.is_a_pass)
-
     if sample.inference.pass_probability < 0.9:
         continue
 
@@ -35,5 +32,5 @@ for idx, sample in enumerate(samples):
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(plot_dir, filename)
     fig.savefig(plot_path)
-    plt.show()
+    # plt.show()
     plt.close(fig)

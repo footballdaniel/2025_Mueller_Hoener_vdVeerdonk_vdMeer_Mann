@@ -11,16 +11,16 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
         gridspec_kw={'hspace': 2}  # Increase vertical space between subplots
     )
 
-    start_time = round(sample.timestamps[0], 1) if sample.timestamps else 0.0
-    end_time = round(sample.timestamps[-1], 1) if sample.timestamps else 0.0
+    start_time = round(sample.recording.timestamps[0], 1) if sample.recording.timestamps else 0.0
+    end_time = round(sample.recording.timestamps[-1], 1) if sample.recording.timestamps else 0.0
 
     # Pass probability
     prediction = f"Prediction: {sample.inference.pass_probability:.2f}" if sample.inference.pass_probability is not None else "Prediction: N/A"
 
     # Main title
-    pass_text = 'Pass' if sample.pass_info.is_a_pass else 'No Pass'
+    pass_text = 'Pass' if sample.pass_event.is_a_pass else 'No Pass'
     fig.suptitle(
-        f"Split: {sample.inference.split.name.lower()} Trial Number: {sample.trial_number} - {pass_text} \n"
+        f"Split: {sample.inference.split.name.lower()} Trial Number: {sample.recording.trial_number} - {pass_text} \n"
         f"Start: {start_time}s, End: {end_time}s, {prediction}",
         fontsize=16
     )
@@ -31,7 +31,7 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
     for i in range(num_features):
         ax = axs[i]
         feature = sample.inference.features[i]
-        time = sample.timestamps
+        time = sample.recording.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)
         ax.legend()
@@ -40,9 +40,9 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
         ax.grid(True)
 
         # If there is a pass event, add vertical line
-        if sample.pass_info.is_a_pass and sample.pass_info.pass_id is not None:
+        if sample.pass_event.is_a_pass and sample.pass_event.pass_id is not None:
             ax.axvline(
-                x=sample.pass_info.pass_timestamp,
+                x=sample.pass_event.timestamp,
                 color='green',
                 linestyle='--',
                 linewidth=2,
@@ -57,15 +57,15 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
 
 
 def plot_sample(sample: Sample):
-    dominant_x = [pos.x for pos in sample.user_dominant_foot_positions]
-    dominant_y = [pos.y for pos in sample.user_dominant_foot_positions]
-    dominant_z = [pos.z for pos in sample.user_dominant_foot_positions]
+    dominant_x = [pos.x for pos in sample.recording.user_dominant_foot_positions]
+    dominant_y = [pos.y for pos in sample.recording.user_dominant_foot_positions]
+    dominant_z = [pos.z for pos in sample.recording.user_dominant_foot_positions]
 
-    non_dominant_x = [pos.x for pos in sample.user_non_dominant_foot_positions]
-    non_dominant_y = [pos.y for pos in sample.user_non_dominant_foot_positions]
-    non_dominant_z = [pos.z for pos in sample.user_non_dominant_foot_positions]
+    non_dominant_x = [pos.x for pos in sample.recording.user_non_dominant_foot_positions]
+    non_dominant_y = [pos.y for pos in sample.recording.user_non_dominant_foot_positions]
+    non_dominant_z = [pos.z for pos in sample.recording.user_non_dominant_foot_positions]
 
-    timestamps = sample.timestamps
+    timestamps = sample.recording.timestamps
 
     plt.figure(figsize=(12, 8))
     plt.subplot(3, 1, 1)

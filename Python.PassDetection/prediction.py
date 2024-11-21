@@ -34,4 +34,4 @@ def predict_probability_onnx(features):
 for sample in samples:
     predicted_probability = predict_probability_onnx(sample.inference.features)
     print(
-        f"Sample {sample.recording.trial_number} - Predicted Probability: {predicted_probability:.2f}, Actual: {sample.inference.pass_probability}")
+        f"Sample {sample.recording.trial_number} - Predicted Probability: {predicted_probability:.3f}, Actual: {sample.inference.pass_probability}")
