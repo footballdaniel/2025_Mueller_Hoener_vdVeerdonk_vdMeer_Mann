@@ -17,8 +17,6 @@ from src.features.foot_offset import FootOffsetCalculator
 from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
 from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
 from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
-from src.io.enum_encoder import CustomEncoder
-from src.io.raw_data_reader import read_recording_from_json, read_pass_events_from_csv
 from src.nn.accuracy import prediction_accuracy
 from src.nn.brier import prediction_brier
 from src.nn.f1_scores import predict_precision_recall_f1
@@ -27,13 +25,15 @@ from src.nn.pass_dataset import PassDataset
 from src.services.augmenter import Augmenter
 from src.services.label_creator import LabelCreator
 from src.services.plotter import plot_sample_with_features
+from src.services.recording_parser import RecordingParser
+from src.utils import CustomEncoder
 
-"""Reading Trials"""
+"""Reading recordings"""
 pattern = "../Data/Pilot_4/**/*.csv"
 plot_dir = Path("plots")
 save_plots = False
 
-trials = []
+recordings = []
 for filename in glob.iglob(pattern, recursive=True):
     print(f"Processing file: {filename}")
     json_filename = filename.replace(".csv", ".json")
@@ -41,13 +41,13 @@ for filename in glob.iglob(pattern, recursive=True):
         print("No JSON file found for", filename)
         continue
 
-    trial = read_recording_from_json(json_filename)
-    pass_events = read_pass_events_from_csv(filename)
-    trial.pass_events.extend(pass_events)  # Append the events to the Trial
-    trials.append(trial)
+    parser = RecordingParser()
+    parser.read_recording_from_json(json_filename)
+    parser.read_pass_events_from_csv(filename)
+    recordings.append(parser.recording)
 
 """SAMPLING AND AUGMENTATION"""
-labeled_samples = LabelCreator.generate(trials)
+labeled_samples = LabelCreator.generate(recordings)
 augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
 
 """FEATURE ENGINEERING"""
@@ -75,10 +75,10 @@ for i in val_indices:
 train_dataset = Subset(dataset, train_indices)
 validation_dataset = Subset(dataset, val_indices)
 
-positive_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_info.is_a_pass)
-negative_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_info.is_a_pass)
-positive_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_info.is_a_pass)
-negative_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_info.is_a_pass)
+positive_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass)
+negative_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass)
+positive_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass)
+negative_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass)
 print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
 print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
 
@@ -197,7 +197,7 @@ for idx, sample in enumerate(dataset.samples):
     if not save_plots:
         break
 
-    filename = f"sample_{sample.trial_number}_{idx}_pass{sample.pass_info.is_a_pass}.png"
+    filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(str(plot_dir), filename)
     fig.savefig(plot_path)

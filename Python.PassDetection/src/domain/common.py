@@ -10,10 +10,10 @@ class Position:
     y: float
     z: float
 
-    def mirror_x(self):
+    def mirror_x(self) -> Position:
         return Position(x=-self.x, y=self.y, z=self.z)
 
-    def rotate_around_y(self, angle_degrees: float):
+    def rotate_around_y(self, angle_degrees: float) -> Position:
         """Rotate the position around the y-axis by the given angle in degrees."""
         angle_radians = math.radians(angle_degrees)
         cos_theta = math.cos(angle_radians)

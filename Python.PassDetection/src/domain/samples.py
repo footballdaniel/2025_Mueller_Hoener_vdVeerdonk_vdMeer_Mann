@@ -1,47 +1,65 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, replace
-from typing import List
+from dataclasses import dataclass, replace, field
+
 from src.domain.augmentations import Augmentation, NoAugmentation
-from src.domain.common import Position
 from src.domain.inferences import Inference, NoInference
-from src.domain.passes import Pass, NoPass
+from src.domain.recordings import Recording, PassEvent
 
 
-@dataclass(frozen=True)
+@dataclass
 class Sample:
-    frame_rate_hz: int
-    number_of_frames: int
-    timestamps: List[float]
-    trial_number: int
-    duration: float
-    user_dominant_foot_positions: List[Position] = field(default_factory=list)
-    user_non_dominant_foot_positions: List[Position] = field(default_factory=list)
-    pass_info: Pass = field(default_factory=NoPass)
-    augmentation: Augmentation = field(default_factory=NoAugmentation)
+    recording: Recording
+    pass_event: PassEvent
     inference: Inference = field(default_factory=NoInference)
+    augmentation: Augmentation = field(default_factory=NoAugmentation)
 
-    @staticmethod
-    def mirror(sample: Sample) -> Sample:
+    def mirror(self) -> Sample:
+        """Return a mirrored version of the sample."""
+        new_recording = replace(
+            self.recording,
+            user_dominant_foot_positions=[pos.mirror_x() for pos in self.recording.user_dominant_foot_positions],
+            user_non_dominant_foot_positions=[pos.mirror_x() for pos in self.recording.user_non_dominant_foot_positions],
+        )
         return replace(
-            sample,
-            user_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_dominant_foot_positions],
-            user_non_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_non_dominant_foot_positions],
+            self,
+            recording=new_recording,
+            augmentation=replace(
+                self.augmentation,
+                swapped_feet=True
+            ),
         )
 
-    @staticmethod
-    def rotate_around_y(sample: Sample, angle_degrees: float) -> Sample:
+    def rotate_around_y(self, angle_degrees: float) -> Sample:
+        new_recording = replace(
+            self.recording,
+            user_dominant_foot_positions=[
+                pos.rotate_around_y(angle_degrees) for pos in self.recording.user_dominant_foot_positions
+            ],
+            user_non_dominant_foot_positions=[
+                pos.rotate_around_y(angle_degrees) for pos in self.recording.user_non_dominant_foot_positions
+            ],
+        )
         return replace(
-            sample,
-            user_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_dominant_foot_positions],
-            user_non_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_non_dominant_foot_positions],
-            augmentation=Augmentation(rotation_angle=angle_degrees, swapped_feet=sample.augmentation.swapped_feet),
+            self,
+            recording=new_recording,
+            augmentation=replace(
+                self.augmentation,
+                rotation_angle=angle_degrees
+            ),
         )
 
-    @staticmethod
-    def swap_feet(sample: Sample) -> Sample:
+    def swap_feet(self) -> Sample:
+        """Return a version of the sample with dominant and non-dominant foot positions swapped."""
+        new_recording = replace(
+            self.recording,
+            user_dominant_foot_positions=self.recording.user_non_dominant_foot_positions.copy(),
+            user_non_dominant_foot_positions=self.recording.user_dominant_foot_positions.copy(),
+        )
         return replace(
-            sample,
-            user_dominant_foot_positions=sample.user_non_dominant_foot_positions.copy(),
-            user_non_dominant_foot_positions=sample.user_dominant_foot_positions.copy(),
-            augmentation=Augmentation(rotation_angle=sample.augmentation.rotation_angle, swapped_feet=True),
+            self,
+            recording=new_recording,
+            augmentation=replace(
+                self.augmentation,
+                swapped_feet=True
+            ),
         )

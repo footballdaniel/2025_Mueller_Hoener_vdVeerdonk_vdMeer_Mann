@@ -11,7 +11,7 @@ def prediction_brier(samples: List[Sample]) -> float:
         if sample.inference.pass_probability is None:
             continue  # Skip samples without a probability
 
-        label = float(sample.pass_info.is_a_pass)
+        label = float(sample.pass_event.is_a_pass)
         probability = sample.inference.pass_probability
 
         loss = (probability - label) ** 2

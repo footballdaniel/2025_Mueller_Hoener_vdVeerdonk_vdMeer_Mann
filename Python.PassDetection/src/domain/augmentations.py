@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Augmentation:
-    rotation_angle: float
-    swapped_feet: bool
-
-
-@dataclass
-class NoAugmentation(Augmentation):
-    rotation_angle: float = 0
+    rotation_angle: float = 0.0
     swapped_feet: bool = False
+
+
+@dataclass(frozen=True)
+class NoAugmentation(Augmentation):
+    pass

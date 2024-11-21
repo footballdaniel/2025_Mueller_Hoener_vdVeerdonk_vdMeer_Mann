@@ -11,7 +11,7 @@ def prediction_accuracy(samples: List[Sample]) -> float:
         if sample.inference.pass_probability is None:
             continue  # Skip samples without a probability
 
-        label = int(sample.pass_info.is_a_pass)
+        label = int(sample.pass_event.is_a_pass)
         predicted = 1 if sample.inference.pass_probability >= 0.5 else 0
 
         if predicted == label:

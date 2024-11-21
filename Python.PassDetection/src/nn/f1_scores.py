@@ -13,7 +13,7 @@ def predict_precision_recall_f1(samples: List[Sample]) -> Tuple[float, float, fl
         if sample.inference.pass_probability is None:
             continue  # Skip samples without a probability
 
-        label = int(sample.pass_info.is_a_pass)
+        label = int(sample.pass_event.is_a_pass)
         predicted = 1 if sample.inference.pass_probability >= 0.5 else 0
 
         all_labels.append(label)

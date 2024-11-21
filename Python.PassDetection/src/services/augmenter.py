@@ -13,7 +13,7 @@ class Augmenter:
         for sample in samples:
             augmented_samples.append(sample)
 
-            if only_augment_passes and not sample.pass_info.is_a_pass:
+            if only_augment_passes and not sample.pass_event.is_a_pass:
                 continue
 
             Augmenter.add_rotated_passes(augmented_samples, sample, rotation_angles)

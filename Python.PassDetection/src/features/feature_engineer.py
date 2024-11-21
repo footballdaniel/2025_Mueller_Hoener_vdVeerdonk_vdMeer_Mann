@@ -17,10 +17,10 @@ class FeatureEngineer:
         for sample in samples:
             features = []
             for calculator in self.feature_calculators:
-                calculated = calculator.calculate(sample)
+                calculated = calculator.calculate(sample.recording)
                 features.extend(calculated)  # Each calculator returns a list of Features
 
-            outcome = int(sample.pass_info.is_a_pass)
+            outcome = int(sample.pass_event.is_a_pass)
             inference = Inference(features, outcome)
             engineered_samples.append(replace(sample, inference=inference))
         return engineered_samples

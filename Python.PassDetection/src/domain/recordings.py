@@ -8,17 +8,21 @@ from src.domain.common import Position
 
 
 class Foot(Enum):
-    RIGHT = 0
-    LEFT = 1
+    UNASSIGNED = 0
+    RIGHT = 1
+    LEFT = 2
 
     def mirror(self):
         return Foot.LEFT if self == Foot.RIGHT else Foot.RIGHT
 
 
-@dataclass
+@dataclass(frozen=True)
 class PassEvent:
+    is_a_pass: bool
     frame_number: int
     foot: Foot
+    pass_id: int
+    timestamp: float
 
 
 @dataclass
