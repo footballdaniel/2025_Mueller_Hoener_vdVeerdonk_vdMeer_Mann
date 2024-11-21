@@ -1,6 +1,8 @@
 from typing import List
 
-from src.domain import FeatureCalculator, AugmentedLabeledSample, Feature, Position
+from src.domain.common import Position
+from src.domain.inferences import FeatureCalculator, Feature
+from src.domain.recordings import Recording
 
 
 class ZeroedPositionDominantFootCalculator(FeatureCalculator):
@@ -8,8 +10,8 @@ class ZeroedPositionDominantFootCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
-        dominant_positions = trial.user_dominant_foot_positions
+    def calculate(self, recording: Recording) -> List[Feature]:
+        dominant_positions = recording.user_dominant_foot_positions
         origin = dominant_positions[0]
         zeroed_positions = [
             Position(p.x - origin.x, p.y - origin.y, p.z - origin.z) for p in dominant_positions

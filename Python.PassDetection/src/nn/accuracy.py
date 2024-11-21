@@ -1,18 +1,18 @@
 from typing import List
 
-from src.domain import SampleWithFeatures
+from src.domain.samples import Sample
 
 
-def prediction_accuracy(samples: List[SampleWithFeatures]) -> float:
+def prediction_accuracy(samples: List[Sample]) -> float:
     correct = 0
     total = 0
 
     for sample in samples:
-        if sample.pass_probability is None:
+        if sample.inference.pass_probability is None:
             continue  # Skip samples without a probability
 
-        label = int(sample.is_a_pass)
-        predicted = 1 if sample.pass_probability >= 0.5 else 0
+        label = int(sample.pass_info.is_a_pass)
+        predicted = 1 if sample.inference.pass_probability >= 0.5 else 0
 
         if predicted == label:
             correct += 1

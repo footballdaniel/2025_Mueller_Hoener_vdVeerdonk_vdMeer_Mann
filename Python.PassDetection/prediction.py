@@ -4,7 +4,7 @@ from typing import List
 import onnxruntime as ort
 import torch
 
-from src.domain import SampleWithFeatures
+from src.domain.samples import Sample
 
 # Load the ONNX model
 onnx_model_path = 'pass_detection_model.onnx'
@@ -12,7 +12,7 @@ onnx_session = ort.InferenceSession(onnx_model_path)
 
 # Load data samples
 with open('dataset.pkl', 'rb') as f:
-    samples: List[SampleWithFeatures] = pickle.load(f)
+    samples: List[Sample] = pickle.load(f)
 
 
 def predict_probability_onnx(features):
@@ -32,6 +32,6 @@ def predict_probability_onnx(features):
 
 
 for sample in samples:
-    predicted_probability = predict_probability_onnx(sample.features)
+    predicted_probability = predict_probability_onnx(sample.inference.features)
     print(
-        f"Sample {sample.trial_number} - Predicted Probability: {predicted_probability:.2f}, Actual: {sample.pass_probability}")
+        f"Sample {sample.trial_number} - Predicted Probability: {predicted_probability:.2f}, Actual: {sample.inference.pass_probability}")

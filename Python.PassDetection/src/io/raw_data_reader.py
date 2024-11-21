@@ -2,7 +2,8 @@ import csv
 import json
 from typing import List
 
-from src.domain import PassEvent, Foot, Position, Trial
+from src.domain.common import Position
+from src.domain.recordings import PassEvent, Foot, Recording
 
 
 def read_pass_events_from_csv(file_path: str) -> List[PassEvent]:
@@ -17,10 +18,10 @@ def read_pass_events_from_csv(file_path: str) -> List[PassEvent]:
     return events
 
 
-def read_trial_from_json(file_path: str) -> Trial:
+def read_recording_from_json(file_path: str) -> Recording:
     with open(file_path, "r") as f:
         data = json.load(f)
-        trial = Trial(
+        recording = Recording(
             frame_rate_hz=data['FrameRateHz'],
             number_of_frames=data['NumberOfFrames'],
             timestamps=data['Timestamps'],
@@ -33,4 +34,4 @@ def read_trial_from_json(file_path: str) -> Trial:
                 Position(**pos) for pos in data['UserNonDominantFootPositions']
             ]
         )
-    return trial
+    return recording

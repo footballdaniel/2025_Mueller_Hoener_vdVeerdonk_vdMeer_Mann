@@ -1,36 +1,39 @@
 import os
 import pickle
+from typing import List
 
 from matplotlib import pyplot as plt
 
-from src.domain import Split
-from src.plots import plot_sample_with_features
+from src.domain.inferences import Split
+from src.domain.samples import Sample
+from src.services.plots import plot_sample_with_features
 
 with open('dataset.pkl', 'rb') as f:
-    samples = pickle.load(f)
+    samples: List[Sample] = pickle.load(f)
 
 plot_dir = 'plots'
 os.makedirs(plot_dir, exist_ok=True)
 
 for idx, sample in enumerate(samples):
 
-    if sample.pass_probability < 0.9:
+    if sample.pass_info.is_a_pass:
+        print(sample.pass_info.is_a_pass)
+
+    if sample.inference.pass_probability < 0.9:
         continue
 
-    if sample.rotation_angle != 0:
+    if sample.augmentation.rotation_angle != 0:
         continue
 
-    if sample.swapped_feet:
+    if sample.augmentation.swapped_feet:
         continue
 
-    if sample.split == Split.TRAIN:
+    if sample.inference.split == Split.TRAIN:
         continue
 
-    filename = f"Sample_{sample.trial_number}_{idx}_Pass_{sample.is_a_pass}.png"
+    filename = f"Sample_{sample.trial_number}_{idx}_Pass_{sample.pass_info.is_a_pass}.png"
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(plot_dir, filename)
     fig.savefig(plot_path)
-    # plt.show()
+    plt.show()
     plt.close(fig)
-
-print(f"Plots saved in directory: {plot_dir}")

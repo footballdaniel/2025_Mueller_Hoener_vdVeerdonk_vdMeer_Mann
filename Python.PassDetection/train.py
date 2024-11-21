@@ -11,22 +11,22 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 from torch.utils.data import Subset, DataLoader
 
-from src.domain import Split
+from src.domain.inferences import Split
 from src.features.feature_engineer import FeatureEngineer
 from src.features.foot_offset import FootOffsetCalculator
 from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
 from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
 from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
 from src.io.enum_encoder import CustomEncoder
-from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
+from src.io.raw_data_reader import read_recording_from_json, read_pass_events_from_csv
 from src.nn.accuracy import prediction_accuracy
 from src.nn.brier import prediction_brier
 from src.nn.f1_scores import predict_precision_recall_f1
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
-from src.plots import plot_sample_with_features
-from src.trial_augmenter import Augmentor
-from src.trial_labeler import Labels
+from src.services.augmenter import Augmenter
+from src.services.label_creator import LabelCreator
+from src.services.plotter import plot_sample_with_features
 
 """Reading Trials"""
 pattern = "../Data/Pilot_4/**/*.csv"
@@ -41,14 +41,14 @@ for filename in glob.iglob(pattern, recursive=True):
         print("No JSON file found for", filename)
         continue
 
-    trial = read_trial_from_json(json_filename)
+    trial = read_recording_from_json(json_filename)
     pass_events = read_pass_events_from_csv(filename)
     trial.pass_events.extend(pass_events)  # Append the events to the Trial
     trials.append(trial)
 
 """SAMPLING AND AUGMENTATION"""
-labeled_samples = Labels.generate(trials)
-augmented_samples = Augmentor.augment(labeled_samples, only_augment_passes=True)
+labeled_samples = LabelCreator.generate(trials)
+augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
 
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
@@ -67,18 +67,18 @@ validation_size = len(dataset) - train_size
 train_indices, val_indices = torch.utils.data.random_split(range(len(dataset)), [train_size, validation_size])
 
 for i in train_indices:
-    dataset.samples[i].split = Split.TRAIN
+    dataset.samples[i].inference.split = Split.TRAIN
 for i in val_indices:
-    dataset.samples[i].split = Split.VALIDATION
+    dataset.samples[i].inference.split = Split.VALIDATION
 
 # Create Subset datasets for training and validation
 train_dataset = Subset(dataset, train_indices)
 validation_dataset = Subset(dataset, val_indices)
 
-positive_training = sum(1 for sample in dataset.samples if sample.split == Split.TRAIN and sample.is_a_pass)
-negative_training = sum(1 for sample in dataset.samples if sample.split == Split.TRAIN and not sample.is_a_pass)
-positive_validation = sum(1 for sample in dataset.samples if sample.split == Split.VALIDATION and sample.is_a_pass)
-negative_validation = sum(1 for sample in dataset.samples if sample.split == Split.VALIDATION and not sample.is_a_pass)
+positive_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_info.is_a_pass)
+negative_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_info.is_a_pass)
+positive_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_info.is_a_pass)
+negative_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_info.is_a_pass)
 print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
 print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
 
@@ -177,7 +177,7 @@ with torch.no_grad():
         input_tensor = input_tensor.unsqueeze(0).to(device)
         output = model(input_tensor)
         probability = output.item()
-        sample.pass_probability = round(probability,3)
+        sample.pass_probability = round(probability, 3)
 
 print(f"Brier Score: {prediction_brier(dataset.samples):.4f}")
 print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
@@ -197,7 +197,7 @@ for idx, sample in enumerate(dataset.samples):
     if not save_plots:
         break
 
-    filename = f"sample_{sample.trial_number}_{idx}_pass{sample.is_a_pass}.png"
+    filename = f"sample_{sample.trial_number}_{idx}_pass{sample.pass_info.is_a_pass}.png"
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(str(plot_dir), filename)
     fig.savefig(plot_path)
@@ -209,8 +209,8 @@ onnx_file_path = "pass_detection_model.onnx"
 model.to('cpu')
 model.eval()
 
-# Grab only the first sample from the first batch of val_loader for export
-example_input = inputs[0:1].cpu()  # First sample with batch size 1
+# Grab only the first sample from the last batch of val_loader for export
+example_input = inputs[0:1].cpu()  # First sample of last batch with batch size 1
 
 # Evaluate the model with this single sample input (First sample from data)
 with torch.no_grad():

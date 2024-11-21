@@ -1,10 +1,10 @@
 from matplotlib import pyplot as plt
 
-from src.domain import SampleWithFeatures, Sample
+from src.domain.samples import Sample
 
 
-def plot_sample_with_features(sample: SampleWithFeatures) -> plt.Figure:
-    num_features = len(sample.features)
+def plot_sample_with_features(sample: Sample) -> plt.Figure:
+    num_features = len(sample.inference.features)
     fig_height = num_features * 2  # Smaller figure height per feature
     fig, axs = plt.subplots(
         num_features, 1, figsize=(10, fig_height),
@@ -15,12 +15,12 @@ def plot_sample_with_features(sample: SampleWithFeatures) -> plt.Figure:
     end_time = round(sample.timestamps[-1], 1) if sample.timestamps else 0.0
 
     # Pass probability
-    prediction = f"Prediction: {sample.pass_probability:.2f}" if sample.pass_probability is not None else "Prediction: N/A"
+    prediction = f"Prediction: {sample.inference.pass_probability:.2f}" if sample.inference.pass_probability is not None else "Prediction: N/A"
 
     # Main title
-    pass_text = 'Pass' if sample.is_a_pass else 'No Pass'
+    pass_text = 'Pass' if sample.pass_info.is_a_pass else 'No Pass'
     fig.suptitle(
-        f"Split: {sample.split.name.lower()} Trial Number: {sample.trial_number} - {pass_text} \n"
+        f"Split: {sample.inference.split.name.lower()} Trial Number: {sample.trial_number} - {pass_text} \n"
         f"Start: {start_time}s, End: {end_time}s, {prediction}",
         fontsize=16
     )
@@ -30,7 +30,7 @@ def plot_sample_with_features(sample: SampleWithFeatures) -> plt.Figure:
 
     for i in range(num_features):
         ax = axs[i]
-        feature = sample.features[i]
+        feature = sample.inference.features[i]
         time = sample.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)
@@ -40,9 +40,9 @@ def plot_sample_with_features(sample: SampleWithFeatures) -> plt.Figure:
         ax.grid(True)
 
         # If there is a pass event, add vertical line
-        if sample.is_a_pass and sample.pass_id is not None:
+        if sample.pass_info.is_a_pass and sample.pass_info.pass_id is not None:
             ax.axvline(
-                x=sample.pass_timestamp,
+                x=sample.pass_info.pass_timestamp,
                 color='green',
                 linestyle='--',
                 linewidth=2,

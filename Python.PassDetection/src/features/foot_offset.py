@@ -1,6 +1,8 @@
 from typing import List
 
-from src.domain import FeatureCalculator, AugmentedLabeledSample, Feature, Position
+from src.domain.common import Position
+from src.domain.inferences import FeatureCalculator, Feature
+from src.domain.samples import Sample
 
 
 class FootOffsetCalculator(FeatureCalculator):
@@ -8,9 +10,9 @@ class FootOffsetCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, trial: AugmentedLabeledSample) -> List[Feature]:
-        dominant_positions = trial.user_dominant_foot_positions
-        non_dominant_positions = trial.user_non_dominant_foot_positions
+    def calculate(self, sample: Sample) -> List[Feature]:
+        dominant_positions = sample.user_dominant_foot_positions
+        non_dominant_positions = sample.user_non_dominant_foot_positions
         offsets = [
             Position(
                 non_dominant_positions[i].x - dominant_positions[i].x,

@@ -1,6 +1,7 @@
 from typing import List
 
-from src.domain import AugmentedLabeledSample, FeatureCalculator, SampleWithFeatures
+from src.domain.inferences import FeatureCalculator, Inference
+from src.domain.samples import Sample
 
 
 class FeatureEngineer:
@@ -10,17 +11,18 @@ class FeatureEngineer:
     def add_feature(self, feature_calculator: FeatureCalculator):
         self.feature_calculators.append(feature_calculator)
 
-    def engineer_features(self, samples: List[AugmentedLabeledSample]) -> List[SampleWithFeatures]:
-        calculated_features_list = []
+    def engineer_features(self, samples: List[Sample]) -> List[Sample]:
+        engineereed_samples = []
         for sample in samples:
             features = []
             for calculator in self.feature_calculators:
                 calculated = calculator.calculate(sample)
                 features.extend(calculated)  # Each calculator returns a list of Features
 
-            outcome = int(sample.is_a_pass)
-            calculated_features_list.append(SampleWithFeatures(**sample.__dict__, features=features, output=outcome))
-        return calculated_features_list
+            outcome = int(sample.pass_info.is_a_pass)
+            sample.inference = Inference(features, outcome)
+            engineereed_samples.append(Sample(**sample.__dict__))
+        return engineereed_samples
 
     @property
     def input_size(self) -> int:
