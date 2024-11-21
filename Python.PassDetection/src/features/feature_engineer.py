@@ -1,6 +1,6 @@
 from typing import List
 
-from src.domain import AugmentedLabeledSample, FeatureCalculator, CalculatedSample
+from src.domain import AugmentedLabeledSample, FeatureCalculator, SampleWithFeatures
 
 
 class FeatureEngineer:
@@ -10,16 +10,16 @@ class FeatureEngineer:
     def add_feature(self, feature_calculator: FeatureCalculator):
         self.feature_calculators.append(feature_calculator)
 
-    def engineer_features(self, trials: List[AugmentedLabeledSample]) -> List[CalculatedSample]:
+    def engineer_features(self, samples: List[AugmentedLabeledSample]) -> List[SampleWithFeatures]:
         calculated_features_list = []
-        for trial in trials:
+        for sample in samples:
             features = []
             for calculator in self.feature_calculators:
-                calculated = calculator.calculate(trial)
+                calculated = calculator.calculate(sample)
                 features.extend(calculated)  # Each calculator returns a list of Features
 
-            outcome = int(trial.is_a_pass)
-            calculated_features_list.append(CalculatedSample(features=features, outcome=outcome))
+            outcome = int(sample.is_a_pass)
+            calculated_features_list.append(SampleWithFeatures(**sample.__dict__, features=features, outcome=outcome))
         return calculated_features_list
 
     @property

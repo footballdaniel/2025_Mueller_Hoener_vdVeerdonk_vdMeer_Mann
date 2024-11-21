@@ -1,22 +1,22 @@
-import numpy as np
-import torch
+from typing import List
+
+from src.domain import SampleWithFeatures
 
 
-def calculate_brier_score(labels, probabilities):
-    """
-    Calculates the Brier score for binary probabilistic predictions.
+def prediction_brier(samples: List[SampleWithFeatures]) -> float:
+    total_loss = 0.0
+    total = 0
 
-    Args:
-        labels (torch.Tensor or numpy.ndarray): True binary labels (0 or 1).
-        probabilities (torch.Tensor or numpy.ndarray): Predicted probabilities for the positive class.
+    for sample in samples:
+        if sample.pass_probability is None:
+            continue  # Skip samples without a probability
 
-    Returns:
-        float: The Brier score.
-    """
-    if isinstance(labels, torch.Tensor):
-        labels = labels.cpu().numpy()
-    if isinstance(probabilities, torch.Tensor):
-        probabilities = probabilities.cpu().numpy()
+        label = float(sample.is_a_pass)
+        probability = sample.pass_probability
 
-    brier_score = np.mean((probabilities - labels) ** 2)
-    return brier_score
+        loss = (probability - label) ** 2
+        total_loss += loss
+        total += 1
+
+    score = total_loss / total if total > 0 else 0.0
+    return score

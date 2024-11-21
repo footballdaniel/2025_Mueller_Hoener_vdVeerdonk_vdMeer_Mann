@@ -7,18 +7,18 @@ import torch.nn as nn
 from torch.utils.data import random_split, DataLoader
 
 from src.features.feature_engineer import FeatureEngineer
+from src.features.foot_offset import FootOffsetCalculator
 from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
 from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
-from src.features.foot_offset import FootOffsetCalculator
 from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
 from src.io.raw_data_reader import read_trial_from_json, read_pass_events_from_csv
-from src.nn.brier import calculate_brier_score
-from src.nn.f1 import calculate_classification_metrics
+from src.nn.accuracy import prediction_accuracy
+from src.nn.brier import prediction_brier
+from src.nn.f1_scores import predict_precision_recall_f1
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
 from src.trial_augmenter import Augmentor
 from src.trial_labeler import Labels
-
 
 """Reading Trials"""
 pattern = "../Data/Pilot_3/**/*.csv"
@@ -48,7 +48,6 @@ engineer.add_feature(VelocitiesDominantFootCalculator())
 engineer.add_feature(VelocitiesNonDominantFootCalculator())
 
 calculated_features = engineer.engineer_features(augmented_samples)
-
 
 # # Save some to folder
 # with open('10_sample_passes.pkl', 'wb') as f:
@@ -162,55 +161,20 @@ checkpoint = {
 torch.save(checkpoint, 'pass_detection_model.pth')
 
 """EVALUATION"""
-# Validation
 model.eval()
-total_val_loss = 0
-correct = 0
-all_labels = []
-all_predictions = []
-all_probabilities = []
-
 with torch.no_grad():
-    for inputs, labels in validation_loader:
-        inputs = inputs.to(device)
-        labels = labels.to(device).view(-1, 1)
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        total_val_loss += loss.item() * inputs.size(0)
-        probabilities = outputs.squeeze()
-        predicted = (probabilities >= 0.5).float()
-        correct += (predicted == labels.squeeze()).sum().item()
+    for idx in range(len(dataset)):
+        sample = dataset.samples[idx]
+        input_tensor, label = dataset[idx]
+        input_tensor = input_tensor.unsqueeze(0).to(device)
+        output = model(input_tensor)
+        probability = output.item()
+        sample.pass_probability = probability
 
-        # Collect labels and predictions for metrics
-        all_labels.extend(labels.squeeze().cpu())
-        all_predictions.extend(predicted.cpu())
-        all_probabilities.extend(probabilities.cpu())
-
-avg_val_loss = total_val_loss / len(validation_loader.dataset)
-accuracy = correct / len(validation_loader.dataset)
-print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
-
-# Calculate Brier score
-brier_score = calculate_brier_score(torch.tensor(all_labels), torch.tensor(all_probabilities))
-print(f"Brier Score: {brier_score:.4f}")
-
-# Calculate precision, recall, F1 score
-precision, recall, f1 = calculate_classification_metrics(torch.tensor(all_labels), torch.tensor(all_predictions))
-print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
-
-"""RUN MODEL ON FIRST BATCH FOR SANITY CHECK"""
-with torch.no_grad():
-    for inputs, labels in validation_loader:
-        inputs = inputs.to(device)
-        labels = labels.to(device)
-        outputs = model(inputs)
-        probabilities = outputs.squeeze()
-        predicted = (probabilities >= 0.5).float()
-        print(f"Probabilities: {probabilities[:5]}")
-        print(f"Predicted labels: {predicted[:5]}")
-        print(f"Actual labels: {labels.squeeze()[:5]}")
-        # Only print first batch, continue to export
-        break
+print(f"Brier Score: {prediction_brier(dataset.samples):.4f}")
+print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
+precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
+print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
 
 """EXPORT ONNX"""
 # Path for ONNX file
@@ -248,10 +212,7 @@ torch.onnx.export(
     }
 )
 
-# Load the exported ONNX model and add metadata
 onnx_model = onnx.load(onnx_file_path)
-
-# Adding metadata for example input and output
 metadata_props = onnx_model.metadata_props.add()
 metadata_props.key = "example_input"
 metadata_props.value = str(example_input.tolist())  # Store example input as string
@@ -259,6 +220,4 @@ metadata_props.value = str(example_input.tolist())  # Store example input as str
 metadata_props = onnx_model.metadata_props.add()
 metadata_props.key = "example_output"
 metadata_props.value = str(example_output_values)  # Store example output as string
-
-# Save the modified model with added metadata
 onnx.save(onnx_model, onnx_file_path)

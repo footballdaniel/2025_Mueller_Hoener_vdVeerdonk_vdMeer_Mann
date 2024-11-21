@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import math
 from dataclasses import dataclass, field
@@ -38,6 +40,7 @@ class Position:
 class PassEvent:
     frame_number: int
     foot: Foot
+
 
 @dataclass
 class Trial:
@@ -88,8 +91,10 @@ class Sample:
             timestamps=sample.timestamps,
             trial_number=sample.trial_number,
             duration=sample.duration,
-            user_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_dominant_foot_positions],
-            user_non_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in sample.user_non_dominant_foot_positions],
+            user_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in
+                                          sample.user_dominant_foot_positions],
+            user_non_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in
+                                              sample.user_non_dominant_foot_positions],
             is_a_pass=sample.is_a_pass,
             pass_id=sample.pass_id
         )
@@ -125,9 +130,9 @@ class Feature:
 
 
 @dataclass
-class CalculatedSample:
-    features: List[Feature]
-    outcome: int  # Binary outcome (e.g., 0 or 1 indicating pass or no pass)
+class SampleWithFeatures(AugmentedLabeledSample):
+    features: List[Feature] = field(default_factory=list)
+    outcome: int = 0
 
 
 class FeatureCalculator(abc.ABC):

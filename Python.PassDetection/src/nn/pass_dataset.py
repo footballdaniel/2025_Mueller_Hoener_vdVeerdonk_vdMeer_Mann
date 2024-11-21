@@ -5,18 +5,18 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from src.domain import FeatureCalculator, CalculatedSample
+from src.domain import FeatureCalculator, SampleWithFeatures
 
 
 @dataclass
 class PassDataset(Dataset):
-    calculated_features: List[CalculatedSample]
+    samples: List[SampleWithFeatures]
 
     def __len__(self) -> int:
-        return len(self.calculated_features)
+        return len(self.samples)
 
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
-        trial = self.calculated_features[idx]
+        trial = self.samples[idx]
 
         # Convert each feature's values into a tensor and stack along the correct dimension
         input_tensor = torch.stack(
