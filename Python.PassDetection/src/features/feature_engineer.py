@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import List
 
 from src.domain.inferences import FeatureCalculator, Inference
@@ -12,7 +13,7 @@ class FeatureEngineer:
         self.feature_calculators.append(feature_calculator)
 
     def engineer_features(self, samples: List[Sample]) -> List[Sample]:
-        engineereed_samples = []
+        engineered_samples = []
         for sample in samples:
             features = []
             for calculator in self.feature_calculators:
@@ -20,9 +21,9 @@ class FeatureEngineer:
                 features.extend(calculated)  # Each calculator returns a list of Features
 
             outcome = int(sample.pass_info.is_a_pass)
-            sample.inference = Inference(features, outcome)
-            engineereed_samples.append(Sample(**sample.__dict__))
-        return engineereed_samples
+            inference = Inference(features, outcome)
+            engineered_samples.append(replace(sample, inference=inference))
+        return engineered_samples
 
     @property
     def input_size(self) -> int:

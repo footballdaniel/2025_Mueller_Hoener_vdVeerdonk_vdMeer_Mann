@@ -177,7 +177,7 @@ with torch.no_grad():
         input_tensor = input_tensor.unsqueeze(0).to(device)
         output = model(input_tensor)
         probability = output.item()
-        sample.pass_probability = round(probability, 3)
+        sample.inference.pass_probability = round(probability, 3)
 
 print(f"Brier Score: {prediction_brier(dataset.samples):.4f}")
 print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
