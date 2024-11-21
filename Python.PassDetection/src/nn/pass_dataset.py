@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Tuple
 
 import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from src.domain import FeatureCalculator, SampleWithFeatures
+from src.domain import SampleWithFeatures
 
 
 @dataclass

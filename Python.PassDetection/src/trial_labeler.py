@@ -1,6 +1,7 @@
 from typing import List, Tuple, Optional
 
 from src.domain import Trial, Sample
+from src.plots import plot_sample
 
 
 class Labels:
@@ -20,7 +21,7 @@ class Labels:
 
         for start_idx in range(total_samples - sequence_length + 1):
             end_idx = start_idx + sequence_length
-            is_a_pass, pass_event_index = Labels._get_pass_event_in_sequence(trial, start_idx, end_idx)
+            is_a_pass, pass_event_index, pass_timestamp = Labels._get_pass_event_in_sequence(trial, start_idx, end_idx)
 
             labeled_trial = Sample(
                 frame_rate_hz=trial.frame_rate_hz,
@@ -31,20 +32,24 @@ class Labels:
                 user_dominant_foot_positions=trial.user_dominant_foot_positions[start_idx:end_idx],
                 user_non_dominant_foot_positions=trial.user_non_dominant_foot_positions[start_idx:end_idx],
                 is_a_pass=is_a_pass,
-                pass_id=pass_event_index
+                pass_id=pass_event_index,
+                pass_timestamp=pass_timestamp
             )
             sequences.append(labeled_trial)
         return sequences
 
     @staticmethod
-    def _get_pass_event_in_sequence(trial: Trial, start_idx: int, end_idx: int) -> Tuple[bool, Optional[int]]:
+    def _get_pass_event_in_sequence(trial: Trial, start_idx: int, end_idx: int) -> Tuple[
+        bool, Optional[int], Optional[float]]:
         is_a_pass = False
         pass_event_index = None
+        pass_event_timestamp = None
 
         for event in trial.pass_events:
             if start_idx <= event.frame_number < end_idx:
                 is_a_pass = True
                 pass_event_index = event.frame_number
+                pass_event_timestamp = trial.timestamps[event.frame_number]
                 break  # Assuming only one pass event per sequence
 
-        return is_a_pass, pass_event_index
+        return is_a_pass, pass_event_index, pass_event_timestamp

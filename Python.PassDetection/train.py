@@ -1,9 +1,12 @@
 import glob
 import os
+import pickle
+from pathlib import Path
 
 import onnx
 import torch
 import torch.nn as nn
+from matplotlib import pyplot as plt
 from torch.utils.data import random_split, DataLoader
 
 from src.features.feature_engineer import FeatureEngineer
@@ -17,11 +20,14 @@ from src.nn.brier import prediction_brier
 from src.nn.f1_scores import predict_precision_recall_f1
 from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
+from src.plots import plot_sample_with_features
 from src.trial_augmenter import Augmentor
 from src.trial_labeler import Labels
 
 """Reading Trials"""
-pattern = "../Data/Pilot_3/**/*.csv"
+pattern = "../Data/Pilot_4/**/*.csv"
+plot_dir = Path("plots")
+save_plots = False
 
 trials = []
 for filename in glob.iglob(pattern, recursive=True):
@@ -48,17 +54,6 @@ engineer.add_feature(VelocitiesDominantFootCalculator())
 engineer.add_feature(VelocitiesNonDominantFootCalculator())
 
 calculated_features = engineer.engineer_features(augmented_samples)
-
-# # Save some to folder
-# with open('10_sample_passes.pkl', 'wb') as f:
-#     pickle.dump(augmented_trials[:10], f)
-# # save 10 non-passes
-# non_passes = [sample for sample in labeled_samples if not sample.is_a_pass]
-# with open('10_sample_non_passes.pkl', 'wb') as f:
-#     pickle.dump(non_passes[:10], f)
-#
-# for sample in labeled_samples:
-#     plot_labeled_trial(sample, 'plots', f'{sample.trial_number}_{round(sample.timestamps[0],2)}_{sample.is_a_pass}.png')
 
 """SPLIT PYTORCH DATASET"""
 dataset = PassDataset(calculated_features)
@@ -176,6 +171,21 @@ print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
 precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
 print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
 
+"""VISUALIZE RESULTS"""
+# Save some to folder
+with open('dataset.pkl', 'wb') as f:
+    pickle.dump(dataset.samples, f)
+
+for idx, sample in enumerate(dataset.samples):
+    if not save_plots:
+        break
+
+    filename = f"sample_{sample.trial_number}_{idx}_pass{sample.is_a_pass}.png"
+    fig = plot_sample_with_features(sample)
+    plot_path = os.path.join(str(plot_dir), filename)
+    fig.savefig(plot_path)
+    plt.close(fig)
+
 """EXPORT ONNX"""
 # Path for ONNX file
 onnx_file_path = "pass_detection_model.onnx"
@@ -196,7 +206,6 @@ with torch.no_grad():
     print(f"Example input: {example_input}")
     print(f"Example output: {example_output_values}")
 
-# Export the model using the first sample as the dummy input
 torch.onnx.export(
     model,
     example_input,

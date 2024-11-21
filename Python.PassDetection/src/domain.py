@@ -65,6 +65,7 @@ class Sample:
     user_non_dominant_foot_positions: List[Position]
     is_a_pass: bool = False
     pass_id: Optional[int] = None
+    pass_timestamp: Optional[float] = None
     pass_probability: Optional[float] = None
 
     @staticmethod
@@ -79,7 +80,8 @@ class Sample:
             user_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_dominant_foot_positions],
             user_non_dominant_foot_positions=[pos.mirror_x() for pos in sample.user_non_dominant_foot_positions],
             is_a_pass=sample.is_a_pass,
-            pass_id=sample.pass_id
+            pass_id=sample.pass_id,
+            pass_timestamp=sample.pass_timestamp,
         )
 
     @staticmethod
@@ -96,7 +98,8 @@ class Sample:
             user_non_dominant_foot_positions=[pos.rotate_around_y(angle_degrees) for pos in
                                               sample.user_non_dominant_foot_positions],
             is_a_pass=sample.is_a_pass,
-            pass_id=sample.pass_id
+            pass_id=sample.pass_id,
+            pass_timestamp=sample.pass_timestamp,
         )
 
     @staticmethod
@@ -111,7 +114,8 @@ class Sample:
             user_dominant_foot_positions=sample.user_non_dominant_foot_positions.copy(),
             user_non_dominant_foot_positions=sample.user_dominant_foot_positions.copy(),
             is_a_pass=sample.is_a_pass,
-            pass_id=sample.pass_id
+            pass_id=sample.pass_id,
+            pass_timestamp=sample.pass_timestamp,
         )
 
 
