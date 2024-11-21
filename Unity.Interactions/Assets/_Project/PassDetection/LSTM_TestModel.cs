@@ -33,7 +33,8 @@ namespace PassDetection
 		public float Evaluate()
 		{
 			var stopwatch = Stopwatch.StartNew();
-			_worker.Schedule(_input);
+			_worker.SetInput("input", _input);
+			_worker.Schedule();
 			var outputTensor = _worker.PeekOutput("output") as Tensor<float>;
 			var cpuOutputTensor = outputTensor.ReadbackAndClone();
 			stopwatch.Stop();

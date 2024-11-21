@@ -11,6 +11,7 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 from torch.utils.data import random_split, DataLoader
 
+from src.domain import Split
 from src.features.feature_engineer import FeatureEngineer
 from src.features.foot_offset import FootOffsetCalculator
 from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
@@ -61,38 +62,43 @@ calculated_features = engineer.engineer_features(augmented_samples)
 dataset = PassDataset(calculated_features)
 torch.manual_seed(42)  # Set the seed
 train_size = int(0.8 * len(dataset))
-val_size = len(dataset) - train_size
-train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+validation_size = len(dataset) - train_size
+train_dataset, validation_dataset = random_split(dataset, [train_size, validation_size])
 batch_size = 32
 training_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-validation_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
 
-# Count positive and negative samples in combined_dataset
-num_positive = sum(1 for feature in augmented_samples if feature.is_a_pass)
-num_negative = sum(1 for feature in augmented_samples if not feature.is_a_pass)
-print(f"Total samples: {len(augmented_samples)}")
-print(f"Positive samples: {num_positive}")
-print(f"Negative samples: {num_negative}")
+for i in train_dataset:
+    dataset.samples[i].split = Split.TRAIN
+for i in validation_dataset:
+    dataset.samples[i].split = Split.VALIDATION
 
-# Model parameters
+positive_samples_training_set = sum(1 for sample in train_dataset if sample.is_a_pass)
+negative_samples_training_set = sum(1 for sample in train_dataset if not sample.is_a_pass)
+positive_samples_validation_set = sum(1 for sample in validation_dataset if sample.is_a_pass)
+negative_samples_validation_set = sum(1 for sample in validation_dataset if not sample.is_a_pass)
+print(f"Training set: {len(train_dataset)} samples with {positive_samples_training_set} positive and {negative_samples_training_set} negative samples")
+print(f"Validation set: {len(validation_dataset)} samples with {positive_samples_validation_set} positive and {negative_samples_validation_set} negative samples")
+
+"""MODEL"""
 input_size = engineer.input_size
 hidden_size = 64
 num_layers = 2
 learning_rate = 0.001
 num_epochs = 1000
 
-# Initialize model, loss function, optimizer
 model = PassDetectionModel(input_size, hidden_size, num_layers)
 criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# Early stopping parameters
+"""EARLY STOPPING"""
 patience = 5
 best_val_loss = float('inf')
 epochs_no_improve = 0
 early_stop = False
 
-# Training loop
+
+"""TRAINING"""
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -145,7 +151,7 @@ for epoch in range(num_epochs):
             print(f'Early stopping at epoch {epoch + 1}')
             early_stop = True
 
-# Save the best model
+"""SAVE MODEL"""
 checkpoint = {
     'model_state_dict': model.state_dict(),
     'optimizer_state_dict': optimizer.state_dict(),
@@ -180,6 +186,7 @@ with open('dataset.pkl', 'wb') as f:
 with open('dataset.json', 'w') as f:
     json.dump([asdict(sample) for sample in dataset.samples], f, indent=4)
 
+"""PLOT SAMPLES"""
 for idx, sample in enumerate(dataset.samples):
     if not save_plots:
         break
@@ -215,7 +222,7 @@ torch.onnx.export(
     example_input,
     onnx_file_path,
     export_params=True,
-    opset_version=11,
+    opset_version=15,
     do_constant_folding=True,
     input_names=['input'],
     output_names=['output'],

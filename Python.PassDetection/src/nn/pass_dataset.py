@@ -25,6 +25,6 @@ class PassDataset(Dataset):
         )
 
         # Use the outcome as the label
-        label = torch.tensor(trial.outcome, dtype=torch.float32)
+        label = torch.tensor(trial.output, dtype=torch.float32)
 
         return input_tensor, label

@@ -19,7 +19,7 @@ class FeatureEngineer:
                 features.extend(calculated)  # Each calculator returns a list of Features
 
             outcome = int(sample.is_a_pass)
-            calculated_features_list.append(SampleWithFeatures(**sample.__dict__, features=features, outcome=outcome))
+            calculated_features_list.append(SampleWithFeatures(**sample.__dict__, features=features, output=outcome))
         return calculated_features_list
 
     @property

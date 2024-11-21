@@ -134,10 +134,17 @@ class Feature:
         return torch.tensor(self.values, dtype=torch.float32)
 
 
+class Split(Enum):
+    TRAIN = 0
+    VALIDATION = 1
+    TEST = 2
+
+
 @dataclass
 class SampleWithFeatures(AugmentedLabeledSample):
     features: List[Feature] = field(default_factory=list)
-    outcome: int = 0
+    output: int = 0
+    split: Split = Split.TRAIN
 
 
 class FeatureCalculator(abc.ABC):

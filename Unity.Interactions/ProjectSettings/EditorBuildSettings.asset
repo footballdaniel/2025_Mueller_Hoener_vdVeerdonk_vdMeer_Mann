@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Packages/com.vu.powerwall/Samples/Powerwall/Powerwall.unity
     guid: 0f725d4b13e510c438bc636ee68c5704
   - enabled: 1
-    path: Assets/_Project/Interactions.unity
+    path: Assets/_Project/Interactions/Interactions.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: c4b647b02fcb47a44890bbe842707b73,
