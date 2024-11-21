@@ -6,7 +6,7 @@ from src.domain import AugmentedLabeledSample, Sample
 class Augmentor:
 
     @staticmethod
-    def augment(trials: List[Sample]) -> List[AugmentedLabeledSample]:
+    def augment(trials: List[Sample], only_augment_passes: bool) -> List[AugmentedLabeledSample]:
         rotation_angles = [angle for angle in range(5, 360, 10)]
         augmented_trials: List[AugmentedLabeledSample] = []
 
@@ -14,8 +14,12 @@ class Augmentor:
             # Original trial without modifications
             augmented_trials.append(AugmentedLabeledSample(
                 **trial.__dict__,
-                rotation_angle=0
+                rotation_angle=0,
+                swapped_feet=False
             ))
+
+            if only_augment_passes and not trial.is_a_pass:
+                continue
 
             Augmentor.add_rotated_passes(augmented_trials, trial, rotation_angles)
             Augmentor.add_swapped_feet_pass(augmented_trials, trial)
@@ -40,7 +44,8 @@ class Augmentor:
         swapped_trial = Sample.swap_feet(trial)
         augmented_trials.append(AugmentedLabeledSample(
             **swapped_trial.__dict__,
-            rotation_angle=0  # No rotation on swapped
+            rotation_angle=0, # No rotation on swapped
+            swapped_feet=True
         ))
 
     @staticmethod
@@ -52,5 +57,6 @@ class Augmentor:
             swapped_rotated_trial = Sample.rotate_around_y(swapped_trial, angle)
             augmented_trials.append(AugmentedLabeledSample(
                 **swapped_rotated_trial.__dict__,
-                rotation_angle=angle
+                rotation_angle=angle,
+                swapped_feet=True
             ))

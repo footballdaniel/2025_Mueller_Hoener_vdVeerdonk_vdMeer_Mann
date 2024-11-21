@@ -1,6 +1,8 @@
 import glob
+import json
 import os
 import pickle
+from dataclasses import asdict
 from pathlib import Path
 
 import onnx
@@ -44,7 +46,7 @@ for filename in glob.iglob(pattern, recursive=True):
 
 """SAMPLING AND AUGMENTATION"""
 labeled_samples = Labels.generate(trials)
-augmented_samples = Augmentor.augment(labeled_samples)
+augmented_samples = Augmentor.augment(labeled_samples, only_augment_passes=True)
 
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
@@ -98,7 +100,6 @@ epoch_index = 0
 for epoch in range(num_epochs):
     epoch_index = epoch
     if early_stop:
-        print("Early stopping")
         break
 
     model.train()
@@ -171,10 +172,13 @@ print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
 precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
 print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
 
-"""VISUALIZE RESULTS"""
+"""SAVE DATASET"""
 # Save some to folder
 with open('dataset.pkl', 'wb') as f:
     pickle.dump(dataset.samples, f)
+
+with open('dataset.json', 'w') as f:
+    json.dump([asdict(sample) for sample in dataset.samples], f, indent=4)
 
 for idx, sample in enumerate(dataset.samples):
     if not save_plots:

@@ -122,6 +122,7 @@ class Sample:
 @dataclass
 class AugmentedLabeledSample(Sample):
     rotation_angle: Optional[float] = None
+    swapped_feet: bool = False
 
 
 @dataclass

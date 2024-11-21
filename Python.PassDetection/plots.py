@@ -16,10 +16,16 @@ os.makedirs(plot_dir, exist_ok=True)
 # Iterate over samples and plot each one
 for idx, sample in enumerate(samples):
 
-    # if sample.pass_probability < 0.5:
-    #     continue
+    if sample.pass_probability < 0.9:
+        continue
 
-    filename = f"sample_{sample.trial_number}_{idx}_pass{sample.is_a_pass}.png"
+    if sample.rotation_angle != 0:
+        continue
+
+    if sample.swapped_feet:
+        continue
+
+    filename = f"Sample_{sample.trial_number}_{idx}_Pass_{sample.is_a_pass}.png"
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(plot_dir, filename)
     fig.savefig(plot_path)
