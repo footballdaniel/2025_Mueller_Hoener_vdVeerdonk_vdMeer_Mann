@@ -7,7 +7,7 @@ from src.domain.samples import Sample
 
 class FeatureEngineer:
     def __init__(self):
-        self.feature_calculators = []
+        self.feature_calculators: List[FeatureCalculator] = []
 
     def add_feature(self, feature_calculator: FeatureCalculator):
         self.feature_calculators.append(feature_calculator)
@@ -17,7 +17,7 @@ class FeatureEngineer:
         for sample in samples:
             features = []
             for calculator in self.feature_calculators:
-                calculated = calculator.calculate(sample.recording)
+                calculated = calculator.calculate(sample.recording.input_data)
                 features.extend(calculated)  # Each calculator returns a list of Features
 
             outcome = int(sample.pass_event.is_a_pass)

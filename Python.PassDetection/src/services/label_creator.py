@@ -20,16 +20,19 @@ class LabelCreator:
     def _create_sequences(recording: Recording, sequence_length: int) -> List[Sample]:
         """Create labeled sequences from a single recording."""
         samples = []
-        total_samples = len(recording.user_dominant_foot_positions)
+        total_samples = len(recording.input_data.user_dominant_foot_positions)
 
         for start_idx in range(total_samples - sequence_length + 1):
             pass_event = LabelCreator._get_pass_event_in_sequence(recording, start_idx, start_idx + sequence_length)
             updated_recording = replace(
                 recording,
                 pass_events=[pass_event],
-                user_dominant_foot_positions=recording.user_dominant_foot_positions[start_idx:start_idx + sequence_length],
-                user_non_dominant_foot_positions=recording.user_non_dominant_foot_positions[start_idx:start_idx + sequence_length],
-                timestamps=recording.timestamps[start_idx:start_idx + sequence_length],
+                input_data=replace(
+                    recording.input_data,
+                    user_dominant_foot_positions=recording.input_data.user_dominant_foot_positions[start_idx:start_idx + sequence_length],
+                    user_non_dominant_foot_positions=recording.input_data.user_non_dominant_foot_positions[start_idx:start_idx + sequence_length],
+                    timestamps=recording.input_data.timestamps[start_idx:start_idx + sequence_length],
+                ),
                 number_of_frames=sequence_length,
             )
             sample = Sample(recording=updated_recording, pass_event=pass_event)

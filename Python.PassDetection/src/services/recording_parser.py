@@ -1,10 +1,9 @@
 import csv
 import json
 from dataclasses import replace
-from typing import List
 
-from src.domain.common import Position
-from src.domain.recordings import PassEvent, Foot, Recording
+from src.domain.common import Vector3
+from src.domain.recordings import PassEvent, Foot, Recording, InputData
 
 
 class RecordingParser:
@@ -22,17 +21,20 @@ class RecordingParser:
             recording = Recording(
                 frame_rate_hz=data['FrameRateHz'],
                 number_of_frames=data['NumberOfFrames'],
-                timestamps=data['Timestamps'],
+
                 trial_number=data['TrialNumber'],
                 duration=data['Duration'],
-                user_dominant_foot_positions=[
-                    Position(**pos) for pos in data['UserDominantFootPositions']
-                ],
-                user_non_dominant_foot_positions=[
-                    Position(**pos) for pos in data['UserNonDominantFootPositions']
-                ]
+                input_data=InputData(
+                    user_dominant_foot_positions=[
+                        Vector3(**pos) for pos in data['UserDominantFootPositions']
+                    ],
+                    user_non_dominant_foot_positions=[
+                        Vector3(**pos) for pos in data['UserNonDominantFootPositions']
+                    ],
+                    timestamps=data['Timestamps'],
+                )
             )
-        self._recording = recording
+            self._recording = recording
 
     def read_pass_events_from_csv(self, file_path: str) -> None:
         events = []
@@ -49,7 +51,7 @@ class RecordingParser:
                     foot=foot,
                     is_a_pass=True,
                     pass_id=index,
-                    timestamp=self.recording.timestamps[frame_number])
+                    timestamp=self.recording.input_data.timestamps[frame_number])
                 events.append(event)
 
         self._recording = replace(self.recording, pass_events=events)

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, replace, field
 
 from src.domain.augmentations import Augmentation, NoAugmentation
@@ -17,8 +18,13 @@ class Sample:
         """Return a mirrored version of the sample."""
         new_recording = replace(
             self.recording,
-            user_dominant_foot_positions=[pos.mirror_x() for pos in self.recording.user_dominant_foot_positions],
-            user_non_dominant_foot_positions=[pos.mirror_x() for pos in self.recording.user_non_dominant_foot_positions],
+            input_data=replace(
+                self.recording.input_data,
+                user_dominant_foot_positions=[pos.mirror_x() for pos in
+                                              self.recording.input_data.user_dominant_foot_positions],
+                user_non_dominant_foot_positions=[pos.mirror_x() for pos in
+                                                  self.recording.input_data.user_non_dominant_foot_positions],
+            ),
         )
         return replace(
             self,
@@ -32,12 +38,15 @@ class Sample:
     def rotate_around_y(self, angle_degrees: float) -> Sample:
         new_recording = replace(
             self.recording,
-            user_dominant_foot_positions=[
-                pos.rotate_around_y(angle_degrees) for pos in self.recording.user_dominant_foot_positions
-            ],
-            user_non_dominant_foot_positions=[
-                pos.rotate_around_y(angle_degrees) for pos in self.recording.user_non_dominant_foot_positions
-            ],
+            input_data=replace(
+                self.recording.input_data,
+                user_dominant_foot_positions=[
+                    pos.rotate_around_y(angle_degrees) for pos in self.recording.input_data.user_dominant_foot_positions
+                ],
+                user_non_dominant_foot_positions=[
+                    pos.rotate_around_y(angle_degrees) for pos in self.recording.input_data.user_non_dominant_foot_positions
+                ],
+            ),
         )
         return replace(
             self,
@@ -52,8 +61,11 @@ class Sample:
         """Return a version of the sample with dominant and non-dominant foot positions swapped."""
         new_recording = replace(
             self.recording,
-            user_dominant_foot_positions=self.recording.user_non_dominant_foot_positions.copy(),
-            user_non_dominant_foot_positions=self.recording.user_dominant_foot_positions.copy(),
+            input_data=replace(
+                self.recording.input_data,
+                user_dominant_foot_positions=self.recording.input_data.user_non_dominant_foot_positions.copy(),
+                user_non_dominant_foot_positions=self.recording.input_data.user_dominant_foot_positions.copy(),
+            ),
         )
         return replace(
             self,

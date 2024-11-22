@@ -1,9 +1,9 @@
 using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
+using _Project.PassDetection.Replay;
 using _Project.PassDetectionReplay;
 using Newtonsoft.Json;
-using PassDetection;
 using Unity.Sentis;
 using UnityEngine;
 using UnityEngine.Video;
@@ -21,7 +21,7 @@ namespace PassDetectionReplay
         float _currentTimeStamp;
         int _currentFrameIndex;
         float _lastPrediction;
-        LSTM_Model _lstmModel;
+        LstmModel _lstmModel;
 
         public int NumberOfFrames => _trial.NumberOfFrames;
         public int CurrentFrameIndex => _currentFrameIndex;
@@ -53,7 +53,7 @@ namespace PassDetectionReplay
                 jsonSettings.Converters.Add(new SideEnumConverter());
                 _trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
                 
-                _lstmModel = new LSTM_Model(ModelAsset, _trial);
+                _lstmModel = new LstmModel(ModelAsset);
 
                 ReplayUI.Set(this);
         }
@@ -74,7 +74,7 @@ namespace PassDetectionReplay
                 VideoPlayer.Pause();
             VideoPlayer.Play();
             
-            _lastPrediction = _lstmModel.EvaluateTrialAtTime(_currentTimeStamp);
+            _lastPrediction = _lstmModel.Evaluate(null);
         }
         
         

@@ -7,6 +7,8 @@ from typing import List
 
 import torch
 
+from src.domain.recordings import InputData
+
 
 class FeatureCalculator(abc.ABC):
     @property
@@ -16,7 +18,7 @@ class FeatureCalculator(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def calculate(self, sample: 'Sample') -> List[Feature]:
+    def calculate(self, input_data: InputData) -> List[Feature]:
         """Calculate the feature for a given trial."""
         ...
 

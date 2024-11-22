@@ -15,9 +15,13 @@ plot_dir = 'plots'
 os.makedirs(plot_dir, exist_ok=True)
 
 for idx, sample in enumerate(samples):
+    #
+    # if sample.inference.pass_probability < 0.9:
+    #     continue
 
-    if sample.inference.pass_probability < 0.9:
-        continue
+    #
+    # if sample.inference.split == Split.TRAIN:
+    #     continue
 
     if sample.augmentation.rotation_angle != 0:
         continue
@@ -25,8 +29,6 @@ for idx, sample in enumerate(samples):
     if sample.augmentation.swapped_feet:
         continue
 
-    if sample.inference.split == Split.TRAIN:
-        continue
 
     filename = f"Sample_{sample.recording.trial_number}_{idx}_Pass_{sample.pass_event.is_a_pass}.png"
     fig = plot_sample_with_features(sample)

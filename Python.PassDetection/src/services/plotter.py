@@ -11,8 +11,8 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
         gridspec_kw={'hspace': 2}  # Increase vertical space between subplots
     )
 
-    start_time = round(sample.recording.timestamps[0], 1) if sample.recording.timestamps else 0.0
-    end_time = round(sample.recording.timestamps[-1], 1) if sample.recording.timestamps else 0.0
+    start_time = round(sample.recording.input_data.timestamps[0], 1) if sample.recording.input_data.timestamps else 0.0
+    end_time = round(sample.recording.input_data.timestamps[-1], 1) if sample.recording.input_data.timestamps else 0.0
 
     # Pass probability
     prediction = f"Prediction: {sample.inference.pass_probability:.2f}" if sample.inference.pass_probability is not None else "Prediction: N/A"
@@ -31,7 +31,7 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
     for i in range(num_features):
         ax = axs[i]
         feature = sample.inference.features[i]
-        time = sample.recording.timestamps
+        time = sample.recording.input_data.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)
         ax.legend()
@@ -57,15 +57,15 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
 
 
 def plot_sample(sample: Sample):
-    dominant_x = [pos.x for pos in sample.recording.user_dominant_foot_positions]
-    dominant_y = [pos.y for pos in sample.recording.user_dominant_foot_positions]
-    dominant_z = [pos.z for pos in sample.recording.user_dominant_foot_positions]
+    dominant_x = [pos.x for pos in sample.recording.input_data.user_dominant_foot_positions]
+    dominant_y = [pos.y for pos in sample.recording.input_data.user_dominant_foot_positions]
+    dominant_z = [pos.z for pos in sample.recording.input_data.user_dominant_foot_positions]
 
-    non_dominant_x = [pos.x for pos in sample.recording.user_non_dominant_foot_positions]
-    non_dominant_y = [pos.y for pos in sample.recording.user_non_dominant_foot_positions]
-    non_dominant_z = [pos.z for pos in sample.recording.user_non_dominant_foot_positions]
+    non_dominant_x = [pos.x for pos in sample.recording.input_data.user_non_dominant_foot_positions]
+    non_dominant_y = [pos.y for pos in sample.recording.input_data.user_non_dominant_foot_positions]
+    non_dominant_z = [pos.z for pos in sample.recording.input_data.user_non_dominant_foot_positions]
 
-    timestamps = sample.recording.timestamps
+    timestamps = sample.recording.input_data.timestamps
 
     plt.figure(figsize=(12, 8))
     plt.subplot(3, 1, 1)

@@ -1,8 +1,8 @@
 from typing import List
 
-from src.domain.common import Position
+from src.domain.common import Vector3
 from src.domain.inferences import FeatureCalculator, Feature
-from src.domain.recordings import Recording
+from src.domain.recordings import InputData
 
 
 class FootOffsetCalculator(FeatureCalculator):
@@ -10,11 +10,11 @@ class FootOffsetCalculator(FeatureCalculator):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, recording: Recording) -> List[Feature]:
-        dominant_positions = recording.user_dominant_foot_positions
-        non_dominant_positions = recording.user_non_dominant_foot_positions
+    def calculate(self, input_data: InputData) -> List[Feature]:
+        dominant_positions = input_data.user_dominant_foot_positions
+        non_dominant_positions = input_data.user_non_dominant_foot_positions
         offsets = [
-            Position(
+            Vector3(
                 non_dominant_positions[i].x - dominant_positions[i].x,
                 non_dominant_positions[i].y - dominant_positions[i].y,
                 non_dominant_positions[i].z - dominant_positions[i].z,

@@ -1,65 +1,79 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.IO;
 using _Project.Interactions.Scripts.Domain;
+using _Project.PassDetection.Replay.Features;
+using Src.Domain.Inferences;
 using Unity.Sentis;
-using Debug = UnityEngine.Debug;
 
-namespace PassDetection
+namespace _Project.PassDetection.Replay
 {
-	public class LSTM_Model : IDisposable
+	public class LstmModel : IDisposable
 	{
-		public LSTM_Model(ModelAsset asset, Trial trial)
+		public LstmModel(ModelAsset asset)
 		{
 			var model = ModelLoader.Load(asset);
 			_worker = new Worker(model, BackendType.GPUCompute);
-			_trial = trial;
 		}
 
 		public void Dispose()
 		{
-			_input?.Dispose();
 			_worker?.Dispose();
 		}
 
 
-		public float EvaluateTrialAtTime(float timeSinceTrialStart)
+		public float Evaluate(InputData data)
 		{
-			var features0 = ZeroedPositionDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
-			var features1 = OffsetDominantFootToNonDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
-			var features2 = VelocitiesDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
-			var features3 = VelocitiesNonDominantFootCalculator.Calculate(_trial, timeSinceTrialStart);
+			var zeroedPositionDominantFootCalculator = new ZeroedPositionDominantFootCalculator();
+			var footOffsetCalculator = new FootOffsetCalculator();
+			var velocitiesDominantFootCalculator = new VelocitiesDominantFootCalculator();
+			var velocitiesNonDominantFootCalculator = new VelocitiesNonDominantFootCalculator();
+
+			var features = new List<Feature>();
+			features.AddRange(zeroedPositionDominantFootCalculator.Calculate(data));
+			features.AddRange(footOffsetCalculator.Calculate(data));
+			features.AddRange(velocitiesDominantFootCalculator.Calculate(data));
+			features.AddRange(velocitiesNonDominantFootCalculator.Calculate(data));
+
+			var timeseriesCount = features[0].Values.Count;
+			var featureCount = features.Count;
+			var batchSize = 1;
+
+			var shape = new TensorShape(batchSize, timeseriesCount, featureCount);
+			var flattenedValues = new float[timeseriesCount * featureCount];
+
+			var index = 0;
+
+			foreach (var feature in features)
+			foreach (var value in feature.Values)
+				flattenedValues[index++] = value;
 
 
-			var allFeatures = features0.Concat(features1).Concat(features2).Concat(features3).ToList();
-			var numTimeSteps = allFeatures.First().Values.Count;
-			var numFeatures = allFeatures.Count;
+			var desiredTimestamp = 0.1;
 
-			var allFeatureValues = allFeatures.SelectMany(feature => feature.Values).ToList();
-			var requiredSize = numTimeSteps * numFeatures;
+			if (Math.Abs(data.Timestamps[0] - desiredTimestamp) < 0.001)
+			{
+				var flattenedValuesStrings = Array.ConvertAll(flattenedValues, value => value.ToString("F3"));
+				var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+				File.WriteAllLines(Path.Combine(desktopPath, "unity_tensor.txt") , flattenedValuesStrings);
+			}
 
-			if (allFeatureValues.Count < requiredSize)
-				Debug.LogWarning("Not enough features to fill the input tensor. Padding with zeros.");
-			else if (allFeatureValues.Count > requiredSize)
-				Debug.LogWarning("Too many features to fill the input tensor");
+			var input = new Tensor<float>(shape, flattenedValues);
 
-			var featureArray = allFeatureValues.ToArray();
-			_input = new Tensor<float>(new TensorShape(1, numTimeSteps, numFeatures), featureArray);
-
-			_worker.Schedule(_input);
-			var outputTensor = _worker.PeekOutput("output") as Tensor<float>;
+			_worker.Schedule(input);
+			var outputTensor = _worker.PeekOutput() as Tensor<float>;
 			var cpuOutputTensor = outputTensor.ReadbackAndClone();
 
 			var result = cpuOutputTensor[0];
 			cpuOutputTensor.Dispose();
-			_input.Dispose();
+			input.Dispose();
 
 			return result;
 		}
 
 		readonly ModelAsset _asset;
+		readonly Worker _worker;
 
-		Tensor _input;
 		Trial _trial;
-		Worker _worker;
 	}
 }

@@ -19,6 +19,10 @@ def predict_probability_onnx(features):
     features_as_tensors = [feature.to_tensor() for feature in features]
     input_tensor = torch.stack(features_as_tensors, dim=1).unsqueeze(0)  # Add batch dimension
 
+    # Flatten the tensor
+    # flat_input = input_tensor.flatten().cpu().numpy()
+
+    # input_tensor.cpu()
     # import pandas as pd
     # input_tensor_df = pd.DataFrame(input_tensor.squeeze(0).cpu().numpy()).round(2)
     # input_tensor_df.to_csv('input_tensor.csv', index=False)
@@ -33,5 +37,4 @@ def predict_probability_onnx(features):
 
 for sample in samples:
     predicted_probability = predict_probability_onnx(sample.inference.features)
-    print(
-        f"Sample {sample.recording.trial_number} - Predicted Probability: {predicted_probability:.3f}, Actual: {sample.inference.pass_probability}")
+    print(f"Sample {sample.recording.trial_number} - Predicted Probability: {predicted_probability:.3f}, Actual: {sample.inference.pass_probability}")

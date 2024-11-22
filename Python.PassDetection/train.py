@@ -216,17 +216,12 @@ model.eval()
 
 # Grab only the first sample from the last batch of val_loader for export
 example_input = inputs[0:1].cpu()  # First sample of last batch with batch size 1
-
-# Evaluate the model with this single sample input (First sample from data)
 with torch.no_grad():
     example_output = model(example_input)
     example_output_values = example_output.squeeze().tolist()
 
     print(f"Example input shape: {example_input.shape}")
     print(f"Example output shape: {example_output.shape}")
-
-    print(f"Example input: {example_input}")
-    print(f"Example output: {example_output_values}")
 
 torch.onnx.export(
     model,
