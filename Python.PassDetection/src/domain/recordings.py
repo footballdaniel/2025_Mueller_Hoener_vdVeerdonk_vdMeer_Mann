@@ -39,7 +39,6 @@ class InputData:
 class Recording:
     frame_rate_hz: int
     number_of_frames: int
-
     trial_number: int
     duration: float
     input_data: InputData = field(default_factory=InputData)

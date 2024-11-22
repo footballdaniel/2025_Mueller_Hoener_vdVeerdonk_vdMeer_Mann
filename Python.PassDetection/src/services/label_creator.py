@@ -34,6 +34,8 @@ class LabelCreator:
                     timestamps=recording.input_data.timestamps[start_idx:start_idx + sequence_length],
                 ),
                 number_of_frames=sequence_length,
+                duration=recording.input_data.timestamps[start_idx + sequence_length - 1] - recording.input_data.timestamps[start_idx],
+
             )
             sample = Sample(recording=updated_recording, pass_event=pass_event)
             samples.append(sample)

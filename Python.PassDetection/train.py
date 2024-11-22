@@ -210,7 +210,7 @@ for idx, sample in enumerate(dataset.samples):
 
 """EXPORT ONNX"""
 # Path for ONNX file
-onnx_file_path = output_dir_model.joinpath("pass_detection_model.onnx")
+onnx_file_paths = ["pass_detection_model.onnx", output_dir_model.joinpath("pass_detection_model.onnx")]
 model.to('cpu')
 model.eval()
 
@@ -223,23 +223,24 @@ with torch.no_grad():
     print(f"Example input shape: {example_input.shape}")
     print(f"Example output shape: {example_output.shape}")
 
-torch.onnx.export(
-    model,
-    example_input,
-    onnx_file_path,
-    export_params=True,
-    opset_version=15,
-    do_constant_folding=True,
-    input_names=['input'],
-    output_names=['output'],
-)
+for onnx_file_path in onnx_file_paths:
+    torch.onnx.export(
+        model,
+        example_input,
+        onnx_file_path,
+        export_params=True,
+        opset_version=15,
+        do_constant_folding=True,
+        input_names=['input'],
+        output_names=['output'],
+    )
 
-onnx_model = onnx.load(onnx_file_path)
-metadata_props = onnx_model.metadata_props.add()
-metadata_props.key = "example_input"
-metadata_props.value = str(example_input.tolist())  # Store example input as string
+    onnx_model = onnx.load(onnx_file_path)
+    metadata_props = onnx_model.metadata_props.add()
+    metadata_props.key = "example_input"
+    metadata_props.value = str(example_input.tolist())  # Store example input as string
 
-metadata_props = onnx_model.metadata_props.add()
-metadata_props.key = "example_output"
-metadata_props.value = str(example_output_values)  # Store example output as string
-onnx.save(onnx_model, onnx_file_path)
+    metadata_props = onnx_model.metadata_props.add()
+    metadata_props.key = "example_output"
+    metadata_props.value = str(example_output_values)  # Store example output as string
+    onnx.save(onnx_model, onnx_file_path)

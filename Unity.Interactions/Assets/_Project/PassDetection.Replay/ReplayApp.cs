@@ -10,89 +10,99 @@ using UnityEngine.Video;
 
 namespace PassDetectionReplay
 {
-    public class ReplayApp : MonoBehaviour
-    {
-        public ModelAsset ModelAsset;
-        public ReplayUI ReplayUI;
-        public VideoPlayer VideoPlayer;
-        public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4"; // Forward slashes
-        Trial _trial;
-        bool _isPlaying;
-        float _currentTimeStamp;
-        int _currentFrameIndex;
-        float _lastPrediction;
-        LstmModel _lstmModel;
+	public class ReplayApp : MonoBehaviour
+	{
+		public ModelAsset ModelAsset;
+		public ReplayUI ReplayUI;
+		public VideoPlayer VideoPlayer;
+		public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4"; // Forward slashes
 
-        public int NumberOfFrames => _trial.NumberOfFrames;
-        public int CurrentFrameIndex => _currentFrameIndex;
+		public int NumberOfFrames => _trial.NumberOfFrames;
+		public int CurrentFrameIndex => _currentFrameIndex;
 
-        public float ModelPrediction => _lastPrediction;
+		public float ModelPrediction => _lastPrediction;
 
-        void Start()
-        {
-                // Use Directory.GetFiles with forward slashes
-                var jsonFiles = Directory.GetFiles(DataPath, "*.json");
-                var jsonFile = jsonFiles[0];
+		void Start()
+		{
+			// Use Directory.GetFiles with forward slashes
+			var jsonFiles = Directory.GetFiles(DataPath, "*.json");
+			var jsonFile = jsonFiles[0];
 
-                Debug.Log("Found json file: " + jsonFile);
-                var mp4File = Path.ChangeExtension(jsonFile, ".mp4");
+			Debug.Log("Found json file: " + jsonFile);
+			var mp4File = Path.ChangeExtension(jsonFile, ".mp4");
 
-                var mp4FileExists = File.Exists(mp4File);
-                if (!mp4FileExists)
-                {
-                    Debug.LogError("Missing json or mp4 file for: " + jsonFile);
-                    return;
-                }
+			var mp4FileExists = File.Exists(mp4File);
 
-                VideoPlayer.url = mp4File;
-                VideoPlayer.Prepare();
+			if (!mp4FileExists)
+			{
+				Debug.LogError("Missing json or mp4 file for: " + jsonFile);
+				return;
+			}
 
-                var json = File.ReadAllText(jsonFile);
-                var jsonSettings = new JsonSerializerSettings();
-                jsonSettings.Converters.Add(new Vector3Converter());
-                jsonSettings.Converters.Add(new SideEnumConverter());
-                _trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
-                
-                _lstmModel = new LstmModel(ModelAsset);
+			VideoPlayer.url = mp4File;
+			VideoPlayer.Prepare();
 
-                ReplayUI.Set(this);
-        }
-        
-        void Update()
-        {
-            if (_isPlaying)
-            {
-                _currentTimeStamp += Time.deltaTime;
-                var recordingFrameRate = _trial.FrameRateHz;
-                _currentFrameIndex = Mathf.FloorToInt(_currentTimeStamp * recordingFrameRate);
-            }
+			var json = File.ReadAllText(jsonFile);
+			var jsonSettings = new JsonSerializerSettings();
+			jsonSettings.Converters.Add(new Vector3Converter());
+			jsonSettings.Converters.Add(new SideEnumConverter());
+			_trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
 
-            _currentFrameIndex = Mathf.Clamp(_currentFrameIndex, 0, _trial.NumberOfFrames - 1);
-            VideoPlayer.frame = _currentFrameIndex;
+			_lstmModel = new LstmModel(ModelAsset);
 
-            if (VideoPlayer.isPlaying)
-                VideoPlayer.Pause();
-            VideoPlayer.Play();
-            
-            _lastPrediction = _lstmModel.Evaluate(null);
-        }
-        
-        
-        public void ShowFrame(int value)
-        {
-            _currentFrameIndex = value;
-            var frameRate = _trial.FrameRateHz;
-            _currentTimeStamp = _currentFrameIndex / (float)frameRate;
-        }
+			ReplayUI.Set(this);
+		}
 
-        public void TogglePlayPause()
-        {
-            _isPlaying = !_isPlaying;
-        }
+		void Update()
+		{
+			if (_isPlaying)
+			{
+				_currentTimeStamp += Time.deltaTime;
+				var recordingFrameRate = _trial.FrameRateHz;
+				_currentFrameIndex = Mathf.FloorToInt(_currentTimeStamp * recordingFrameRate);
+			}
 
-        void OnDestroy()
-        {
-            _lstmModel.Dispose();
-        }
-    }
+			_currentFrameIndex = Mathf.Clamp(_currentFrameIndex, 0, _trial.NumberOfFrames - 1);
+			VideoPlayer.frame = _currentFrameIndex;
+
+			var toTake = 10;
+
+			var next10Timestamps = _trial.Timestamps.GetRange(_currentFrameIndex, toTake);
+			var next10Positions = _trial.UserDominantFootPositions.GetRange(_currentFrameIndex, toTake);
+			var next10NonDominantPositions = _trial.UserNonDominantFootPositions.GetRange(_currentFrameIndex, toTake);
+
+			var inputData = new InputData(next10Positions, next10NonDominantPositions, next10Timestamps);
+
+			if (VideoPlayer.isPlaying)
+				VideoPlayer.Pause();
+			VideoPlayer.Play();
+
+			_lastPrediction = _lstmModel.Evaluate(inputData);
+		}
+
+
+		public void ShowFrame(int value)
+		{
+			_currentFrameIndex = value;
+			var frameRate = _trial.FrameRateHz;
+			_currentTimeStamp = _currentFrameIndex / (float)frameRate;
+		}
+
+		public void TogglePlayPause()
+		{
+			_isPlaying = !_isPlaying;
+		}
+
+		void OnDestroy()
+		{
+			_lstmModel.Dispose();
+		}
+
+		int _currentFrameIndex;
+		float _currentTimeStamp;
+		bool _isPlaying;
+		float _lastPrediction;
+		LstmModel _lstmModel;
+		Trial _trial;
+	}
 }

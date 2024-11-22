@@ -562,7 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _evaluateButton: {fileID: 919459512}
   _resultText: {fileID: 402624668}
-  _lstmTestModel: {fileID: 121979484}
+  _passValidationApp: {fileID: 121979484}
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0

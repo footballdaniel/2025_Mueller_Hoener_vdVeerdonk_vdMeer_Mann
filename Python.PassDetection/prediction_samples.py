@@ -6,7 +6,7 @@ import torch
 
 from src.domain.samples import Sample
 
-# Load the ONNX model
+# Load ONNX model
 onnx_model_path = 'pass_detection_model.onnx'
 onnx_session = ort.InferenceSession(onnx_model_path)
 
@@ -14,35 +14,29 @@ onnx_session = ort.InferenceSession(onnx_model_path)
 with open('dataset.pkl', 'rb') as f:
     samples: List[Sample] = pickle.load(f)
 
-
-def predict_probability_onnx(features):
+# Loop through each sample
+for sample in samples:
+    # Prepare the input tensor
     batch_size = 1
     timeseries_length = 10
+    features = sample.inference.features
     features_count = len(features)
 
-    flattened_values = []
-    for feature in features:
-        flattened_values.extend(feature.values)
-
+    flattened_values = [value for feature in features for value in feature.values]
     input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
     input_tensor = input_tensor.view(batch_size, timeseries_length, features_count)
 
-    # Flatten the tensor
-    # flat_input = input_tensor.flatten().cpu().numpy()
-
-    # input_tensor.cpu()
-    # import pandas as pd
-    # input_tensor_df = pd.DataFrame(input_tensor.squeeze(0).cpu().numpy()).round(2)
-    # input_tensor_df.to_csv('input_tensor.csv', index=False)
-
+    # Convert tensor to numpy and run ONNX inference
     input_numpy = input_tensor.cpu().numpy()
     onnx_inputs = {onnx_session.get_inputs()[0].name: input_numpy}
     onnx_outputs = onnx_session.run(None, onnx_inputs)
 
-    probability = onnx_outputs[0].squeeze()
-    return float(probability)
+    # Extract predicted probability
+    predicted_probability = float(onnx_outputs[0].squeeze())
 
-
-for sample in samples:
-    predicted_probability = predict_probability_onnx(sample.inference.features)
-    print(f"Sample {sample.recording.trial_number} - Predicted Probability: {predicted_probability:.3f}, Actual: {sample.inference.pass_probability}")
+    # Print results
+    print(
+        f"Trial {sample.recording.trial_number}, Timestamp: {sample.recording.input_data.timestamps[0]:.3f} - "
+        f"Predicted Probability: {predicted_probability:.3f}, "
+        f"Actual Probability: {sample.inference.pass_probability:.3f}"
+    )

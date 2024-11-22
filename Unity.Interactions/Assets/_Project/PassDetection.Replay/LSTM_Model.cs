@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay.Features;
 using Src.Domain.Inferences;
@@ -47,17 +46,7 @@ namespace _Project.PassDetection.Replay
 			foreach (var feature in features)
 			foreach (var value in feature.Values)
 				flattenedValues[index++] = value;
-
-
-			var desiredTimestamp = 0.1;
-
-			if (Math.Abs(data.Timestamps[0] - desiredTimestamp) < 0.001)
-			{
-				var flattenedValuesStrings = Array.ConvertAll(flattenedValues, value => value.ToString("F3"));
-				var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-				File.WriteAllLines(Path.Combine(desktopPath, "unity_tensor.txt") , flattenedValuesStrings);
-			}
-
+			
 			var input = new Tensor<float>(shape, flattenedValues);
 
 			_worker.Schedule(input);
