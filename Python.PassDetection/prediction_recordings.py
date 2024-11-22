@@ -51,8 +51,16 @@ for timestamp in recording.input_data.timestamps:
     features.extend(velocities_dominant_foot.calculate(input_data))
     features.extend(velocities_non_dominant_foot.calculate(input_data))
 
-    features_as_tensors = [feature.to_tensor() for feature in features]
-    input_tensor = torch.stack(features_as_tensors, dim=1).unsqueeze(0)  # Add batch dimension
+    batch_size = 1
+    timeseries_length = 10
+    features_count = len(features)
+
+    flattened_values = []
+    for feature in features:
+        flattened_values.extend(feature.values)
+
+    input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
+    input_tensor = input_tensor.view(batch_size, timeseries_length, features_count)
 
     input_numpy = input_tensor.cpu().numpy()
     onnx_inputs = {onnx_session.get_inputs()[0].name: input_numpy}

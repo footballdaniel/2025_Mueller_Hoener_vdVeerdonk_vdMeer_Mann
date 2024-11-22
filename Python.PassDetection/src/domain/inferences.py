@@ -5,8 +5,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-import torch
-
 from src.domain.recordings import InputData
 
 
@@ -27,9 +25,6 @@ class FeatureCalculator(abc.ABC):
 class Feature:
     name: str
     values: List[float]
-
-    def to_tensor(self) -> torch.Tensor:
-        return torch.tensor(self.values, dtype=torch.float32)
 
 
 class Split(Enum):

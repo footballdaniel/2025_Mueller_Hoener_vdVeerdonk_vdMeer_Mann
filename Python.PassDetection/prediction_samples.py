@@ -16,8 +16,16 @@ with open('dataset.pkl', 'rb') as f:
 
 
 def predict_probability_onnx(features):
-    features_as_tensors = [feature.to_tensor() for feature in features]
-    input_tensor = torch.stack(features_as_tensors, dim=1).unsqueeze(0)  # Add batch dimension
+    batch_size = 1
+    timeseries_length = 10
+    features_count = len(features)
+
+    flattened_values = []
+    for feature in features:
+        flattened_values.extend(feature.values)
+
+    input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
+    input_tensor = input_tensor.view(batch_size, timeseries_length, features_count)
 
     # Flatten the tensor
     # flat_input = input_tensor.flatten().cpu().numpy()
