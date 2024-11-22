@@ -31,6 +31,7 @@ from src.utils import CustomEncoder
 """Reading recordings"""
 pattern = "../Data/Pilot_4/**/*.csv"
 plot_dir = Path("plots")
+output_dir_model = Path("../Unity.Interactions/Assets/Resources")
 save_plots = False
 
 recordings = []
@@ -75,10 +76,14 @@ for i in val_indices:
 train_dataset = Subset(dataset, train_indices)
 validation_dataset = Subset(dataset, val_indices)
 
-positive_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass)
-negative_training = sum(1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass)
-positive_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass)
-negative_validation = sum(1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass)
+positive_training = sum(
+    1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass)
+negative_training = sum(
+    1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass)
+positive_validation = sum(
+    1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass)
+negative_validation = sum(
+    1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass)
 print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
 print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
 
@@ -189,7 +194,7 @@ print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4
 with open('dataset.pkl', 'wb') as f:
     pickle.dump(dataset.samples, f)
 
-with open('dataset.json', 'w') as f:
+with open("dataset.json", 'w') as f:
     json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
 
 """PLOT SAMPLES"""
@@ -205,7 +210,7 @@ for idx, sample in enumerate(dataset.samples):
 
 """EXPORT ONNX"""
 # Path for ONNX file
-onnx_file_path = "pass_detection_model.onnx"
+onnx_file_path = output_dir_model.joinpath("pass_detection_model.onnx")
 model.to('cpu')
 model.eval()
 

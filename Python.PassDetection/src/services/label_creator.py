@@ -29,7 +29,8 @@ class LabelCreator:
                 pass_events=[pass_event],
                 user_dominant_foot_positions=recording.user_dominant_foot_positions[start_idx:start_idx + sequence_length],
                 user_non_dominant_foot_positions=recording.user_non_dominant_foot_positions[start_idx:start_idx + sequence_length],
-                timestamps=recording.timestamps[start_idx:start_idx + sequence_length]
+                timestamps=recording.timestamps[start_idx:start_idx + sequence_length],
+                number_of_frames=sequence_length,
             )
             sample = Sample(recording=updated_recording, pass_event=pass_event)
             samples.append(sample)

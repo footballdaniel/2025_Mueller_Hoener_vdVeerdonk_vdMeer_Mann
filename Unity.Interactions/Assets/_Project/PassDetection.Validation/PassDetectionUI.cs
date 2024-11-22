@@ -2,13 +2,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PassDetection
+namespace _Project.PassDetection.Validation
 {
     public class PassDetectionUI : MonoBehaviour
     {
         [SerializeField] Button _evaluateButton;
         [SerializeField] TMP_Text _resultText;
-        [SerializeField] LSTM_TestModel _lstmTestModel;
+        [SerializeField] PassValidationApp _passValidationApp;
     
         void Start()
         {
@@ -17,7 +17,7 @@ namespace PassDetection
 
         void OnEvaluateButtonClicked()
         {
-            var result = _lstmTestModel.Evaluate();
+            var result = _passValidationApp.EvaluateNext();
             _resultText.SetText($"Prediction Probability: {result*100:F1}%");
         }
     }

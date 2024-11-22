@@ -1,9 +1,9 @@
 {
-    "name": "PassDetectionReplay",
+    "name": "PassDetection.Validation",
     "rootNamespace": "",
     "references": [
-        "GUID:4f4864879987c63429f81b3fd17aab6b",
-        "GUID:c98377141161c7746a178fb5cb1af075"
+        "GUID:c98377141161c7746a178fb5cb1af075",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

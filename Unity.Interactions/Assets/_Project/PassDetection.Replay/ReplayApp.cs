@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Linq;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetectionReplay;
@@ -9,7 +7,6 @@ using PassDetection;
 using Unity.Sentis;
 using UnityEngine;
 using UnityEngine.Video;
-using Vector3 = System.Numerics.Vector3;
 
 namespace PassDetectionReplay
 {
