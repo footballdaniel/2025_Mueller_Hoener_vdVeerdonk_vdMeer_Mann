@@ -15,14 +15,14 @@ namespace Tactive.MachineLearning.Models
 		public ONNXModelMetadata MetaData => _metaData;
 		[field: SerializeReference] public List<string> FeatureNames { get; private set; }
 
-		public void Initialize(ONNXModelMetadata metadata, ModelAsset parent)
+		public void Initialize(ONNXModelMetadata metadata, ModelAsset modelAsset)
 		{
 			_metaData = metadata;
 
 			if (metadata.MetadataProps.TryGetValue("features", out var featureNames))
 				FeatureNames = JsonConvert.DeserializeObject<List<string>>(featureNames);
 
-			ModelAsset = parent;
+			ModelAsset = modelAsset;
 		}
 
 		List<string> _featureNames;

@@ -20,14 +20,16 @@ namespace Tactive.MachineLearning.Models
 				var asset = AssetDatabase.LoadAssetAtPath<ModelAsset>(assetPath);
 				var directory = Path.GetDirectoryName(assetPath);
 				var parentFileName = stem + "_with_metadata.asset";
-				var parentPath = Path.Combine(directory!, parentFileName);
+				var path = Path.Combine(directory!, parentFileName);
 
 				var assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
 				assetWithMetadata.name = stem + "_with_metadata";
 
-				AssetDatabase.CreateAsset(assetWithMetadata, parentPath);
-				AssetDatabase.AddObjectToAsset(asset, assetWithMetadata);
-
+				AssetDatabase.CreateAsset(assetWithMetadata, path);
+				
+				// copy the asset, and add it as a child to the new assetWithMetadata
+				
+				
 				assetWithMetadata.Initialize(metadata, asset);
 
 				AssetDatabase.SaveAssets();
