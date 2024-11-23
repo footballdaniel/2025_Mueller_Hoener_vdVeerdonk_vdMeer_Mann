@@ -247,7 +247,7 @@ for onnx_file_path in onnx_file_paths:
 
     feature_names = [feature for feature in features]
     metadata_props = onnx_model.metadata_props.add()
-    metadata_props.key = "feature_names"
+    metadata_props.key = "features"
     metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
 
     metadata_props = onnx_model.metadata_props.add()

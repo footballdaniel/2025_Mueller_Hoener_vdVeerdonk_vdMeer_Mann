@@ -1,38 +1,24 @@
+using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-namespace Tactive.MachineLearning.Models
+namespace Tactive.MachineLearning._Project.MachineLearning
 {
-	public class ModelMetadataLoader : ScriptableObject, IONNXMetadataImportCallbackReceiver
+	public class ModelMetadataLoader : IONNXMetadataImportCallbackReceiver
 	{
 		public void OnMetadataImported(AssetImportContext ctx, ONNXModelMetadata metadata)
 		{
-			var metadataWrapper = CreateInstance<ONNXModelMetadataWrapper>();
+			var metadataWrapper = ScriptableObject.CreateInstance<OnnxModelMetadataWrapper>();
+			metadataWrapper.name = "ONNX Metadata";
 			metadataWrapper.Initialize(metadata);
-
 			ctx.AddObjectToAsset("Metadata", metadataWrapper);
-
+			
+			// make this the main object, context should become child
 			ctx.SetMainObject(metadataWrapper);
+			
+			Debug.Log($"ONNX Metadata imported: {metadata.DocString}");
 		}
 	}
-
-	/// <summary>
-	/// Wrapper to hold the ONNXModelMetadata as a ScriptableObject for Unity's asset database.
-	/// </summary>
-	public class ONNXModelMetadataWrapper : ScriptableObject
-	{
-
-		public ONNXModelMetadata Metadata => metadata;
-
-		// Initialize the wrapper with metadata
-		public void Initialize(ONNXModelMetadata metadata)
-		{
-			this.metadata = metadata;
-		}
-
-		[SerializeField] ONNXModelMetadata metadata;
-	}
-
 
 }
