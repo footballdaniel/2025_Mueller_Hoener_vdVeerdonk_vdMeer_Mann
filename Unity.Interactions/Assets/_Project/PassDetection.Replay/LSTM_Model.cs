@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using _Project.Interactions.Scripts.Domain;
-using _Project.PassDetection.Replay.Features;
 using PassDetection.Replay.Features;
-using Src.Domain.Inferences;
 using Tactive.MachineLearning._Project.MachineLearning;
 using Tactive.MachineLearning.Features;
 using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 
-namespace _Project.PassDetection.Replay
+namespace PassDetection.Replay
 {
 	public class LstmModel : IDisposable
 	{

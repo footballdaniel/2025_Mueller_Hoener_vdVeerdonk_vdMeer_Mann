@@ -24,13 +24,11 @@ namespace Tactive.MachineLearning.Models
 
 				var assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
 				assetWithMetadata.name = stem + "_with_metadata";
-				assetWithMetadata.Initialize(metadata, asset);
 
 				AssetDatabase.CreateAsset(assetWithMetadata, parentPath);
-				AssetDatabase.RemoveObjectFromAsset(asset);
-				AssetDatabase.DeleteAsset(assetPath);
 				AssetDatabase.AddObjectToAsset(asset, assetWithMetadata);
 
+				assetWithMetadata.Initialize(metadata, asset);
 
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();

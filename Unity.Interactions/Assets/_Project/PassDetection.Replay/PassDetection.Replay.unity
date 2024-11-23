@@ -667,8 +667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d9a3f2bf529b842b66148d58b30511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelAsset: {fileID: 5022602860645237092, guid: b351acffe086e3f48beb598b0823fabe,
-    type: 3}
+  ModelAsset: {fileID: 11400000, guid: 153af441f6479b04386c53f3677b00b0, type: 2}
   ReplayUI: {fileID: 1690496641}
   VideoPlayer: {fileID: 673130088}
   DataPath: C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4

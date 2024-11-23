@@ -1,4 +1,5 @@
 using Unity.Sentis;
+using UnityEngine;
 
 namespace Tactive.MachineLearning.Models
 {
@@ -6,7 +7,9 @@ namespace Tactive.MachineLearning.Models
 	{
 		public static Model Load(ModelAssetWithMetadata asset)
 		{
-			return ModelLoader.Load(asset.ModelAsset);
+			
+			var resource = Resources.Load<ModelAsset>(asset.ModelAsset.name);
+			return ModelLoader.Load(resource);
 		}
 	}
 }

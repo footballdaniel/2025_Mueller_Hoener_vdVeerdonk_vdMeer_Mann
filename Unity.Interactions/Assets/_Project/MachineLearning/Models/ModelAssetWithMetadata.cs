@@ -10,7 +10,8 @@ namespace Tactive.MachineLearning.Models
 	/// </summary>
 	public class ModelAssetWithMetadata : ScriptableObject
 	{
-		public ModelAsset ModelAsset { get; private set; }
+		[field: SerializeReference] public ModelAsset ModelAsset { get; private set; }
+		[field: SerializeReference] public string ModelName => ModelAsset.name;
 		public ONNXModelMetadata MetaData => _metaData;
 		[field: SerializeReference] public List<string> FeatureNames { get; private set; }
 

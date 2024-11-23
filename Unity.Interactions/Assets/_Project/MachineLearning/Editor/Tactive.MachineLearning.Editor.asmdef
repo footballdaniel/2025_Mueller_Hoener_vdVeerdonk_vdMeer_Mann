@@ -2,8 +2,9 @@
     "name": "Tactive.MachineLearning.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:c98377141161c7746a178fb5cb1af075",
-        "GUID:baf600a77e4c04e4892ea6fddd7fc131"
+        "Unity.Sentis",
+        "Unity.Sentis.ONNX",
+        "Tactive.MachineLearning"
     ],
     "includePlatforms": [
         "Editor"

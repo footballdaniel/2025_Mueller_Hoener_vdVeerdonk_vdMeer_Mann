@@ -1,4 +1,4 @@
-using PassDetectionReplay;
+using PassDetection.Replay;
 using UnityEngine;
 using UnityEngine.UI;
 

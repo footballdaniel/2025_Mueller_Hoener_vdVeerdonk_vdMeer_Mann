@@ -1,17 +1,14 @@
 using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
-using _Project.PassDetection.Replay;
-using _Project.PassDetection.Replay.Features;
 using _Project.PassDetectionReplay;
 using Newtonsoft.Json;
 using PassDetection.Replay.Features;
 using Tactive.MachineLearning.Models;
-using Unity.Sentis;
 using UnityEngine;
 using UnityEngine.Video;
 
-namespace PassDetectionReplay
+namespace PassDetection.Replay
 {
 	public class ReplayApp : MonoBehaviour
 	{
