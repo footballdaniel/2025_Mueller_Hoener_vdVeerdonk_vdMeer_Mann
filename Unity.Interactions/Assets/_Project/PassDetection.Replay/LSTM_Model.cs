@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay.Features;
+using PassDetection.Replay.Features;
 using Src.Domain.Inferences;
 using Tactive.MachineLearning._Project.MachineLearning;
 using Unity.Sentis;

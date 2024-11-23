@@ -4,6 +4,7 @@ using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay.Features;
 using Newtonsoft.Json;
+using PassDetection.Replay.Features;
 using Unity.Sentis;
 using UnityEditor;
 using UnityEngine;
