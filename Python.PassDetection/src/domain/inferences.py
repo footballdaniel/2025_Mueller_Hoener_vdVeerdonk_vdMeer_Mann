@@ -24,7 +24,7 @@ class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
         return self.__class__.__name__
 
 
-@dataclass
+@dataclass(frozen=True)
 class Target:
     """Represents a feature that has been calculated. This is part of the input for the model"""
     name: str
@@ -38,7 +38,7 @@ class Split(Enum):
     TEST = 3
 
 
-@dataclass
+@dataclass(frozen=True)
 class Inference:
     targets: List[Target] = field(default_factory=list)
     outcome_label: int = 0
@@ -46,6 +46,6 @@ class Inference:
     split: Split = Split.UNASSIGNED
 
 
-@dataclass
+@dataclass(frozen=True)
 class NoInference(Inference):
     pass

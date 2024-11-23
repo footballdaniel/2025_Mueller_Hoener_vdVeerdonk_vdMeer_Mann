@@ -1,7 +1,6 @@
 import glob
 import json
 import os
-import subprocess
 from dataclasses import asdict
 from pathlib import Path
 
@@ -12,9 +11,10 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset, DataLoader
+from dataclasses import replace
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.inferences import Split
+from src.domain.inferences import Split, Inference
 from src.domain.run import Run, Scores
 from src.features.feature_registry import FeatureRegistry
 from src.kpi.accuracy import prediction_accuracy
@@ -27,10 +27,10 @@ from src.services.feature_engineer import FeatureEngineer
 from src.services.label_creator import LabelCreator
 from src.services.plotter import plot_sample_with_features
 from src.services.recording_parser import RecordingParser
-from src.utils import CustomEncoder
+from src.utils import CustomEncoder, manage_mlflow_server
 
 """LOGGING"""
-subprocess.Popen("mlflow server --host 127.0.0.1 --port 8080", shell=True)
+manage_mlflow_server('127.0.0.1', 8080)
 mlflow.set_experiment("Pass Detection")
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
@@ -63,51 +63,40 @@ with mlflow.start_run(run_name=architecture):
     augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
 
     """SPLITTING DATASET"""
-    dataset = PassDataset(augmented_samples)
-    torch.manual_seed(42)  # Set the seed
+    seed = 42
+    torch.manual_seed(seed)  # Set the seed
 
-    num_samples = len(dataset.samples)
+    num_samples = len(augmented_samples)
     indices = list(range(num_samples))
-    labels = [sample.pass_event.is_a_pass for sample in dataset.samples]
+    labels = [sample.pass_event.is_a_pass for sample in augmented_samples]
 
-    # First split: training set (70%) and temp set (30% for validation + test)
-    train_indices, temp_indices = train_test_split(
-        indices, test_size=0.3, stratify=labels, random_state=42
+    # First split: training set (70%) and eval set (30% for validation + test)
+    train_indices, eval_indices = train_test_split(
+        indices, test_size=(1 / 3), stratify=labels, random_state=seed
     )
-
-    # Extract labels for the temp set
-    temp_labels = [labels[i] for i in temp_indices]
-
+    eval_labels = [labels[i] for i in eval_indices]
     # Second split: validation set (20% total) and test set (10% total)
     val_indices, test_indices = train_test_split(
-        temp_indices, test_size=(1 / 3), stratify=temp_labels, random_state=42
+        eval_indices, test_size=(1 / 3), stratify=eval_labels, random_state=seed
     )
 
-    # Create Subsets using the indices
-    train_dataset = Subset(dataset, train_indices)
-    validation_dataset = Subset(dataset, val_indices)
-    test_dataset = Subset(dataset, test_indices)
+    for idx in train_indices:
+        augmented_samples[idx] = replace(
+            augmented_samples[idx],
+            inference=replace(augmented_samples[idx].inference, split=Split.TRAIN)
+        )
 
-    def count_positive_negative(subset):
-        positive = 0
-        negative = 0
-        for idx in subset.indices:
-            sample = dataset.samples[idx]
-            if sample.pass_event.is_a_pass:
-                positive += 1
-            else:
-                negative += 1
-        return positive, negative
+    for idx in val_indices:
+        augmented_samples[idx] = replace(
+            augmented_samples[idx],
+            inference=replace(augmented_samples[idx].inference, split=Split.VALIDATION)
+        )
 
-    positive_training, negative_training = count_positive_negative(train_dataset)
-    positive_validation, negative_validation = count_positive_negative(validation_dataset)
-    positive_testing, negative_testing = count_positive_negative(test_dataset)
-
-    # Print the counts
-    print(f"Training set: Size:{len(train_dataset)} Positive:{positive_training} Negative:{negative_training}")
-    print(
-        f"Validation set: Size:{len(validation_dataset)} Positive:{positive_validation} Negative:{negative_validation}")
-    print(f"Test set: Size:{len(test_dataset)} Positive:{positive_testing} Negative:{negative_testing}")
+    for idx in test_indices:
+        augmented_samples[idx] = replace(
+            augmented_samples[idx],
+            inference=replace(augmented_samples[idx].inference, split=Split.TEST)
+        )
 
     best_score: float = float('inf')
     best_run: Run = None
@@ -119,7 +108,13 @@ with mlflow.start_run(run_name=architecture):
             feature_instance = FeatureRegistry.create(feature)
             engineer.add_feature(feature_instance)
 
-        calculated_features = engineer.engineer(dataset.samples)
+        engineered_samples = engineer.engineer(augmented_samples)
+        dataset = PassDataset(engineered_samples)
+
+        # Create Subsets using the indices
+        train_dataset = Subset(dataset, train_indices)
+        validation_dataset = Subset(dataset, val_indices)
+        test_dataset = Subset(dataset, test_indices)
 
         validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
         training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
@@ -156,6 +151,7 @@ with mlflow.start_run(run_name=architecture):
 
             model.train()
             total_loss = 0
+
             for inputs, labels in training_loader:
                 inputs = inputs.to(device)
                 labels = labels.to(device).view(-1, 1)
@@ -205,10 +201,13 @@ with mlflow.start_run(run_name=architecture):
                 input_tensor, label = dataset[idx]
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
-                probability = output.item()
-                sample.inference.pass_probability = round(probability, 3)
+                probability = round(output.item(),3)
+                dataset.samples[idx] = replace(
+                    dataset.samples[idx],
+                    inference=replace(dataset.samples[idx].inference, pass_probability=probability)
+                )
 
-        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.VALIDATION]
+        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.TEST]
         brier_score = prediction_brier(validation_samples)
         accuracy = prediction_accuracy(validation_samples)
         precision, recall, f1_score = predict_precision_recall_f1(validation_samples)
@@ -253,7 +252,11 @@ with mlflow.start_run(run_name=architecture):
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            sample.inference.pass_probability = round(probability, 3)
+            dataset.samples[idx] = replace(
+                dataset.samples[idx],
+                inference=replace(
+                    dataset.samples[idx].inference, pass_probability=probability)
+            )
 
     test_samples = [sample for sample in dataset.samples if sample.inference.split == Split.TEST]
 

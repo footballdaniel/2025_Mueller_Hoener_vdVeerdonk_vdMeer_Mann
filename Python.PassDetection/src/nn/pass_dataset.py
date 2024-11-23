@@ -10,7 +10,9 @@ from src.domain.samples import Sample
 
 @dataclass
 class PassDataset(Dataset):
-    samples: List[Sample]
+
+    def __init__(self, samples: List[Sample]):
+        self.samples = samples
 
     def __len__(self) -> int:
         return len(self.samples)
