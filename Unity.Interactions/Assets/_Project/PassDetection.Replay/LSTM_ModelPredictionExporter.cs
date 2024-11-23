@@ -5,6 +5,7 @@ using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay.Features;
 using Newtonsoft.Json;
 using PassDetection.Replay.Features;
+using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 using UnityEditor;
 using UnityEngine;
@@ -17,10 +18,10 @@ namespace _Project.PassDetection.Replay
 		public static void RunPredictions()
 		{
 			var jsonPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4/trial_3_2024-10-29_15-58-40.json";
-			var modelPath = "pass_detection_model";
+			var modelPath = "pass_detection_model_with_metadata";
 			var outputPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4/trial_3_2024-10-29_15-58-40_recalculated.csv";
 
-			var asset = Resources.Load<ModelAsset>(modelPath);
+			var asset = Resources.Load<ModelAssetWithMetadata>(modelPath);
 			var json = File.ReadAllText(jsonPath);
 			var jsonSettings = new JsonSerializerSettings();
 			jsonSettings.Converters.Add(new Vector3Converter());

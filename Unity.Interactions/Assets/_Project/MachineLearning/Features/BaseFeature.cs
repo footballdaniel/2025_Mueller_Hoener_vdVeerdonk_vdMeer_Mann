@@ -1,6 +1,7 @@
 
 
 using System.Collections.Generic;
+using Tactive.MachineLearning.Features;
 
 namespace Tactive.MachineLearning._Project.MachineLearning
 {
@@ -8,6 +9,6 @@ namespace Tactive.MachineLearning._Project.MachineLearning
 	{
 		public string Name => GetType().Name;
 		public abstract int Size { get; }
-		public abstract List<Feature> Calculate(T inputData);
+		public abstract List<Target> Calculate(T inputData);
 	}
 }

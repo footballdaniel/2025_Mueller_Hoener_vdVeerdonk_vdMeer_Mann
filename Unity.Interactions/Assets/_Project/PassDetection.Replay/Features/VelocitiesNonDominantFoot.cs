@@ -4,6 +4,7 @@ using _Project.PassDetection.Replay;
 using _Project.PassDetection.Replay.Features;
 using PassDetection.Replay.Features;
 using Tactive.MachineLearning._Project.MachineLearning;
+using Tactive.MachineLearning.Features;
 using UnityEngine;
 
 namespace Src.Domain.Inferences
@@ -12,7 +13,7 @@ namespace Src.Domain.Inferences
     {
         public override int Size => 3;
 
-        public override List<Feature> Calculate(InputData inputData)
+        public override List<Target> Calculate(InputData inputData)
         {
             var nonDominantPositions = inputData.UserNonDominantFootPositions;
             var timestamps = inputData.Timestamps;
@@ -35,11 +36,11 @@ namespace Src.Domain.Inferences
             var yValues = velocities.Select(v => v.y).ToList();
             var zValues = velocities.Select(v => v.z).ToList();
 
-            return new List<Feature>
+            return new List<Target>
             {
-                new Feature("velocities_non_dominant_foot_x", xValues),
-                new Feature("velocities_non_dominant_foot_y", yValues),
-                new Feature("velocities_non_dominant_foot_z", zValues)
+                new Target("velocities_non_dominant_foot_x", xValues),
+                new Target("velocities_non_dominant_foot_y", yValues),
+                new Target("velocities_non_dominant_foot_z", zValues)
             };
         }
     }

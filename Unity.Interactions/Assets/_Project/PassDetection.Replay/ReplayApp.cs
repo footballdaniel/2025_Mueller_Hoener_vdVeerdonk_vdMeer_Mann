@@ -6,6 +6,7 @@ using _Project.PassDetection.Replay.Features;
 using _Project.PassDetectionReplay;
 using Newtonsoft.Json;
 using PassDetection.Replay.Features;
+using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 using UnityEngine;
 using UnityEngine.Video;
@@ -14,7 +15,7 @@ namespace PassDetectionReplay
 {
 	public class ReplayApp : MonoBehaviour
 	{
-		public ModelAsset ModelAsset;
+		public ModelAssetWithMetadata ModelAsset;
 		public ReplayUI ReplayUI;
 		public VideoPlayer VideoPlayer;
 		public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4"; // Forward slashes

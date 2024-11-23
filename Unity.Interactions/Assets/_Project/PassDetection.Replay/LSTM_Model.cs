@@ -5,15 +5,22 @@ using _Project.PassDetection.Replay.Features;
 using PassDetection.Replay.Features;
 using Src.Domain.Inferences;
 using Tactive.MachineLearning._Project.MachineLearning;
+using Tactive.MachineLearning.Features;
+using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 
 namespace _Project.PassDetection.Replay
 {
 	public class LstmModel : IDisposable
 	{
-		public LstmModel(ModelAsset asset)
+		public LstmModel(ModelAssetWithMetadata asset)
 		{
-			var model = ModelLoader.Load(asset);
+			var model = ModelLoaderWithMetadata.Load(asset);
+
+			_features = new List<BaseFeature<InputData>>();
+			foreach (var featureName in asset.FeatureNames)
+				_features.Add(FeatureRegistry.Create<InputData>(featureName));
+			
 			_worker = new Worker(model, BackendType.GPUCompute);
 		}
 
@@ -25,19 +32,13 @@ namespace _Project.PassDetection.Replay
 
 		public float Evaluate(InputData data)
 		{
-			var zeroedPositionDominantFootCalculator = new ZeroedPositionDominantFoot();
-			var footOffsetCalculator = new FootOffset();
-			var velocitiesDominantFootCalculator = new VelocitiesDominantFoot();
-			var velocitiesNonDominantFootCalculator = new VelocitiesNonDominantFoot();
+			var targets = new List<Target>();
+			
+			foreach (var feature in _features)
+				targets.AddRange(feature.Calculate(data));
 
-			var features = new List<Feature>();
-			features.AddRange(zeroedPositionDominantFootCalculator.Calculate(data));
-			features.AddRange(footOffsetCalculator.Calculate(data));
-			features.AddRange(velocitiesDominantFootCalculator.Calculate(data));
-			features.AddRange(velocitiesNonDominantFootCalculator.Calculate(data));
-
-			var timeseriesCount = features[0].Values.Count;
-			var featureCount = features.Count;
+			var timeseriesCount = targets[0].Values.Count;
+			var featureCount = targets.Count;
 			var batchSize = 1;
 
 			var shape = new TensorShape(batchSize, timeseriesCount, featureCount);
@@ -45,10 +46,10 @@ namespace _Project.PassDetection.Replay
 
 			var index = 0;
 
-			foreach (var feature in features)
+			foreach (var feature in targets)
 			foreach (var value in feature.Values)
 				flattenedValues[index++] = value;
-			
+
 			var input = new Tensor<float>(shape, flattenedValues);
 
 			_worker.Schedule(input);
@@ -62,9 +63,7 @@ namespace _Project.PassDetection.Replay
 			return result;
 		}
 
-		readonly ModelAsset _asset;
 		readonly Worker _worker;
-
-		Trial _trial;
+		readonly List<BaseFeature<InputData>> _features;
 	}
 }

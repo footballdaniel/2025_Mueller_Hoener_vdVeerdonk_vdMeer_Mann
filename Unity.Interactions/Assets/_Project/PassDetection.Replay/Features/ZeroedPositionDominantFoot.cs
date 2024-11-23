@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PassDetection.Replay.Features;
 using Tactive.MachineLearning._Project.MachineLearning;
+using Tactive.MachineLearning.Features;
 using UnityEngine;
 
 namespace _Project.PassDetection.Replay.Features
@@ -10,7 +11,7 @@ namespace _Project.PassDetection.Replay.Features
 	{
 		public override int Size => 3;
 
-		public override List<Feature> Calculate(InputData inputData)
+		public override List<Target> Calculate(InputData inputData)
 		{
 			var dominantPositions = inputData.UserDominantFootPositions;
 			var origin = dominantPositions[0];
@@ -22,11 +23,11 @@ namespace _Project.PassDetection.Replay.Features
 			var yValues = zeroedPositions.Select(pos => pos.y).ToList();
 			var zValues = zeroedPositions.Select(pos => pos.z).ToList();
 
-			return new List<Feature>
+			return new List<Target>
 			{
-				new Feature("zeroed_position_dominant_foot_x", xValues),
-				new Feature("zeroed_position_dominant_foot_y", yValues),
-				new Feature("zeroed_position_dominant_foot_z", zValues)
+				new Target("zeroed_position_dominant_foot_x", xValues),
+				new Target("zeroed_position_dominant_foot_y", yValues),
+				new Target("zeroed_position_dominant_foot_z", zValues)
 			};
 		}
 	}

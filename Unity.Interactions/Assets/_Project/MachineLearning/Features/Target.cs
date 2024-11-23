@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
-namespace Tactive.MachineLearning._Project.MachineLearning
+namespace Tactive.MachineLearning.Features
 {
-	public class Feature
+	public class Target
 	{
 
-		public Feature(string name, List<float> values)
+		public Target(string name, List<float> values)
 		{
 			Name = name;
 			Values = values;

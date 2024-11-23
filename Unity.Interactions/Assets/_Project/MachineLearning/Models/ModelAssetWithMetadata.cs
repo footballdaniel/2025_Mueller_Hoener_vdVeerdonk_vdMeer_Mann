@@ -8,7 +8,7 @@ namespace Tactive.MachineLearning.Models
 	/// <summary>
 	/// This is automatically created as a child of a ModelAsset when importing an ONNX
 	/// </summary>
-	public class OnnxModelWithMetadata : ScriptableObject
+	public class ModelAssetWithMetadata : ScriptableObject
 	{
 		public ModelAsset ModelAsset { get; private set; }
 		public ONNXModelMetadata MetaData => _metaData;
