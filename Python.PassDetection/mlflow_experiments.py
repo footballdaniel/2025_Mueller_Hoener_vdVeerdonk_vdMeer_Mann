@@ -4,9 +4,7 @@ from random import random
 import mlflow
 
 from src.nn.lstm_model import LSTMPassDetectionModel
-from src.utils import start_local_mlflow_server
 
-start_local_mlflow_server()
 mlflow.set_experiment("Pass Detection")
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
