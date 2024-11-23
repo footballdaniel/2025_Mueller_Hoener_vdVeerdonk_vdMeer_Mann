@@ -19,7 +19,7 @@ for sample in samples:
     # Prepare the input tensor
     batch_size = 1
     timeseries_length = 10
-    features = sample.inference.features
+    features = sample.inference.targets
     features_count = len(features)
 
     flattened_values = [value for feature in features for value in feature.values]

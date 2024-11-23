@@ -1,7 +1,7 @@
 from typing import List
 
 from src.domain.common import Vector3
-from src.domain.inferences import BaseFeature, Feature
+from src.domain.inferences import BaseFeature, Target
 from src.domain.recordings import InputData
 
 
@@ -10,7 +10,7 @@ class VelocitiesDominantFoot(BaseFeature):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, input_data: InputData) -> List[Feature]:
+    def calculate(self, input_data: InputData) -> List[Target]:
         dominant_positions = input_data.user_dominant_foot_positions
         timestamps = input_data.timestamps
         velocities = []
@@ -31,7 +31,7 @@ class VelocitiesDominantFoot(BaseFeature):
         z_values = [vel.z for vel in velocities]
 
         return [
-            Feature(name="velocities_dominant_foot_x", values=x_values),
-            Feature(name="velocities_dominant_foot_y", values=y_values),
-            Feature(name="velocities_dominant_foot_z", values=z_values),
+            Target(name="velocities_dominant_foot_x", values=x_values),
+            Target(name="velocities_dominant_foot_y", values=y_values),
+            Target(name="velocities_dominant_foot_z", values=z_values),
         ]

@@ -16,7 +16,7 @@ class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
         ...
 
     @abc.abstractmethod
-    def calculate(self, input_data: InputData) -> List[Feature]:
+    def calculate(self, input_data: InputData) -> List[Target]:
         ...
 
     @property
@@ -25,7 +25,7 @@ class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
 
 
 @dataclass
-class Feature:
+class Target:
     name: str
     values: List[float]
 
@@ -39,7 +39,7 @@ class Split(Enum):
 
 @dataclass
 class Inference:
-    features: List[Feature] = field(default_factory=list)
+    targets: List[Target] = field(default_factory=list)
     outcome_label: int = 0
     pass_probability: float = 0.0
     split: Split = Split.UNASSIGNED

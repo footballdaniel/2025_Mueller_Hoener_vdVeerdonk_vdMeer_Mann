@@ -45,22 +45,22 @@ for timestamp in recording.input_data.timestamps:
     velocities_dominant_foot = VelocitiesDominantFoot()
     velocities_non_dominant_foot = VelocitiesNonDominantFoot()
 
-    features = []
-    features.extend(zeroed_position.calculate(input_data))
-    features.extend(foot_offset.calculate(input_data))
-    features.extend(velocities_dominant_foot.calculate(input_data))
-    features.extend(velocities_non_dominant_foot.calculate(input_data))
+    targets = []
+    targets.extend(zeroed_position.calculate(input_data))
+    targets.extend(foot_offset.calculate(input_data))
+    targets.extend(velocities_dominant_foot.calculate(input_data))
+    targets.extend(velocities_non_dominant_foot.calculate(input_data))
 
     batch_size = 1
     timeseries_length = 10
-    features_count = len(features)
+    target_count = len(targets)
 
     flattened_values = []
-    for feature in features:
+    for feature in targets:
         flattened_values.extend(feature.values)
 
     input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
-    input_tensor = input_tensor.view(batch_size, timeseries_length, features_count)
+    input_tensor = input_tensor.view(batch_size, timeseries_length, target_count)
 
     input_numpy = input_tensor.cpu().numpy()
     onnx_inputs = {onnx_session.get_inputs()[0].name: input_numpy}

@@ -18,11 +18,11 @@ class PassDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
         sample = self.samples[idx]
 
-        timeseries_length = len(sample.inference.features[0].values)
-        features_count = len(sample.inference.features)
+        timeseries_length = len(sample.inference.targets[0].values)
+        features_count = len(sample.inference.targets)
 
         flattened_values = []
-        for feature in sample.inference.features:
+        for feature in sample.inference.targets:
             flattened_values.extend(feature.values)
 
         input_tensor = torch.tensor(flattened_values, dtype=torch.float32)

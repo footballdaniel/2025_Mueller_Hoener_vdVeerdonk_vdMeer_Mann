@@ -4,7 +4,7 @@ from src.domain.samples import Sample
 
 
 def plot_sample_with_features(sample: Sample) -> plt.Figure:
-    num_features = len(sample.inference.features)
+    num_features = len(sample.inference.targets)
     fig_height = num_features * 2  # Smaller figure height per feature
     fig, axs = plt.subplots(
         num_features, 1, figsize=(10, fig_height),
@@ -30,7 +30,7 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
 
     for i in range(num_features):
         ax = axs[i]
-        feature = sample.inference.features[i]
+        feature = sample.inference.targets[i]
         time = sample.recording.input_data.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)

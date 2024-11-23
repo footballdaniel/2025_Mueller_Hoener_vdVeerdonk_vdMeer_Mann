@@ -1,7 +1,7 @@
 from typing import List
 
 from src.domain.common import Vector3
-from src.domain.inferences import BaseFeature, Feature
+from src.domain.inferences import BaseFeature, Target
 from src.domain.recordings import InputData
 
 
@@ -10,7 +10,7 @@ class ZeroedPositionDominantFoot(BaseFeature):
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)
 
-    def calculate(self, input_data: InputData) -> List[Feature]:
+    def calculate(self, input_data: InputData) -> List[Target]:
         dominant_positions = input_data.user_dominant_foot_positions
         origin = dominant_positions[0]
         zeroed_positions = [
@@ -21,7 +21,7 @@ class ZeroedPositionDominantFoot(BaseFeature):
         z_values = [pos.z for pos in zeroed_positions]
 
         return [
-            Feature(name="zeroed_position_dominant_foot_x", values=x_values),
-            Feature(name="zeroed_position_dominant_foot_y", values=y_values),
-            Feature(name="zeroed_position_dominant_foot_z", values=z_values),
+            Target(name="zeroed_position_dominant_foot_x", values=x_values),
+            Target(name="zeroed_position_dominant_foot_y", values=y_values),
+            Target(name="zeroed_position_dominant_foot_z", values=z_values),
         ]

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using Tactive.MachineLearning._Project.MachineLearning;
 
-namespace Tactive.MachineLearning._Project.MachineLearning
+namespace Tactive.MachineLearning.Features
 {
 	public static class FeatureRegistry
 	{
