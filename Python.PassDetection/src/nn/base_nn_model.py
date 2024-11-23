@@ -1,4 +1,5 @@
-from src import nn
+from torch import nn
+
 from src.domain.model_registry import ModelRegistry
 
 

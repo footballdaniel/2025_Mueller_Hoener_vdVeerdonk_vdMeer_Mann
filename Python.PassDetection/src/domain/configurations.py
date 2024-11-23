@@ -9,15 +9,12 @@ import yaml
 class Configuration:
     features: list[str]
     model_type: str
-    optimizer_function: str
     loss_function: str
     learning_rate: float
     epochs: int
-    batch_size: int
-    test_size: float
     early_stopping_patience: int
     early_stopping_delta: float
-    random_seed: int
+    batch_size: int
 
 
 class ConfigurationParser:
@@ -32,15 +29,12 @@ class ConfigurationParser:
         all_combinations = product(
             features,
             [hyperparams['model_type']],
-            [hyperparams['optimizer_function']],
             [hyperparams['loss_function']],
             [hyperparams['learning_rate']],
             [hyperparams['epochs']],
-            [hyperparams['batch_size']],
-            [hyperparams['test_size']],
             [hyperparams['early_stopping_patience']],
             [hyperparams['early_stopping_delta']],
-            [hyperparams['random_seed']]
+            [hyperparams['batch_size']]
         )
 
         configurations = [
