@@ -1,7 +1,9 @@
 import glob
 import json
 import os
+import pickle
 from dataclasses import asdict
+from dataclasses import replace
 from pathlib import Path
 
 import mlflow
@@ -11,10 +13,9 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset, DataLoader
-from dataclasses import replace
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.inferences import Split, Inference
+from src.domain.inferences import Split
 from src.domain.run import Run, Scores
 from src.features.feature_registry import FeatureRegistry
 from src.kpi.accuracy import prediction_accuracy
@@ -116,8 +117,8 @@ with mlflow.start_run(run_name=architecture):
         validation_dataset = Subset(dataset, val_indices)
         test_dataset = Subset(dataset, test_indices)
 
-        validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
         training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
+        validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
         testing_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
 
         """MODEL"""
@@ -201,13 +202,13 @@ with mlflow.start_run(run_name=architecture):
                 input_tensor, label = dataset[idx]
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
-                probability = round(output.item(),3)
+                probability = round(output.item(), 3)
                 dataset.samples[idx] = replace(
                     dataset.samples[idx],
                     inference=replace(dataset.samples[idx].inference, pass_probability=probability)
                 )
 
-        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.TEST]
+        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.VALIDATION]
         brier_score = prediction_brier(validation_samples)
         accuracy = prediction_accuracy(validation_samples)
         precision, recall, f1_score = predict_precision_recall_f1(validation_samples)
@@ -245,6 +246,7 @@ with mlflow.start_run(run_name=architecture):
             # )
 
     """EVALUATION BEST MODEL ON TEST SET"""
+    model = best_run.model
     with torch.no_grad():
         for idx in range(len(dataset)):
             sample = dataset.samples[idx]
@@ -275,28 +277,15 @@ with mlflow.start_run(run_name=architecture):
         recall=recall,
         accuracy=accuracy,
     )
+    with mlflow.start_run(nested=True, run_name="Best Run Test Score"):
+    mlflow.log_params(asdict(config))
+    mlflow.log_metrics(asdict(test_score))
 
-    if brier_score < best_score:
-        best_run = config
-
-    with mlflow.start_run(nested=True, run_name=str(run_idx)):
-        mlflow.log_params(asdict(config))
-        mlflow.log_metrics(asdict(test_score))
-
-        # model_info = mlflow.pytorch.log_model(
-        #     pytorch_model=model,
-        #     artifact_path="model",
-        #     registered_model_name=model_name,
-        # )
-
-    """SAVE BEST MODEL"""
-    checkpoint = {
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'input_size': input_size,
-        'epoch': epoch_index,
-    }
-    torch.save(checkpoint, 'pass_detection_model.pth')
+    # model_info = mlflow.pytorch.log_model(
+    #     pytorch_model=model,
+    #     artifact_path="model",
+    #     registered_model_name=model_name,
+    # )
 
     """SAVE DATASET"""
     # Save some to folder
