@@ -80,6 +80,8 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"t:AssemblyDefinitionAsset sentis."
+	"t:AssemblyDefinitionAsset senti"
 	"t:AssemblyDefinitionAsset sentis"
 	"t:AssemblyDefinitionAsset intera"
 	"t:AssemblyDefinitionAsset"

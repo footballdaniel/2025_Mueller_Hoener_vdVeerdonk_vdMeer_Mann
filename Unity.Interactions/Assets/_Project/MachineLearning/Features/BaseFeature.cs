@@ -10,5 +10,4 @@ namespace Tactive.MachineLearning._Project.MachineLearning
 		public abstract int Size { get; }
 		public abstract List<Feature> Calculate(T inputData);
 	}
-
 }
