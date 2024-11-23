@@ -6,19 +6,22 @@ from enum import Enum
 from typing import List
 
 from src.domain.recordings import InputData
+from src.features.feature_registry import FeatureRegistry
 
 
-class FeatureCalculator(abc.ABC):
+class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
     @property
     @abc.abstractmethod
     def size(self) -> int:
-        """Return the size of the feature this calculator produces."""
         ...
 
     @abc.abstractmethod
     def calculate(self, input_data: InputData) -> List[Feature]:
-        """Calculate the feature for a given trial."""
         ...
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
 
 
 @dataclass

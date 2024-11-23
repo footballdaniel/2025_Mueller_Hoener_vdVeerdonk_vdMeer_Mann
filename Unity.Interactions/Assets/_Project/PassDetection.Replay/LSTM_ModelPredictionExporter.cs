@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
+using _Project.PassDetection.Replay.Features;
 using Newtonsoft.Json;
 using Unity.Sentis;
 using UnityEditor;

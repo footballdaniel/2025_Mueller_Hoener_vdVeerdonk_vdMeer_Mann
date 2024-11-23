@@ -1,18 +1,18 @@
 from dataclasses import replace
 from typing import List
 
-from src.domain.inferences import FeatureCalculator, Inference
+from src.domain.inferences import BaseFeature, Inference
 from src.domain.samples import Sample
 
 
 class FeatureEngineer:
     def __init__(self):
-        self.feature_calculators: List[FeatureCalculator] = []
+        self.feature_calculators: List[BaseFeature] = []
 
-    def add_feature(self, feature_calculator: FeatureCalculator):
+    def add_feature(self, feature_calculator: BaseFeature):
         self.feature_calculators.append(feature_calculator)
 
-    def engineer_features(self, samples: List[Sample]) -> List[Sample]:
+    def engineer(self, samples: List[Sample]) -> List[Sample]:
         engineered_samples = []
         for sample in samples:
             features = []

@@ -1,11 +1,11 @@
 from typing import List
 
 from src.domain.common import Vector3
-from src.domain.inferences import Feature, FeatureCalculator
+from src.domain.inferences import Feature, BaseFeature
 from src.domain.recordings import InputData
 
 
-class VelocitiesNonDominantFootCalculator(FeatureCalculator):
+class VelocitiesNonDominantFoot(BaseFeature):
     @property
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)

@@ -1,11 +1,11 @@
 from typing import List
 
 from src.domain.common import Vector3
-from src.domain.inferences import FeatureCalculator, Feature
+from src.domain.inferences import BaseFeature, Feature
 from src.domain.recordings import InputData
 
 
-class FootOffsetCalculator(FeatureCalculator):
+class FootOffset(BaseFeature):
     @property
     def size(self) -> int:
         return 3  # Each feature now has only one component (x, y, or z)

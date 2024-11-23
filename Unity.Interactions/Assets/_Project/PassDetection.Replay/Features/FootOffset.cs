@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
+using Tactive.MachineLearning._Project.MachineLearning;
 using UnityEngine;
 
 namespace _Project.PassDetection.Replay.Features
 {
-	public class FootOffsetCalculator : FeatureCalculator
+	public class FootOffset : BaseFeature<InputData>
 	{
 		public override int Size => 3;
 
-		public override List<Feature> Calculate(InputData inputData)
+		public override List<Feature> Calculate(InputData inputInputData)
 		{
-			var dominantPositions = inputData.UserDominantFootPositions;
-			var nonDominantPositions = inputData.UserNonDominantFootPositions;
+			var dominantPositions = inputInputData.UserDominantFootPositions;
+			var nonDominantPositions = inputInputData.UserNonDominantFootPositions;
 
 			var offsets = dominantPositions
 				.Select((dominant, i) => new Vector3(

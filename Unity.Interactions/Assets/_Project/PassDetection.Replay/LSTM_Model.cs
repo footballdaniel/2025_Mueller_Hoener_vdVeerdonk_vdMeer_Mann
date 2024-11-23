@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay.Features;
 using Src.Domain.Inferences;
+using Tactive.MachineLearning._Project.MachineLearning;
 using Unity.Sentis;
 
 namespace _Project.PassDetection.Replay
@@ -23,10 +24,10 @@ namespace _Project.PassDetection.Replay
 
 		public float Evaluate(InputData data)
 		{
-			var zeroedPositionDominantFootCalculator = new ZeroedPositionDominantFootCalculator();
-			var footOffsetCalculator = new FootOffsetCalculator();
-			var velocitiesDominantFootCalculator = new VelocitiesDominantFootCalculator();
-			var velocitiesNonDominantFootCalculator = new VelocitiesNonDominantFootCalculator();
+			var zeroedPositionDominantFootCalculator = new ZeroedPositionDominantFoot();
+			var footOffsetCalculator = new FootOffset();
+			var velocitiesDominantFootCalculator = new VelocitiesDominantFoot();
+			var velocitiesNonDominantFootCalculator = new VelocitiesNonDominantFoot();
 
 			var features = new List<Feature>();
 			features.AddRange(zeroedPositionDominantFootCalculator.Calculate(data));

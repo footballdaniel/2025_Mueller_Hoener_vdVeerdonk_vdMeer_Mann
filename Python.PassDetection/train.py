@@ -13,10 +13,11 @@ from torch.utils.data import Subset, DataLoader
 
 from src.domain.inferences import Split
 from src.features.feature_engineer import FeatureEngineer
-from src.features.foot_offset import FootOffsetCalculator
-from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
-from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
-from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
+from src.features.feature_registry import FeatureRegistry
+from src.features.foot_offset import FootOffset
+from src.features.velocities_dominant_foot import VelocitiesDominantFoot
+from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFoot
+from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFoot
 from src.nn.accuracy import prediction_accuracy
 from src.nn.brier import prediction_brier
 from src.nn.f1_scores import predict_precision_recall_f1
@@ -53,12 +54,13 @@ augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
 
 """FEATURE ENGINEERING"""
 engineer = FeatureEngineer()
-engineer.add_feature(ZeroedPositionDominantFootCalculator())
-engineer.add_feature(FootOffsetCalculator())
-engineer.add_feature(VelocitiesDominantFootCalculator())
-engineer.add_feature(VelocitiesNonDominantFootCalculator())
+features = ["ZeroedPositionDominantFoot", "FootOffset", "VelocitiesDominantFoot", "VelocitiesNonDominantFoot"]
 
-calculated_features = engineer.engineer_features(augmented_samples)
+for feature in features:
+    feature_instance = FeatureRegistry.create(feature)
+    engineer.add_feature(feature_instance)
+
+calculated_features = engineer.engineer(augmented_samples)
 
 # SPLIT PYTORCH DATASET
 dataset = PassDataset(calculated_features)
@@ -236,6 +238,18 @@ for onnx_file_path in onnx_file_paths:
     )
 
     onnx_model = onnx.load(onnx_file_path)
+
+    onnx_model.doc_string = "LSTM Model for pass detection"
+    onnx_model.domain = "com.tactivesport.feedback"
+    onnx_model.producer_name = "Tactive Sport"
+    onnx_model.producer_version = "1"
+    onnx_model.model_version = 1
+
+    feature_names = [feature for feature in features]
+    metadata_props = onnx_model.metadata_props.add()
+    metadata_props.key = "feature_names"
+    metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
+
     metadata_props = onnx_model.metadata_props.add()
     metadata_props.key = "example_input"
     metadata_props.value = str(example_input.tolist())  # Store example input as string

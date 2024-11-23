@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using Unity.Sentis;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace _Project.PassDetection.Validation
 {
 	public class PassValidationApp : MonoBehaviour
 	{
-		[SerializeField]
-		ModelAsset _modelAsset;
+		[SerializeField] ModelAsset _modelAsset;
+		public string CurrentPrediction => _currentPrediction;
 
 		void Start()
 		{
@@ -41,8 +40,11 @@ namespace _Project.PassDetection.Validation
 			cpuOutputTensor.Dispose();
 			stopwatch.Stop();
 
-			Debug.Log("Inference Time: " + stopwatch.ElapsedMilliseconds + "ms");
-			Debug.Log($"Python Prediction {currentSample.Inference.PassProbability:F3} Unity Prediction {result:F3}");
+
+			_currentPrediction = "Inference Time: {stopwatch.ElapsedMilliseconds} ms\n" +
+			                     $"Python Prediction: {currentSample.Inference.PassProbability:F3}\n" +
+			                     $"Unity Prediction: {result:F3}\n" +
+			                     $"Label: {currentSample.Inference.OutcomeLabel}";
 
 			input?.Dispose();
 
@@ -67,6 +69,8 @@ namespace _Project.PassDetection.Validation
 		{
 			_worker.Dispose();
 		}
+
+		string _currentPrediction;
 
 
 		IEnumerator<Sample> _sampleEnumerator;

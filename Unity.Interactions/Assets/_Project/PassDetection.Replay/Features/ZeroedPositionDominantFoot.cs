@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Tactive.MachineLearning._Project.MachineLearning;
 using UnityEngine;
 
 namespace _Project.PassDetection.Replay.Features
 {
-	public class ZeroedPositionDominantFootCalculator : FeatureCalculator
+	public class ZeroedPositionDominantFoot : BaseFeature<InputData>
 	{
 		public override int Size => 3;
 

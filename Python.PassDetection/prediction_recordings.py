@@ -2,10 +2,10 @@ import onnxruntime as ort
 import torch
 
 from src.domain.recordings import InputData
-from src.features.foot_offset import FootOffsetCalculator
-from src.features.velocities_dominant_foot import VelocitiesDominantFootCalculator
-from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFootCalculator
-from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFootCalculator
+from src.features.foot_offset import FootOffset
+from src.features.velocities_dominant_foot import VelocitiesDominantFoot
+from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFoot
+from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFoot
 from src.services.recording_parser import RecordingParser
 
 # Load the ONNX model
@@ -40,10 +40,10 @@ for timestamp in recording.input_data.timestamps:
         timestamps=timestamps
     )
 
-    zeroed_position = ZeroedPositionDominantFootCalculator()
-    foot_offset = FootOffsetCalculator()
-    velocities_dominant_foot = VelocitiesDominantFootCalculator()
-    velocities_non_dominant_foot = VelocitiesNonDominantFootCalculator()
+    zeroed_position = ZeroedPositionDominantFoot()
+    foot_offset = FootOffset()
+    velocities_dominant_foot = VelocitiesDominantFoot()
+    velocities_non_dominant_foot = VelocitiesNonDominantFoot()
 
     features = []
     features.extend(zeroed_position.calculate(input_data))

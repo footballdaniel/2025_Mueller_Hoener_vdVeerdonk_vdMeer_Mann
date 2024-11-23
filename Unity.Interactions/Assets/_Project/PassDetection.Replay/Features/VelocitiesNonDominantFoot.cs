@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using _Project.PassDetection.Replay;
 using _Project.PassDetection.Replay.Features;
+using Tactive.MachineLearning._Project.MachineLearning;
 using UnityEngine;
 
 namespace Src.Domain.Inferences
 {
-    public class VelocitiesNonDominantFootCalculator : FeatureCalculator
+    public class VelocitiesNonDominantFoot : BaseFeature<InputData>
     {
         public override int Size => 3;
 

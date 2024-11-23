@@ -2,6 +2,7 @@ using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Replay;
+using _Project.PassDetection.Replay.Features;
 using _Project.PassDetectionReplay;
 using Newtonsoft.Json;
 using Unity.Sentis;
@@ -24,7 +25,6 @@ namespace PassDetectionReplay
 
 		void Start()
 		{
-			// Use Directory.GetFiles with forward slashes
 			var jsonFiles = Directory.GetFiles(DataPath, "*.json");
 			var jsonFile = jsonFiles[0];
 

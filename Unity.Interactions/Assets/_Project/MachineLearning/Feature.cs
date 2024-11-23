@@ -1,13 +1,7 @@
 using System.Collections.Generic;
 
-namespace _Project.PassDetection.Replay.Features
+namespace Tactive.MachineLearning._Project.MachineLearning
 {
-	public abstract class FeatureCalculator
-	{
-		public abstract int Size { get; }
-		public abstract List<Feature> Calculate(InputData inputData);
-	}
-
 	public class Feature
 	{
 
