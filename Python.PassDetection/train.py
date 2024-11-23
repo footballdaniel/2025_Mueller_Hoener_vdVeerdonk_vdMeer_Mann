@@ -1,5 +1,8 @@
 import glob
+import json
 import os
+import subprocess
+from dataclasses import asdict
 from pathlib import Path
 
 import mlflow
@@ -22,6 +25,7 @@ from src.services.label_creator import LabelCreator
 from src.services.recording_parser import RecordingParser
 
 """LOGGING"""
+subprocess.Popen("mlflow server --host 127.0.0.1 --port 8080", shell=True)
 mlflow.set_experiment("Pass Detection")
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
@@ -265,9 +269,7 @@ with mlflow.start_run(run_name=architecture):
             onnx.save(onnx_model, onnx_file_path)
 
         """LOGGING"""
-        log_parameters = {
-            'num_epochs': config.epochs,
-        }
+        log_parameters = asdict(config)
 
         log_metrics = {
             'brier_score': brier_score,
@@ -278,7 +280,7 @@ with mlflow.start_run(run_name=architecture):
         }
 
         with mlflow.start_run(nested=True, run_name=str(run_idx)):
-            mlflow.log_params(log_parameters)
+            mlflow.log_params(asdict(config))
             mlflow.log_metrics(log_metrics)
             mlflow.set_tag("Training Info", "Feedback Algorithm")
 
