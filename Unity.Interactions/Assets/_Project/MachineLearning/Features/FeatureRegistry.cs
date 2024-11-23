@@ -25,8 +25,8 @@ namespace Tactive.MachineLearning._Project.MachineLearning
 
 		static void RegisterAllFeatures()
 		{
-			var featureTypes = Assembly.GetExecutingAssembly()
-				.GetTypes()
+			var featureTypes = AppDomain.CurrentDomain.GetAssemblies()
+				.SelectMany(a => a.GetTypes())
 				.Where(t => t.BaseType is { IsGenericType: true } && t.BaseType.GetGenericTypeDefinition() == typeof(BaseFeature<>))
 				.ToList();
 

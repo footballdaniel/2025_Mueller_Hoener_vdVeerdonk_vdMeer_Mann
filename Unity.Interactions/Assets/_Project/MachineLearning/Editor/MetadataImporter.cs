@@ -26,10 +26,6 @@ namespace Tactive.MachineLearning.Models
 				assetWithMetadata.name = stem + "_with_metadata";
 
 				AssetDatabase.CreateAsset(assetWithMetadata, path);
-				
-				// copy the asset, and add it as a child to the new assetWithMetadata
-				
-				
 				assetWithMetadata.Initialize(metadata, asset);
 
 				AssetDatabase.SaveAssets();
