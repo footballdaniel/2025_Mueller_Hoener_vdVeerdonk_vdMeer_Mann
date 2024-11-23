@@ -1,35 +1,37 @@
 import glob
 import json
 import os
-import pickle
-from dataclasses import asdict
+from datetime import time
 from pathlib import Path
 
+import mlflow
 import onnx
 import torch
 import torch.nn as nn
-from matplotlib import pyplot as plt
+from mlflow.models import infer_signature
 from torch.utils.data import Subset, DataLoader
 
+from src.domain.configurations import ConfigurationParser
+from src.domain.feature_registry import FeatureRegistry
 from src.domain.inferences import Split
-from src.features.feature_engineer import FeatureEngineer
-from src.features.feature_registry import FeatureRegistry
-from src.features.foot_offset import FootOffset
-from src.features.velocities_dominant_foot import VelocitiesDominantFoot
-from src.features.velocities_non_dominant_foot import VelocitiesNonDominantFoot
-from src.features.zeroed_position_dominant_foot import ZeroedPositionDominantFoot
+from src.domain.model_registry import ModelRegistry
 from src.nn.accuracy import prediction_accuracy
 from src.nn.brier import prediction_brier
 from src.nn.f1_scores import predict_precision_recall_f1
-from src.nn.lstm_model import PassDetectionModel
 from src.nn.pass_dataset import PassDataset
 from src.services.augmenter import Augmenter
+from src.services.feature_engineer import FeatureEngineer
 from src.services.label_creator import LabelCreator
-from src.services.plotter import plot_sample_with_features
 from src.services.recording_parser import RecordingParser
-from src.utils import CustomEncoder
+from src.utils import start_local_mlflow_server
 
-"""Reading recordings"""
+"""READING CONFIGURATIONS"""
+start_local_mlflow_server()
+mlflow.set_experiment("Pass Detection")
+model_name = "test-model" + '_' + time.strftime("%Y%m%d_%H%M%S")
+config_matrix = ConfigurationParser.generate_configurations(Path("config.yaml"))
+
+"""READING RECORDINGS"""
 pattern = "../Data/Pilot_4/**/*.csv"
 plot_dir = Path("plots")
 output_dir_model = Path("../Unity.Interactions/Assets/Resources")
@@ -52,209 +54,242 @@ for filename in glob.iglob(pattern, recursive=True):
 labeled_samples = LabelCreator.generate(recordings)
 augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
 
-"""FEATURE ENGINEERING"""
-engineer = FeatureEngineer()
-features = ["ZeroedPositionDominantFoot", "FootOffset", "VelocitiesDominantFoot", "VelocitiesNonDominantFoot"]
+for config in config_matrix:
 
-for feature in features:
-    feature_instance = FeatureRegistry.create(feature)
-    engineer.add_feature(feature_instance)
+    """FEATURE ENGINEERING"""
+    engineer = FeatureEngineer()
 
-calculated_features = engineer.engineer(augmented_samples)
+    for feature in config.features:
+        feature_instance = FeatureRegistry.create(feature)
+        engineer.add_feature(feature_instance)
 
-# SPLIT PYTORCH DATASET
-dataset = PassDataset(calculated_features)
-torch.manual_seed(42)  # Set the seed
-train_size = int(0.8 * len(dataset))
-validation_size = len(dataset) - train_size
-train_indices, val_indices = torch.utils.data.random_split(range(len(dataset)), [train_size, validation_size])
+    calculated_features = engineer.engineer(augmented_samples)
 
-for i in train_indices:
-    dataset.samples[i].inference.split = Split.TRAIN
-for i in val_indices:
-    dataset.samples[i].inference.split = Split.VALIDATION
+    # SPLIT PYTORCH DATASET
+    dataset = PassDataset(calculated_features)
+    torch.manual_seed(42)  # Set the seed
+    train_size = int(0.8 * len(dataset))
+    validation_size = len(dataset) - train_size
+    train_indices, val_indices = torch.utils.data.random_split(range(len(dataset)), [train_size, validation_size])
 
-# Create Subset datasets for training and validation
-train_dataset = Subset(dataset, train_indices)
-validation_dataset = Subset(dataset, val_indices)
+    for i in train_indices:
+        dataset.samples[i].inference.split = Split.TRAIN
+    for i in val_indices:
+        dataset.samples[i].inference.split = Split.VALIDATION
 
-positive_training = sum(
-    1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass)
-negative_training = sum(
-    1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass)
-positive_validation = sum(
-    1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass)
-negative_validation = sum(
-    1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass)
-print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
-print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
+    # Create Subset datasets for training and validation
+    train_dataset = Subset(dataset, train_indices)
+    validation_dataset = Subset(dataset, val_indices)
 
-# DataLoaders (if needed for further processing)
-batch_size = 32
-training_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
+    positive_training = sum(
+        1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass)
+    negative_training = sum(
+        1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass)
+    positive_validation = sum(
+        1 for sample in dataset.samples if sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass)
+    negative_validation = sum(
+        1 for sample in dataset.samples if
+        sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass)
+    print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
+    print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
 
-"""MODEL"""
-input_size = engineer.input_size
-hidden_size = 64
-num_layers = 2
-learning_rate = 0.001
-num_epochs = 1000
+    training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
+    validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
 
-model = PassDetectionModel(input_size, hidden_size, num_layers)
-criterion = nn.BCELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    """MODEL"""
+    input_size = engineer.input_size
+    learning_rate = config.learning_rate
+    num_epochs = config.epochs
+    patience = config.early_stopping_patience
 
-"""EARLY STOPPING"""
-patience = 5
-best_val_loss = float('inf')
-epochs_no_improve = 0
-early_stop = False
+    model = ModelRegistry.create(config.model_type, input_size)
 
-"""TRAINING"""
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.to(device)
+    if config.optimizer_function == "nn.BCELoss":
+        criterion = nn.BCELoss()
+    else:
+        raise ValueError("Invalid loss function")
 
-epoch_index = 0
-for epoch in range(num_epochs):
-    epoch_index = epoch
-    if early_stop:
-        break
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    model.train()
-    total_loss = 0
-    for inputs, labels in training_loader:
-        inputs = inputs.to(device)
-        labels = labels.to(device).view(-1, 1)
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item() * inputs.size(0)
+    """EARLY STOPPING"""
+    best_val_loss = float('inf')
+    epochs_no_improve = 0
+    early_stop = False
 
-    avg_loss = total_loss / len(training_loader.dataset)
-    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
+    """TRAINING"""
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
 
-    # Validation
-    model.eval()
-    total_val_loss = 0
-    correct = 0
-    with torch.no_grad():
-        for inputs, labels in validation_loader:
+    epoch_index = 0
+    for epoch in range(num_epochs):
+        epoch_index = epoch
+        if early_stop:
+            break
+
+        model.train()
+        total_loss = 0
+        for inputs, labels in training_loader:
             inputs = inputs.to(device)
             labels = labels.to(device).view(-1, 1)
+            optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, labels)
-            total_val_loss += loss.item() * inputs.size(0)
-            predicted = (outputs >= 0.5).float()
-            correct += (predicted == labels).sum().item()
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item() * inputs.size(0)
 
-    avg_val_loss = total_val_loss / len(validation_loader.dataset)
-    accuracy = correct / len(validation_loader.dataset)
-    print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
+        avg_loss = total_loss / len(training_loader.dataset)
+        print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
-    # Check for improvement
-    if avg_val_loss < best_val_loss:
-        best_val_loss = avg_val_loss
-        epochs_no_improve = 0
-    else:
-        epochs_no_improve += 1
-        if epochs_no_improve >= patience:
-            print(f'Early stopping at epoch {epoch + 1}')
-            early_stop = True
+        # Validation
+        model.eval()
+        total_val_loss = 0
+        correct = 0
+        with torch.no_grad():
+            for inputs, labels in validation_loader:
+                inputs = inputs.to(device)
+                labels = labels.to(device).view(-1, 1)
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                total_val_loss += loss.item() * inputs.size(0)
+                predicted = (outputs >= 0.5).float()
+                correct += (predicted == labels).sum().item()
 
-"""SAVE MODEL"""
-checkpoint = {
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-    'input_size': input_size,
-    'hidden_size': hidden_size,
-    'num_layers': num_layers,
-    'epoch': epoch_index,
-}
-torch.save(checkpoint, 'pass_detection_model.pth')
+        avg_val_loss = total_val_loss / len(validation_loader.dataset)
+        accuracy = correct / len(validation_loader.dataset)
+        print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
-"""EVALUATION"""
-model.eval()
-with torch.no_grad():
-    for idx in range(len(dataset)):
-        sample = dataset.samples[idx]
-        input_tensor, label = dataset[idx]
-        input_tensor = input_tensor.unsqueeze(0).to(device)
-        output = model(input_tensor)
-        probability = output.item()
-        sample.inference.pass_probability = round(probability, 3)
+        # Check for improvement
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            epochs_no_improve = 0
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= patience:
+                print(f'Early stopping at epoch {epoch + 1}')
+                early_stop = True
 
-print(f"Brier Score: {prediction_brier(dataset.samples):.4f}")
-print(f"Accuracy: {prediction_accuracy(dataset.samples):.4f}")
-precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
-print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
+    """SAVE MODEL"""
+    checkpoint = {
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'input_size': input_size,
+        'epoch': epoch_index,
+    }
+    torch.save(checkpoint, 'pass_detection_model.pth')
 
-"""SAVE DATASET"""
-# Save some to folder
-with open('dataset.pkl', 'wb') as f:
-    pickle.dump(dataset.samples, f)
+    """EVALUATION"""
+    model.eval()
+    with torch.no_grad():
+        for idx in range(len(dataset)):
+            sample = dataset.samples[idx]
+            input_tensor, label = dataset[idx]
+            input_tensor = input_tensor.unsqueeze(0).to(device)
+            output = model(input_tensor)
+            probability = output.item()
+            sample.inference.pass_probability = round(probability, 3)
 
-with open("dataset.json", 'w') as f:
-    json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
+    brier_score = prediction_brier(dataset.samples)
+    accuracy = prediction_accuracy(dataset.samples)
+    precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
 
-"""PLOT SAMPLES"""
-for idx, sample in enumerate(dataset.samples):
-    if not save_plots:
-        break
+    print(f"Brier Score: {brier_score:.4f}")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
 
-    filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
-    fig = plot_sample_with_features(sample)
-    plot_path = os.path.join(str(plot_dir), filename)
-    fig.savefig(plot_path)
-    plt.close(fig)
+    # """SAVE DATASET"""
+    # # Save some to folder
+    # with open('dataset.pkl', 'wb') as f:
+    #     pickle.dump(dataset.samples, f)
+    #
+    # with open("dataset.json", 'w') as f:
+    #     json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
+    #
+    # """PLOT SAMPLES"""
+    # for idx, sample in enumerate(dataset.samples):
+    #     if not save_plots:
+    #         break
+    #
+    #     filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
+    #     fig = plot_sample_with_features(sample)
+    #     plot_path = os.path.join(str(plot_dir), filename)
+    #     fig.savefig(plot_path)
+    #     plt.close(fig)
 
-"""EXPORT ONNX"""
-# Path for ONNX file
-onnx_file_paths = ["pass_detection_model.onnx", output_dir_model.joinpath("pass_detection_model.onnx")]
-model.to('cpu')
-model.eval()
+    """EXPORT ONNX"""
+    # Path for ONNX file
+    onnx_file_paths = ["pass_detection_model.onnx", output_dir_model.joinpath("pass_detection_model.onnx")]
+    model.to('cpu')
+    model.eval()
 
-# Grab only the first sample from the last batch of val_loader for export
-example_input = inputs[0:1].cpu()  # First sample of last batch with batch size 1
-with torch.no_grad():
-    example_output = model(example_input)
-    example_output_values = example_output.squeeze().tolist()
+    # Grab only the first sample from the last batch of val_loader for export
+    example_input = inputs[0:1].cpu()  # First sample of last batch with batch size 1
+    with torch.no_grad():
+        example_output = model(example_input)
+        example_output_values = example_output.squeeze().tolist()
 
-    print(f"Example input shape: {example_input.shape}")
-    print(f"Example output shape: {example_output.shape}")
+        print(f"Example input shape: {example_input.shape}")
+        print(f"Example output shape: {example_output.shape}")
 
-for onnx_file_path in onnx_file_paths:
-    torch.onnx.export(
-        model,
-        example_input,
-        onnx_file_path,
-        export_params=True,
-        opset_version=15,
-        do_constant_folding=True,
-        input_names=['input'],
-        output_names=['output'],
-    )
+    for onnx_file_path in onnx_file_paths:
+        torch.onnx.export(
+            model,
+            example_input,
+            onnx_file_path,
+            export_params=True,
+            opset_version=15,
+            do_constant_folding=True,
+            input_names=['input'],
+            output_names=['output'],
+        )
 
-    onnx_model = onnx.load(onnx_file_path)
+        onnx_model = onnx.load(onnx_file_path)
 
-    onnx_model.doc_string = "LSTM Model for pass detection"
-    onnx_model.domain = "com.tactivesport.feedback"
-    onnx_model.producer_name = "Tactive Sport"
-    onnx_model.producer_version = "1"
-    onnx_model.model_version = 1
+        onnx_model.doc_string = "LSTM Model for pass detection"
+        onnx_model.domain = "com.tactivesport.feedback"
+        onnx_model.producer_name = "Tactive Sport"
+        onnx_model.producer_version = "1"
+        onnx_model.model_version = 1
 
-    feature_names = [feature for feature in features]
-    metadata_props = onnx_model.metadata_props.add()
-    metadata_props.key = "features"
-    metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
+        feature_names = [feature for feature in config.features]
+        metadata_props = onnx_model.metadata_props.add()
+        metadata_props.key = "features"
+        metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
 
-    metadata_props = onnx_model.metadata_props.add()
-    metadata_props.key = "example_input"
-    metadata_props.value = str(example_input.tolist())  # Store example input as string
+        metadata_props = onnx_model.metadata_props.add()
+        metadata_props.key = "example_input"
+        metadata_props.value = str(example_input.tolist())  # Store example input as string
 
-    metadata_props = onnx_model.metadata_props.add()
-    metadata_props.key = "example_output"
-    metadata_props.value = str(example_output_values)  # Store example output as string
-    onnx.save(onnx_model, onnx_file_path)
+        metadata_props = onnx_model.metadata_props.add()
+        metadata_props.key = "example_output"
+        metadata_props.value = str(example_output_values)  # Store example output as string
+        onnx.save(onnx_model, onnx_file_path)
+
+    """LOGGING"""
+    log_parameters = {
+        'num_epochs': config.epochs,
+        'batch_size': config.batch_size,
+        'd_test_size': config.test_size,
+        'earlys_patience': config.early_stopping_patience,
+        'earlys_delta': config.early_stopping_delta,
+        'i_seed': 42
+    }
+
+    log_metrics = {
+        'brier_score': brier_score,
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1_score': f1_score
+    }
+
+    with mlflow.start_run():
+        mlflow.log_params(log_parameters)
+        mlflow.log_metrics(log_metrics)
+        mlflow.set_tag("Training Info", "Feedback Algorithm")
+
+        model_info = mlflow.pytorch.log_model(
+            pytorch_model=model,
+            artifact_path="model",
+            registered_model_name=model_name,
+        )

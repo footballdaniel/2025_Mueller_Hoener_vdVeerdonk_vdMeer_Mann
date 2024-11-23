@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List
 
 from src.domain.recordings import InputData
-from src.features.feature_registry import FeatureRegistry
+from src.domain.feature_registry import FeatureRegistry
 
 
 class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
@@ -26,6 +26,7 @@ class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
 
 @dataclass
 class Target:
+    """Represents a feature that has been calculated. This is part of the input for the model"""
     name: str
     values: List[float]
 

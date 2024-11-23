@@ -3,3 +3,7 @@ matplotlib~=3.9.2
 scikit-learn~=1.5.2
 onnx~=1.17.0
 onnxruntime~=1.20.1
+PyYAML~=6.0.2
+mlflow~=2.18.0
+mlflow-skinny~=2.18.0
+psutil~=6.1.0

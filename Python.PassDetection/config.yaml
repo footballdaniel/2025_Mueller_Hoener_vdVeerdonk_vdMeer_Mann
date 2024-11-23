@@ -1,0 +1,12 @@
+features:
+  - ["ZeroedPositionDominantFoot", "FootOffset", "VelocitiesDominantFoot", "VelocitiesNonDominantFoot"]
+  - ["VelocitiesDominantFoot"]
+
+hyperparameters:
+  model_type: "LSTMPassDetectionModel"  # This is the class name of a model. The model needs to inherit from BasePytorchModel
+  loss_function: "nn.BCELoss"
+  learning_rate: 0.001
+  epochs: 500
+  early_stopping_patience: 15
+  early_stopping_delta: 0.01
+  batch_size: 300
