@@ -23,7 +23,7 @@ class ModelRegistry(type):
                 importlib.import_module(full_module_name)
 
     @classmethod
-    def create(cls, model_name, *args, **kwargs):
+    def create(cls, model_name, *args, **kwargs) -> 'BaseModel':
         if not cls.registry:
             cls._load_all_modules()  # Load modules dynamically if registry is empty
 

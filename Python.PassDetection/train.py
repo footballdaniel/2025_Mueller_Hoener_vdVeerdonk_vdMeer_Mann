@@ -9,11 +9,13 @@ import mlflow
 import onnx
 import torch
 import torch.nn as nn
+from matplotlib import pyplot as plt
+from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset, DataLoader
 
-from src.domain.configurations import ConfigurationParser, Configuration
+from src.domain.configurations import ConfigurationParser
 from src.domain.inferences import Split
-from src.domain.scores import Score
+from src.domain.run import Run, Scores
 from src.features.feature_registry import FeatureRegistry
 from src.kpi.accuracy import prediction_accuracy
 from src.kpi.brier import prediction_brier
@@ -23,7 +25,9 @@ from src.nn.pass_dataset import PassDataset
 from src.services.augmenter import Augmenter
 from src.services.feature_engineer import FeatureEngineer
 from src.services.label_creator import LabelCreator
+from src.services.plotter import plot_sample_with_features
 from src.services.recording_parser import RecordingParser
+from src.utils import CustomEncoder
 
 """LOGGING"""
 subprocess.Popen("mlflow server --host 127.0.0.1 --port 8080", shell=True)
@@ -62,58 +66,52 @@ with mlflow.start_run(run_name=architecture):
     dataset = PassDataset(augmented_samples)
     torch.manual_seed(42)  # Set the seed
 
-    train_size = int(0.7 * len(dataset))  # 70% for training
-    validation_size = int(0.2 * len(dataset))  # 20% for validation
-    test_size_ten_percent = len(dataset) - train_size - validation_size  # Remaining 10% for testing
+    num_samples = len(dataset.samples)
+    indices = list(range(num_samples))
+    labels = [sample.pass_event.is_a_pass for sample in dataset.samples]
 
-    train_indices, val_indices, test_indices = torch.utils.data.random_split(
-        range(len(dataset)), [train_size, validation_size, test_size_ten_percent]
+    # First split: training set (70%) and temp set (30% for validation + test)
+    train_indices, temp_indices = train_test_split(
+        indices, test_size=0.3, stratify=labels, random_state=42
     )
 
-    for i in train_indices:
-        dataset.samples[i].inference.split = Split.TRAIN
-    for i in val_indices:
-        dataset.samples[i].inference.split = Split.VALIDATION
-    for i in test_indices:
-        dataset.samples[i].inference.split = Split.TEST
+    # Extract labels for the temp set
+    temp_labels = [labels[i] for i in temp_indices]
 
+    # Second split: validation set (20% total) and test set (10% total)
+    val_indices, test_indices = train_test_split(
+        temp_indices, test_size=(1 / 3), stratify=temp_labels, random_state=42
+    )
+
+    # Create Subsets using the indices
     train_dataset = Subset(dataset, train_indices)
     validation_dataset = Subset(dataset, val_indices)
     test_dataset = Subset(dataset, test_indices)
 
-    positive_training = sum(
-        1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and sample.pass_event.is_a_pass
-    )
-    negative_training = sum(
-        1 for sample in dataset.samples if sample.inference.split == Split.TRAIN and not sample.pass_event.is_a_pass
-    )
-    positive_validation = sum(
-        1 for sample in dataset.samples if
-        sample.inference.split == Split.VALIDATION and sample.pass_event.is_a_pass
-    )
-    negative_validation = sum(
-        1 for sample in dataset.samples if
-        sample.inference.split == Split.VALIDATION and not sample.pass_event.is_a_pass
-    )
-    positive_testing = sum(
-        1 for sample in dataset.samples if sample.inference.split == Split.TEST and sample.pass_event.is_a_pass
-    )
-    negative_testing = sum(
-        1 for sample in dataset.samples if sample.inference.split == Split.TEST and not sample.pass_event.is_a_pass
-    )
+    def count_positive_negative(subset):
+        positive = 0
+        negative = 0
+        for idx in subset.indices:
+            sample = dataset.samples[idx]
+            if sample.pass_event.is_a_pass:
+                positive += 1
+            else:
+                negative += 1
+        return positive, negative
 
-    print(f"Training set: Size:{train_size} Positive:{positive_training} Negative:{negative_training}")
-    print(f"Validation set: Size:{validation_size} Positive:{positive_validation} Negative:{negative_validation}")
-    print(f"Test set: Size:{test_size_ten_percent} Positive:{positive_testing} Negative:{negative_testing}")
+    positive_training, negative_training = count_positive_negative(train_dataset)
+    positive_validation, negative_validation = count_positive_negative(validation_dataset)
+    positive_testing, negative_testing = count_positive_negative(test_dataset)
 
-    best_config: Score = Score()
-    best_config: Configuration = None
+    # Print the counts
+    print(f"Training set: Size:{len(train_dataset)} Positive:{positive_training} Negative:{negative_training}")
+    print(
+        f"Validation set: Size:{len(validation_dataset)} Positive:{positive_validation} Negative:{negative_validation}")
+    print(f"Test set: Size:{len(test_dataset)} Positive:{positive_testing} Negative:{negative_testing}")
+
+    best_score: float = float('inf')
+    best_run: Run = None
     for run_idx, config in enumerate(config_matrix):
-
-        validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
-        training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
-        testing_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
-
         """FEATURE ENGINEERING"""
         engineer = FeatureEngineer()
 
@@ -122,6 +120,10 @@ with mlflow.start_run(run_name=architecture):
             engineer.add_feature(feature_instance)
 
         calculated_features = engineer.engineer(dataset.samples)
+
+        validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
+        training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
+        testing_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
 
         """MODEL"""
         input_size = engineer.input_size
@@ -206,9 +208,10 @@ with mlflow.start_run(run_name=architecture):
                 probability = output.item()
                 sample.inference.pass_probability = round(probability, 3)
 
-        brier_score = prediction_brier(dataset.samples)
-        accuracy = prediction_accuracy(dataset.samples)
-        precision, recall, f1_score = predict_precision_recall_f1(dataset.samples)
+        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.VALIDATION]
+        brier_score = prediction_brier(validation_samples)
+        accuracy = prediction_accuracy(validation_samples)
+        precision, recall, f1_score = predict_precision_recall_f1(validation_samples)
 
         print(f"Brier Score: {brier_score:.4f}")
         print(f"Accuracy: {accuracy:.4f}")
@@ -217,29 +220,71 @@ with mlflow.start_run(run_name=architecture):
         """LOGGING"""
         log_parameters = asdict(config)
 
-        score = Score(
+        run = Run(
+            model=model,
+            config=config,
+        )
+
+        test_score = Scores(
             brier_score=brier_score,
-            accuracy=accuracy,
             f1_score=f1_score,
             precision=precision,
             recall=recall,
+            accuracy=accuracy,
         )
 
-        if score.brier_score < best_config.brier_score:
-            best_config = score
-            best_config = config
+        if brier_score < best_score:
+            best_run = run
 
         with mlflow.start_run(nested=True, run_name=str(run_idx)):
             mlflow.log_params(asdict(config))
-            mlflow.log_metrics(asdict(score))
-
+            mlflow.log_metrics(asdict(test_score))
             # model_info = mlflow.pytorch.log_model(
             #     pytorch_model=model,
             #     artifact_path="model",
             #     registered_model_name=model_name,
             # )
 
+    """EVALUATION BEST MODEL ON TEST SET"""
+    with torch.no_grad():
+        for idx in range(len(dataset)):
+            sample = dataset.samples[idx]
+            input_tensor, label = dataset[idx]
+            input_tensor = input_tensor.unsqueeze(0).to(device)
+            output = model(input_tensor)
+            probability = output.item()
+            sample.inference.pass_probability = round(probability, 3)
 
+    test_samples = [sample for sample in dataset.samples if sample.inference.split == Split.TEST]
+
+    brier_score = prediction_brier(test_samples)
+    accuracy = prediction_accuracy(test_samples)
+    precision, recall, f1_score = predict_precision_recall_f1(test_samples)
+
+    print(f"Brier Score: {brier_score:.4f}")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
+
+    test_score = Scores(
+        brier_score=brier_score,
+        f1_score=f1_score,
+        precision=precision,
+        recall=recall,
+        accuracy=accuracy,
+    )
+
+    if brier_score < best_score:
+        best_run = config
+
+    with mlflow.start_run(nested=True, run_name=str(run_idx)):
+        mlflow.log_params(asdict(config))
+        mlflow.log_metrics(asdict(test_score))
+
+        # model_info = mlflow.pytorch.log_model(
+        #     pytorch_model=model,
+        #     artifact_path="model",
+        #     registered_model_name=model_name,
+        # )
 
     """SAVE BEST MODEL"""
     checkpoint = {
@@ -250,24 +295,24 @@ with mlflow.start_run(run_name=architecture):
     }
     torch.save(checkpoint, 'pass_detection_model.pth')
 
-    # """SAVE DATASET"""
-    # # Save some to folder
-    # with open('dataset.pkl', 'wb') as f:
-    #     pickle.dump(dataset.samples, f)
-    #
-    # with open("dataset.json", 'w') as f:
-    #     json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
-    #
-    # """PLOT SAMPLES"""
-    # for idx, sample in enumerate(dataset.samples):
-    #     if not save_plots:
-    #         break
-    #
-    #     filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
-    #     fig = plot_sample_with_features(sample)
-    #     plot_path = os.path.join(str(plot_dir), filename)
-    #     fig.savefig(plot_path)
-    #     plt.close(fig)
+    """SAVE DATASET"""
+    # Save some to folder
+    with open('dataset.pkl', 'wb') as f:
+        pickle.dump(dataset.samples, f)
+
+    with open("dataset.json", 'w') as f:
+        json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
+
+    """PLOT SAMPLES"""
+    for idx, sample in enumerate(dataset.samples):
+        if not save_plots:
+            break
+
+        filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
+        fig = plot_sample_with_features(sample)
+        plot_path = os.path.join(str(plot_dir), filename)
+        fig.savefig(plot_path)
+        plt.close(fig)
 
     """EXPORT ONNX"""
     # Path for ONNX file
