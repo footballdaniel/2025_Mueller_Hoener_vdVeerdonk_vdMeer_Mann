@@ -3,18 +3,18 @@ import os
 from pathlib import Path
 
 import mlflow
-# import onnx
+import onnx
 import torch
 import torch.nn as nn
 from torch.utils.data import Subset, DataLoader
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.feature_registry import FeatureRegistry
+from src.features.feature_registry import FeatureRegistry
 from src.domain.inferences import Split
-from src.domain.model_registry import ModelRegistry
-from src.nn.accuracy import prediction_accuracy
-from src.nn.brier import prediction_brier
-from src.nn.f1_scores import predict_precision_recall_f1
+from src.nn.model_registry import ModelRegistry
+from src.kpi.accuracy import prediction_accuracy
+from src.kpi.brier import prediction_brier
+from src.kpi.f1_scores import predict_precision_recall_f1
 from src.nn.pass_dataset import PassDataset
 from src.services.augmenter import Augmenter
 from src.services.feature_engineer import FeatureEngineer
@@ -103,7 +103,7 @@ with mlflow.start_run(run_name=architecture):
 
         model = ModelRegistry.create(config.model_type, input_size)
 
-        if config.optimizer_function == "nn.BCELoss":
+        if config.loss_function == "nn.BCELoss":
             criterion = nn.BCELoss()
         else:
             raise ValueError("Invalid loss function")
@@ -242,27 +242,27 @@ with mlflow.start_run(run_name=architecture):
                 output_names=['output'],
             )
 
-            # onnx_model = onnx.load(onnx_file_path)
-            #
-            # onnx_model.doc_string = "LSTM Model for pass detection"
-            # onnx_model.domain = "com.tactivesport.feedback"
-            # onnx_model.producer_name = "Tactive Sport"
-            # onnx_model.producer_version = "1"
-            # onnx_model.model_version = 1
-            #
-            # feature_names = [feature for feature in config.features]
-            # metadata_props = onnx_model.metadata_props.add()
-            # metadata_props.key = "features"
-            # metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
-            #
-            # metadata_props = onnx_model.metadata_props.add()
-            # metadata_props.key = "example_input"
-            # metadata_props.value = str(example_input.tolist())  # Store example input as string
-            #
-            # metadata_props = onnx_model.metadata_props.add()
-            # metadata_props.key = "example_output"
-            # metadata_props.value = str(example_output_values)  # Store example output as string
-            # onnx.save(onnx_model, onnx_file_path)
+            onnx_model = onnx.load(onnx_file_path)
+
+            onnx_model.doc_string = "LSTM Model for pass detection"
+            onnx_model.domain = "com.tactivesport.feedback"
+            onnx_model.producer_name = "Tactive Sport"
+            onnx_model.producer_version = "1"
+            onnx_model.model_version = 1
+
+            feature_names = [feature for feature in config.features]
+            metadata_props = onnx_model.metadata_props.add()
+            metadata_props.key = "features"
+            metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
+
+            metadata_props = onnx_model.metadata_props.add()
+            metadata_props.key = "example_input"
+            metadata_props.value = str(example_input.tolist())  # Store example input as string
+
+            metadata_props = onnx_model.metadata_props.add()
+            metadata_props.key = "example_output"
+            metadata_props.value = str(example_output_values)  # Store example output as string
+            onnx.save(onnx_model, onnx_file_path)
 
         """LOGGING"""
         log_parameters = {

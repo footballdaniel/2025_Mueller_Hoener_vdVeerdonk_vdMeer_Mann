@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List
 
 from src.domain.recordings import InputData
-from src.domain.feature_registry import FeatureRegistry
+from src.features.feature_registry import FeatureRegistry
 
 
 class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
