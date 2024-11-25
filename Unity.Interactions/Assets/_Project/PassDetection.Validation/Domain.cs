@@ -67,7 +67,7 @@ namespace _Project.PassDetection.Validation
 		public List<PassEvent> PassEvents { get; set; }
 	}
 
-	public class Feature
+	public class Target
 	{
 		[JsonProperty("name")]
 		public string Name { get; set; }
@@ -78,8 +78,8 @@ namespace _Project.PassDetection.Validation
 
 	public class Inference
 	{
-		[JsonProperty("features")]
-		public List<Feature> Features { get; set; }
+		[JsonProperty("targets")]
+		public List<Target> Targets { get; set; }
 
 		[JsonProperty("outcome_label")]
 		public int OutcomeLabel { get; set; }

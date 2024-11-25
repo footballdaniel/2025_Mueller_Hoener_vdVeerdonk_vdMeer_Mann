@@ -5,6 +5,7 @@ using System.IO;
 using _Project.PassDetection.Validation;
 using Unity.Sentis;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace PassDetection.Valwidation
 {
@@ -37,19 +38,20 @@ namespace PassDetection.Valwidation
 			_worker.Schedule();
 			var outputTensor = _worker.PeekOutput("output") as Tensor<float>;
 			var cpuOutputTensor = outputTensor.ReadbackAndClone();
-			var result = cpuOutputTensor[0];
+			var prediction = cpuOutputTensor[0];
 			cpuOutputTensor.Dispose();
 			stopwatch.Stop();
 
+			_currentPrediction = "Inference Time: " + stopwatch.ElapsedMilliseconds + " ms" +
+			                     "Python Prediction: " + currentSample.Inference.PassProbability.ToString("F3") +
+			                     "Unity Prediction: " + prediction.ToString("F3") +
+			                     "Label: " + currentSample.Inference.OutcomeLabel;
 
-			_currentPrediction = "Inference Time: {stopwatch.ElapsedMilliseconds} ms\n" +
-			                     $"Python Prediction: {currentSample.Inference.PassProbability:F3}\n" +
-			                     $"Unity Prediction: {result:F3}\n" +
-			                     $"Label: {currentSample.Inference.OutcomeLabel}";
+			Debug.Log(_currentPrediction);
 
 			input?.Dispose();
 
-			return result;
+			return prediction;
 		}
 
 		void JumpToNextNonNullProbability(out Sample currentSample)

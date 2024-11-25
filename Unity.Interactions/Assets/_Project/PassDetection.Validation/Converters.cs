@@ -38,14 +38,14 @@ namespace _Project.PassDetection.Validation
 	{
 		public static Tensor ToTensor(this Inference inference)
 		{
-			if (inference.Features.Count != 12 || inference.Features.Any(f => f.Values.Count != 10))
-				throw new ArgumentException("Features must contain exactly 12 items, each with 10 values.");
+			if (inference.Targets.Count != 12 || inference.Targets.Any(f => f.Values.Count != 10))
+				throw new ArgumentException("Targets must contain exactly 12 items, each with 10 values.");
 			
 			var tensor = new Tensor<float>(new TensorShape(1, 10, 12));
 
 			for (var i = 0; i < 12; i++)
 			for (var j = 0; j < 10; j++)
-				tensor[0, j, i] = inference.Features[i].Values[j];
+				tensor[0, j, i] = inference.Targets[i].Values[j];
 
 
 			return tensor;

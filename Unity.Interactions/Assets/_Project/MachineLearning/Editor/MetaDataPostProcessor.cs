@@ -22,7 +22,7 @@ namespace Tactive.MachineLearning.Models
 
 					var metadata = MetadataImporter.Metadata;
 
-					var metadataPath = Path.Combine(Path.GetDirectoryName(assetPath), stem + "_metadata.asset");
+					var metadataPath = Path.Combine(Path.GetDirectoryName(assetPath), stem + "_with_metadata.asset");
 					
 					var assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
 					assetWithMetadata.name = stem + "_with_metadata";

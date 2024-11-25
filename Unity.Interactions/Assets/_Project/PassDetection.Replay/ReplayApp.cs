@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
@@ -20,6 +21,8 @@ namespace PassDetection.Replay
 		public int CurrentFrameIndex => _currentFrameIndex;
 
 		public float ModelPrediction => _lastPrediction;
+
+		public List<string> AvailableRecordings => _availableRecordings;
 
 		void Start()
 		{
@@ -105,5 +108,6 @@ namespace PassDetection.Replay
 		float _lastPrediction;
 		LstmModel _lstmModel;
 		Trial _trial;
+		List<string> _availableRecordings;
 	}
 }
