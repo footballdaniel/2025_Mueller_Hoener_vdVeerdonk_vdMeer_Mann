@@ -645,7 +645,7 @@ VideoPlayer:
   - {fileID: 0}
   m_DirectAudioVolumes:
   - 1
-  m_Url: file://C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4/trial_2_2024-10-29_15-55-29.mp4
+  m_Url: 
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
@@ -670,7 +670,6 @@ MonoBehaviour:
   ModelAsset: {fileID: 11400000, guid: dd11c705314b36242b20676100cbc987, type: 2}
   ReplayUI: {fileID: 1690496641}
   VideoPlayer: {fileID: 673130088}
-  DataPath: C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4
 --- !u!4 &673130090
 Transform:
   m_ObjectHideFlags: 0

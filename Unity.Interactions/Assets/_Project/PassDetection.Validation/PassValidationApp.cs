@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using _Project.PassDetection.Validation;
 using Unity.Sentis;
 using UnityEngine;
 
-namespace _Project.PassDetection.Validation
+namespace PassDetection.Validation
 {
 	public class PassValidationApp : MonoBehaviour
 	{

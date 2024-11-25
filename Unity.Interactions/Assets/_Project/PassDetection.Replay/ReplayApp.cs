@@ -15,7 +15,6 @@ namespace PassDetection.Replay
 		public ModelAssetWithMetadata ModelAsset;
 		public ReplayUI ReplayUI;
 		public VideoPlayer VideoPlayer;
-		public string DataPath = "C:/Users/danie/Desktop/git/2025_Mueller_Hoener_Mann/Data/Pilot_4"; // Forward slashes
 
 		public int NumberOfFrames => _trial.NumberOfFrames;
 		public int CurrentFrameIndex => _currentFrameIndex;
@@ -24,7 +23,10 @@ namespace PassDetection.Replay
 
 		void Start()
 		{
-			var jsonFiles = Directory.GetFiles(DataPath, "*.json");
+			var dataPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../../Data/Pilot_4"));
+
+			
+			var jsonFiles = Directory.GetFiles(dataPath, "*.json");
 			var jsonFile = jsonFiles[0];
 
 			Debug.Log("Found json file: " + jsonFile);

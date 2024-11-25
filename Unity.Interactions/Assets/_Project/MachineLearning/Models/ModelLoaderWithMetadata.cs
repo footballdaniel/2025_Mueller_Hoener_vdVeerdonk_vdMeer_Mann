@@ -7,7 +7,6 @@ namespace Tactive.MachineLearning.Models
 	{
 		public static Model Load(ModelAssetWithMetadata asset)
 		{
-			
 			var resource = Resources.Load<ModelAsset>(asset.ModelAsset.name);
 			return ModelLoader.Load(resource);
 		}
