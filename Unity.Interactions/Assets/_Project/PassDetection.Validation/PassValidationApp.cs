@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using _Project.PassDetection.Common;
 using _Project.PassDetection.Validation;
+using PassDetection.Replay;
+using Tactive.MachineLearning.Models;
 using Unity.Sentis;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -11,7 +14,7 @@ namespace PassDetection.Valwidation
 {
 	public class PassValidationApp : MonoBehaviour
 	{
-		[SerializeField] ModelAsset _modelAsset;
+		[SerializeField] ModelAssetWithMetadata _modelWithMetadata;
 		public string CurrentPrediction => _currentPrediction;
 
 		void Start()
@@ -23,23 +26,25 @@ namespace PassDetection.Valwidation
 
 			_sampleEnumerator = SampleDeserializer.DeserializeSamples(dataset.FullName).GetEnumerator();
 
-			var model = ModelLoader.Load(_modelAsset);
-			_worker = new Worker(model, BackendType.GPUCompute);
+			
+			_lstmModel = new LstmModel(_modelWithMetadata);
 		}
 
 		public float EvaluateNext()
 		{
-			JumpToNextNonNullProbability(out var currentSample);
+			// JumpToNextNonNullProbability(out var currentSample);
+			_sampleEnumerator.MoveNext();
+			var currentSample = _sampleEnumerator.Current;
 
-			var input = currentSample!.Inference.ToTensor();
 
+			var input = new InputData(
+				currentSample!.Recording.InputData.UserDominantFootPositions,
+				currentSample.Recording.InputData.UserNonDominantFootPositions,
+				currentSample.Recording.InputData.Timestamps
+			);
+			
 			var stopwatch = Stopwatch.StartNew();
-			_worker.SetInput("input", input);
-			_worker.Schedule();
-			var outputTensor = _worker.PeekOutput("output") as Tensor<float>;
-			var cpuOutputTensor = outputTensor.ReadbackAndClone();
-			var prediction = cpuOutputTensor[0];
-			cpuOutputTensor.Dispose();
+			var prediction = _lstmModel.Evaluate(input);
 			stopwatch.Stop();
 
 			_currentPrediction = "Inference Time: " + stopwatch.ElapsedMilliseconds + " ms" +
@@ -48,9 +53,6 @@ namespace PassDetection.Valwidation
 			                     "Label: " + currentSample.Inference.OutcomeLabel;
 
 			Debug.Log(_currentPrediction);
-
-			input?.Dispose();
-
 			return prediction;
 		}
 
@@ -78,5 +80,6 @@ namespace PassDetection.Valwidation
 
 		IEnumerator<Sample> _sampleEnumerator;
 		Worker _worker;
+		LstmModel _lstmModel;
 	}
 }

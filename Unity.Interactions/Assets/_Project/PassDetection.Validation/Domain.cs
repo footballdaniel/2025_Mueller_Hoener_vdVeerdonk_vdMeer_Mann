@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PassDetection.Validation;
+using UnityEngine;
 
 namespace _Project.PassDetection.Validation
 {
@@ -40,28 +42,34 @@ namespace _Project.PassDetection.Validation
 		public float Z { get; set; }
 	}
 
+	public class InputDataDto
+	{
+		[JsonProperty("user_dominant_foot_positions")]
+		public List<Vector3> UserDominantFootPositions { get; set; }
+
+		[JsonProperty("user_non_dominant_foot_positions")]
+		public List<Vector3> UserNonDominantFootPositions { get; set; }
+
+		[JsonProperty("timestamps")]
+		public List<float> Timestamps { get; set; }
+	}
+
 	public class Recording
 	{
+		[JsonProperty("input_data")]
+		public InputDataDto InputData { get; set; }
+		
 		[JsonProperty("frame_rate_hz")]
 		public int FrameRateHz { get; set; }
 
 		[JsonProperty("number_of_frames")]
 		public int NumberOfFrames { get; set; }
 
-		[JsonProperty("timestamps")]
-		public List<float> Timestamps { get; set; }
-
 		[JsonProperty("trial_number")]
 		public int TrialNumber { get; set; }
 
 		[JsonProperty("duration")]
 		public float Duration { get; set; }
-
-		[JsonProperty("user_dominant_foot_positions")]
-		public List<Position> UserDominantFootPositions { get; set; }
-
-		[JsonProperty("user_non_dominant_foot_positions")]
-		public List<Position> UserNonDominantFootPositions { get; set; }
 
 		[JsonProperty("pass_events")]
 		public List<PassEvent> PassEvents { get; set; }

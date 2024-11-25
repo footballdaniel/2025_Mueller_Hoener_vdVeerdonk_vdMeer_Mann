@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using _Project.PassDetection.Validation;
 using Newtonsoft.Json;
 using Unity.Sentis;
 
-namespace _Project.PassDetection.Validation
+namespace PassDetection.Validation
 {
-	
+
 	public class SplitEnumConverter : JsonConverter<Split>
 	{
 
@@ -29,26 +29,6 @@ namespace _Project.PassDetection.Validation
 		{
 			// Serialize the enum as its name (e.g., "TRAIN")
 			writer.WriteValue(value.ToString());
-		}
-	}
-	
-	
-	
-	public static class InferenceExtensions
-	{
-		public static Tensor ToTensor(this Inference inference)
-		{
-			if (inference.Targets.Count != 12 || inference.Targets.Any(f => f.Values.Count != 10))
-				throw new ArgumentException("Targets must contain exactly 12 items, each with 10 values.");
-			
-			var tensor = new Tensor<float>(new TensorShape(1, 10, 12));
-
-			for (var i = 0; i < 12; i++)
-			for (var j = 0; j < 10; j++)
-				tensor[0, j, i] = inference.Targets[i].Values[j];
-
-
-			return tensor;
 		}
 	}
 }
