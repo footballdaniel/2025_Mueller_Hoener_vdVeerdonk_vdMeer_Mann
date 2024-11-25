@@ -5,17 +5,19 @@ using Tactive.MachineLearning._Project.MachineLearning;
 using Tactive.MachineLearning.Features;
 using Tactive.MachineLearning.Models;
 using Unity.Sentis;
+using UnityEngine;
 
 namespace PassDetection.Replay
 {
 	public class LstmModel : IDisposable
 	{
-		public LstmModel(ModelAssetWithMetadata asset)
+		public LstmModel(ModelAssetWithMetadata assetWithMetadata)
 		{
-			var model = ModelLoaderWithMetadata.Load(asset);
+			var asset = Resources.Load<ModelAsset>(assetWithMetadata.ModelAssetPath);
+			var model = ModelLoader.Load(asset);
 
 			_features = new List<BaseFeature<InputData>>();
-			foreach (var featureName in asset.FeatureNames)
+			foreach (var featureName in assetWithMetadata.FeatureNames)
 				_features.Add(FeatureRegistry.Create<InputData>(featureName));
 			
 			_worker = new Worker(model, BackendType.GPUCompute);

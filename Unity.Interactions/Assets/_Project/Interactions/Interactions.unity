@@ -1524,6 +1524,7 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!1 &458533433
 GameObject:
   m_ObjectHideFlags: 0
@@ -4138,6 +4139,7 @@ MonoBehaviour:
   ExperimentalCondition: 0
   RecordVideo: 1
   RecordingFrameRateHz: 10
+  DominantFootSide: 0
 --- !u!1 &1856460593
 GameObject:
   m_ObjectHideFlags: 0

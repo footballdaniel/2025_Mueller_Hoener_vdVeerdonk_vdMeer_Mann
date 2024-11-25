@@ -6,7 +6,7 @@ using _Project.PassDetection.Validation;
 using Unity.Sentis;
 using UnityEngine;
 
-namespace PassDetection.Validation
+namespace PassDetection.Valwidation
 {
 	public class PassValidationApp : MonoBehaviour
 	{

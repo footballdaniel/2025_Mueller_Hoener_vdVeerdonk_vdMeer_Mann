@@ -40,8 +40,7 @@ namespace _Project.PassDetection.Validation
 		{
 			if (inference.Features.Count != 12 || inference.Features.Any(f => f.Values.Count != 10))
 				throw new ArgumentException("Features must contain exactly 12 items, each with 10 values.");
-
-
+			
 			var tensor = new Tensor<float>(new TensorShape(1, 10, 12));
 
 			for (var i = 0; i < 12; i++)

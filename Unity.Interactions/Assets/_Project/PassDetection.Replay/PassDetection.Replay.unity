@@ -667,7 +667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d9a3f2bf529b842b66148d58b30511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelAsset: {fileID: 11400000, guid: dd11c705314b36242b20676100cbc987, type: 2}
+  ModelAsset: {fileID: 11400000, guid: 25e187d294949024dbe4c02e281f2015, type: 2}
   ReplayUI: {fileID: 1690496641}
   VideoPlayer: {fileID: 673130088}
 --- !u!4 &673130090

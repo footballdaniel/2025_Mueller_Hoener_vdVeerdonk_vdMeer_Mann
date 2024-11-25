@@ -1,4 +1,4 @@
-using PassDetection.Validation;
+using PassDetection.Valwidation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

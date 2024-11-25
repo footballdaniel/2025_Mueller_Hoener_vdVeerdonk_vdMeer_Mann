@@ -1,38 +1,15 @@
-using System.IO;
 using Unity.Sentis;
-using UnityEditor;
 using UnityEditor.AssetImporters;
-using UnityEngine;
 
-namespace Tactive.MachineLearning.Models
+namespace _Project.MachineLearning.Editor
 {
 	public class MetadataImporter : IONNXMetadataImportCallbackReceiver
 	{
+		public static ONNXModelMetadata Metadata;
+		
 		public void OnMetadataImported(AssetImportContext ctx, ONNXModelMetadata metadata)
 		{
-			var assetPath = ctx.assetPath;
-			var stem = Path.GetFileNameWithoutExtension(assetPath);
-
-			void DelayedOperation()
-			{
-				EditorApplication.delayCall -= DelayedOperation;
-
-				var asset = AssetDatabase.LoadAssetAtPath<ModelAsset>(assetPath);
-				var directory = Path.GetDirectoryName(assetPath);
-				var parentFileName = stem + "_with_metadata.asset";
-				var path = Path.Combine(directory!, parentFileName);
-
-				var assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
-				assetWithMetadata.name = stem + "_with_metadata";
-
-				AssetDatabase.CreateAsset(assetWithMetadata, path);
-				assetWithMetadata.Initialize(metadata, asset);
-
-				AssetDatabase.SaveAssets();
-				AssetDatabase.Refresh();
-			}
-
-			EditorApplication.delayCall += DelayedOperation;
+			Metadata = metadata;
 		}
 	}
 }

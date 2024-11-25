@@ -10,18 +10,17 @@ namespace Tactive.MachineLearning.Models
 	/// </summary>
 	public class ModelAssetWithMetadata : ScriptableObject
 	{
-		[field: SerializeReference] public ModelAsset ModelAsset { get; private set; }
+		[field: SerializeReference] public string ModelAssetPath { get; private set; }
 		public ONNXModelMetadata MetaData => _metaData;
 		[field: SerializeReference] public List<string> FeatureNames { get; private set; }
 
-		public void Initialize(ONNXModelMetadata metadata, ModelAsset modelAsset)
+		public void Initialize(ONNXModelMetadata metadata, string modelAssetPath)
 		{
+			ModelAssetPath = modelAssetPath;
 			_metaData = metadata;
 
 			if (metadata.MetadataProps.TryGetValue("features", out var featureNames))
-				FeatureNames = JsonConvert.DeserializeObject<List<string>>(featureNames);
-
-			ModelAsset = modelAsset;
+				FeatureNames = JsonConvert.DeserializeObject<List<string>>(featureNames);;
 		}
 
 		List<string> _featureNames;
