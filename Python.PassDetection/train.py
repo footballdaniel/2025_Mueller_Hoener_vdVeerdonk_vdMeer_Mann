@@ -40,6 +40,8 @@ architecture = "LSTM"
 config_matrix = ConfigurationParser.generate_configurations(Path("config.yaml"))
 
 with mlflow.start_run(run_name=architecture):
+
+
     """READING RECORDINGS"""
     pattern = "../Data/Pilot_4/**/*.csv"
     plot_dir = Path("plots")
@@ -278,15 +280,6 @@ with mlflow.start_run(run_name=architecture):
         accuracy=accuracy,
     )
 
-    mlflow.log_params(asdict(config))
-    mlflow.log_metrics(asdict(test_score))
-
-    # model_info = mlflow.pytorch.log_model(
-    #     pytorch_model=model,
-    #     artifact_path="model",
-    #     registered_model_name=model_name,
-    # )
-
     """SAVE DATASET"""
     # Save some to folder
     with open('dataset.pkl', 'wb') as f:
@@ -354,3 +347,7 @@ with mlflow.start_run(run_name=architecture):
         metadata_props.key = "example_output"
         metadata_props.value = str(example_output_values)  # Store example output as string
         onnx.save(onnx_model, onnx_file_path)
+
+    mlflow.log_params(asdict(config))
+    mlflow.log_metrics(asdict(test_score))
+    mlflow.log_artifact(onnx_file_paths[0])
