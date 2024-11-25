@@ -277,7 +277,7 @@ with mlflow.start_run(run_name=architecture):
         recall=recall,
         accuracy=accuracy,
     )
-    with mlflow.start_run(nested=True, run_name="Best Run Test Score"):
+
     mlflow.log_params(asdict(config))
     mlflow.log_metrics(asdict(test_score))
 

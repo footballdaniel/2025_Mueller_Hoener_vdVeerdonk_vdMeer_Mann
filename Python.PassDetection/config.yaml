@@ -1,9 +1,5 @@
 features:
   - ["ZeroedPositionDominantFoot", "FootOffset", "VelocitiesDominantFoot", "VelocitiesNonDominantFoot"]
-  - ["VelocitiesDominantFoot"]
-  - ["VelocitiesNonDominantFoot"]
-  - ["FootOffset"]
-  - ["VelocityMagnitudeDominantFoot"]
 
 hyperparameters:
   model_type: "LSTMPassDetectionModel"  # This is the class name of a model. The model needs to inherit from BasePytorchModel
