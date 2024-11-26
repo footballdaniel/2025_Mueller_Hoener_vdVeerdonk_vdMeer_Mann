@@ -5,9 +5,6 @@ using UnityEngine;
 
 namespace Tactive.MachineLearning.Models
 {
-	/// <summary>
-	/// This is automatically created as a child of a ModelAsset when importing an ONNX
-	/// </summary>
 	public class ModelAssetWithMetadata : ScriptableObject
 	{
 		[field: SerializeReference] public string ModelAssetPath { get; private set; }

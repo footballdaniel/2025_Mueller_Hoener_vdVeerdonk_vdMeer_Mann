@@ -1,9 +1,6 @@
-
-
 using System.Collections.Generic;
-using Tactive.MachineLearning.Features;
 
-namespace Tactive.MachineLearning._Project.MachineLearning
+namespace Tactive.MachineLearning.Features
 {
 	public abstract class BaseFeature<T>
 	{

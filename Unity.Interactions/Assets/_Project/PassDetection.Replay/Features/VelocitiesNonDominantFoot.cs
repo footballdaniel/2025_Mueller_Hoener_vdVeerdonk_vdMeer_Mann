@@ -3,7 +3,6 @@ using System.Linq;
 using _Project.PassDetection.Common;
 using _Project.PassDetection.Replay;
 using _Project.PassDetection.Replay.Features;
-using Tactive.MachineLearning._Project.MachineLearning;
 using Tactive.MachineLearning.Features;
 using UnityEngine;
 

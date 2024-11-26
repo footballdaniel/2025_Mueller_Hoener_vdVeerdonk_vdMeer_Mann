@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.PassDetection.Common;
-using Tactive.MachineLearning._Project.MachineLearning;
 using Tactive.MachineLearning.Features;
 using UnityEngine;
 

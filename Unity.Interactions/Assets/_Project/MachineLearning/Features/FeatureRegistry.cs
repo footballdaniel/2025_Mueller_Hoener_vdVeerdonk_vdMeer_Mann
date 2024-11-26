@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tactive.MachineLearning._Project.MachineLearning;
 
 namespace Tactive.MachineLearning.Features
 {
