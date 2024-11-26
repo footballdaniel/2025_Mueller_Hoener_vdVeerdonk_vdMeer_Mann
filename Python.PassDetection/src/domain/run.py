@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.domain.configurations import Configuration
-from src.nn.base_nn_model import BaseModel
+from src.infra.nn import BaseModel
 
 
 @dataclass

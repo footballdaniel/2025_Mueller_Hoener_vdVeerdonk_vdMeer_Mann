@@ -1,123 +1,35 @@
 import json
-from dataclasses import dataclass, is_dataclass
-from typing import List
-from enum import Enum
-from tinydb import TinyDB, Query
-
-
-# Define an Enum for EmployeeType
-class EmployeeType(Enum):
-    FULL_TIME = "full_time"
-    PART_TIME = "part_time"
-    INTERN = "intern"
-
-
-@dataclass
-class Address:
-    street: str
-    city: str
-
-
-@dataclass
-class Employee:
-    name: str
-    age: int
-    address: Address
-    employee_type: EmployeeType
-
-
-@dataclass
-class Company:
-    name: str
-    employees: List[Employee]
-
-
-# Custom Decorator for asdict
-from functools import wraps
-from dataclasses import asdict, is_dataclass
+import subprocess
+import time
+from dataclasses import is_dataclass, asdict
 from enum import Enum
 
-
-def enum_encoder_decorator(func):
-    @wraps(func)
-    def wrapper(obj):
-        if not is_dataclass(obj):
-            raise ValueError("The object must be a dataclass.")
-
-        def encode_enums(data):
-            if isinstance(data, Enum):
-                return data.name  # Convert Enum to its name
-            if isinstance(data, list):
-                return [encode_enums(item) for item in data]
-            if isinstance(data, dict):
-                return {key: encode_enums(value) for key, value in data.items()}
-            return data
-
-        # Call the original function and process its result
-        original_dict = func(obj)
-        return encode_enums(original_dict)
-
-    return wrapper
+import requests
 
 
-@enum_encoder_decorator
-def custom_asdict(obj):
-    return asdict(obj)
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Enum):
+            return o.name  # Serialize Enums as their name
+        if is_dataclass(o):  # Support nested dataclasses
+            return asdict(o)
+        return super().default(o)
 
 
-# Initialize TinyDB
-db = TinyDB('db.json')
+def manage_mlflow_server(host: str = '127.0.0.1', port: int = 8080):
+    def is_server_running():
+        try:
+            response = requests.get(f"http://{host}:{port}")
+            return response.status_code == 200
+        except requests.exceptions.ConnectionError:
+            return False
 
-# Create an example Company instance
-company = Company(
-    name="TechCorp",
-    employees=[
-        Employee(
-            name="Alice", age=30, address=Address(street="123 Main St", city="Metropolis"),
-            employee_type=EmployeeType.FULL_TIME
-        ),
-        Employee(
-            name="Bob", age=40, address=Address(street="456 Elm St", city="Gotham"),
-            employee_type=EmployeeType.PART_TIME
-        ),
-    ],
-)
-
-# Serialize and store in TinyDB using custom_asdict
-serialized_data = custom_asdict(company)
-db.insert(serialized_data)
-
-# Helper function for deserialization (unchanged)
-from typing import Type, TypeVar, get_origin, get_args
-
-T = TypeVar("T")
+    if not is_server_running():
+        mlflow_process = subprocess.Popen(
+            f"mlflow server --host {host} --port {port}",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
 
-def from_dict(cls: Type[T], data: dict) -> T:
-    field_types = {f: cls.__dataclass_fields__[f].type for f in cls.__dataclass_fields__}
-    return cls(**{
-        field: _deserialize_value(field_types[field], value)
-        for field, value in data.items()
-    })
-
-
-def _deserialize_value(field_type, value):
-    if get_origin(field_type) is list:
-        item_type = get_args(field_type)[0]
-        return [_deserialize_value(item_type, item) for item in value]
-
-    if is_dataclass(field_type):
-        return from_dict(field_type, value)
-
-    if issubclass(field_type, Enum):
-        return field_type[value]  # Convert Enum name back to Enum
-
-    return value
-
-
-# Query TinyDB and deserialize
-CompanyQuery = Query()
-result = db.search(CompanyQuery.name == "TechCorp")[0]
-company_instance = from_dict(Company, result)
-
-print(company_instance)

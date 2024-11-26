@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.nn.base_nn_model import BaseModel
+from src.infra.nn.base_nn_model import BaseModel
 
 
 class LSTMPassDetectionModel(BaseModel, nn.Module):

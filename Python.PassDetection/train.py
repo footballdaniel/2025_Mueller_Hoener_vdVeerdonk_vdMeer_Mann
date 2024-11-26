@@ -18,11 +18,11 @@ from src.domain.configurations import ConfigurationParser
 from src.domain.inferences import Split
 from src.domain.run import Run, Scores
 from src.features.feature_registry import FeatureRegistry
-from src.kpi.accuracy import prediction_accuracy
-from src.kpi.brier import prediction_brier
-from src.kpi.f1_scores import predict_precision_recall_f1
-from src.nn.model_registry import ModelRegistry
-from src.nn.pass_dataset import PassDataset
+from src.infra.kpi.accuracy import prediction_accuracy
+from src.infra.kpi.brier import prediction_brier
+from src.infra.kpi.f1_scores import predict_precision_recall_f1
+from src.infra.nn.model_registry import ModelRegistry
+from src.infra.nn import PassDataset
 from src.services.augmenter import Augmenter
 from src.services.feature_engineer import FeatureEngineer
 from src.services.label_creator import LabelCreator
