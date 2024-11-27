@@ -1,26 +1,14 @@
 from dataclasses import replace
-from typing import List, Optional
-
+from typing import Iterator, Optional
 from src.domain.recordings import Recording, PassEvent, Foot
 from src.domain.samples import Sample
 
 
 class LabelCreator:
-
     @staticmethod
-    def generate(recordings: List[Recording], sequence_length: int = 10) -> List[Sample]:
-        """Generate labeled samples for a list of recordings."""
-        return [
-            sample
-            for recording in recordings
-            for sample in LabelCreator._create_sequences(recording, sequence_length)
-        ]
-
-    @staticmethod
-    def _create_sequences(recording: Recording, sequence_length: int) -> List[Sample]:
-        """Create labeled sequences from a single recording."""
-        samples = []
+    def generate(recording: Recording, sequence_length: int = 10, start_id: int = 0) -> Iterator[Sample]:
         total_samples = len(recording.input_data.user_dominant_foot_positions)
+        current_id = start_id
 
         for start_idx in range(total_samples - sequence_length + 1):
             pass_event = LabelCreator._get_pass_event_in_sequence(recording, start_idx, start_idx + sequence_length)
@@ -35,12 +23,10 @@ class LabelCreator:
                 ),
                 number_of_frames=sequence_length,
                 duration=recording.input_data.timestamps[start_idx + sequence_length - 1] - recording.input_data.timestamps[start_idx],
-
             )
-            sample = Sample(recording=updated_recording, pass_event=pass_event)
-            samples.append(sample)
-
-        return samples
+            sample = Sample(id=current_id, recording=updated_recording, pass_event=pass_event)
+            current_id += 1
+            yield sample
 
     @staticmethod
     def _get_pass_event_in_sequence(recording: Recording, start_idx: int, end_idx: int) -> Optional[PassEvent]:

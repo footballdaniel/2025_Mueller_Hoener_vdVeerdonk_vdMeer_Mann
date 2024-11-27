@@ -1,6 +1,7 @@
 import csv
 import json
 from dataclasses import replace
+from pathlib import Path
 
 from src.domain.common import Vector3
 from src.domain.recordings import PassEvent, Foot, Recording, InputData
@@ -15,7 +16,7 @@ class RecordingParser:
     def recording(self) -> Recording:
         return self._recording
 
-    def read_recording_from_json(self, file_path: str) -> None:
+    def read_recording_from_json(self, file_path: Path) -> None:
         with open(file_path, "r") as f:
             data = json.load(f)
             recording = Recording(
@@ -36,7 +37,7 @@ class RecordingParser:
             )
             self._recording = recording
 
-    def read_pass_events_from_csv(self, file_path: str) -> None:
+    def read_pass_events_from_csv(self, file_path: Path) -> None:
         events = []
         if not self.recording:
             raise ValueError("Recording must be read before pass events can be read.")

@@ -1,108 +1,66 @@
-import glob
 import json
 import os
 import pickle
-from dataclasses import asdict
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
+from typing import List
 
 import mlflow
 import onnx
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
-from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset, DataLoader
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.inferences import Split
-from src.domain.run import Run, Scores
+from src.domain.run import Run, Scores, Evaluation, NoRun
 from src.features.feature_registry import FeatureRegistry
 from src.infra.kpi.accuracy import prediction_accuracy
 from src.infra.kpi.brier import prediction_brier
 from src.infra.kpi.f1_scores import predict_precision_recall_f1
 from src.infra.nn.model_registry import ModelRegistry
-from src.infra.nn import PassDataset
-from src.services.augmenter import Augmenter
+from src.infra.nn.pass_dataset import PassDataset
+from src.infra.tiny_db.tiny_db_repository import ReadOnlyRepo
 from src.services.feature_engineer import FeatureEngineer
-from src.services.label_creator import LabelCreator
+from src.services.ingester import DataIngester
 from src.services.plotter import plot_sample_with_features
-from src.services.recording_parser import RecordingParser
-from src.utils import CustomEncoder, manage_mlflow_server
+from src.services.traintestsplitter import TrainTestValidationSplitter
+from src.utils import CustomEncoder
 
 """LOGGING"""
-manage_mlflow_server('127.0.0.1', 8080)
+# manage_mlflow_server('127.0.0.1', 8080)
 mlflow.set_experiment("Pass Detection")
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
 """READING CONFIGURATIONS"""
 architecture = "LSTM"
+number_samples_to_analyze = 20
+train_percentage = 0.7
+validation_percentage = 0.2
+test_percentage = 0.1
 config_matrix = ConfigurationParser.generate_configurations(Path("config.yaml"))
 
 with mlflow.start_run(run_name=architecture):
-
-
-    """READING RECORDINGS"""
-    pattern = "../Data/Pilot_4/**/*.csv"
+    """Config"""
     plot_dir = Path("plots")
     output_dir_model = Path("../Unity.Interactions/Assets/Resources")
     save_plots = False
 
-    recordings = []
-    for filename in glob.iglob(pattern, recursive=True):
-        print(f"Processing file: {filename}")
-        json_filename = filename.replace(".csv", ".json")
-        if not os.path.isfile(json_filename):
-            print("No JSON file found for", filename)
-            continue
-
-        parser = RecordingParser()
-        parser.read_recording_from_json(json_filename)
-        parser.read_pass_events_from_csv(filename)
-        recordings.append(parser.recording)
-
     """SAMPLING AND AUGMENTATION"""
-    labeled_samples = LabelCreator.generate(recordings)
-    augmented_samples = Augmenter.augment(labeled_samples, only_augment_passes=True)
+    recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
+    repo = ReadOnlyRepo(recordings)
 
     """SPLITTING DATASET"""
-    seed = 42
-    torch.manual_seed(seed)  # Set the seed
-
-    num_samples = len(augmented_samples)
-    indices = list(range(num_samples))
-    labels = [sample.pass_event.is_a_pass for sample in augmented_samples]
-
-    # First split: training set (70%) and eval set (30% for validation + test)
-    train_indices, eval_indices = train_test_split(
-        indices, test_size=(1 / 3), stratify=labels, random_state=seed
+    train_indices, validation_indices, test_indices = TrainTestValidationSplitter.split(
+        repo,
+        number_samples_to_analyze,
+        train_percentage,
+        validation_percentage,
+        test_percentage,
     )
-    eval_labels = [labels[i] for i in eval_indices]
-    # Second split: validation set (20% total) and test set (10% total)
-    val_indices, test_indices = train_test_split(
-        eval_indices, test_size=(1 / 3), stratify=eval_labels, random_state=seed
-    )
-
-    for idx in train_indices:
-        augmented_samples[idx] = replace(
-            augmented_samples[idx],
-            inference=replace(augmented_samples[idx].inference, split=Split.TRAIN)
-        )
-
-    for idx in val_indices:
-        augmented_samples[idx] = replace(
-            augmented_samples[idx],
-            inference=replace(augmented_samples[idx].inference, split=Split.VALIDATION)
-        )
-
-    for idx in test_indices:
-        augmented_samples[idx] = replace(
-            augmented_samples[idx],
-            inference=replace(augmented_samples[idx].inference, split=Split.TEST)
-        )
 
     best_score: float = float('inf')
-    best_run: Run = None
+    best_run: Run = NoRun()
     for run_idx, config in enumerate(config_matrix):
         """FEATURE ENGINEERING"""
         engineer = FeatureEngineer()
@@ -111,12 +69,10 @@ with mlflow.start_run(run_name=architecture):
             feature_instance = FeatureRegistry.create(feature)
             engineer.add_feature(feature_instance)
 
-        engineered_samples = engineer.engineer(augmented_samples)
-        dataset = PassDataset(engineered_samples)
+        dataset = PassDataset(repo, number_samples_to_analyze, engineer)
 
-        # Create Subsets using the indices
         train_dataset = Subset(dataset, train_indices)
-        validation_dataset = Subset(dataset, val_indices)
+        validation_dataset = Subset(dataset, validation_indices)
         test_dataset = Subset(dataset, test_indices)
 
         training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
@@ -165,7 +121,7 @@ with mlflow.start_run(run_name=architecture):
                 optimizer.step()
                 total_loss += loss.item() * inputs.size(0)
 
-            avg_loss = total_loss / len(training_loader.dataset)
+            avg_loss = total_loss / number_samples_to_analyze
             print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
             # Validation
@@ -182,8 +138,8 @@ with mlflow.start_run(run_name=architecture):
                     predicted = (outputs >= 0.5).float()
                     correct += (predicted == labels).sum().item()
 
-            avg_val_loss = total_val_loss / len(validation_loader.dataset)
-            accuracy = correct / len(validation_loader.dataset)
+            avg_val_loss = total_val_loss / number_samples_to_analyze
+            accuracy = correct / number_samples_to_analyze
             print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
             # Check for improvement
@@ -198,26 +154,19 @@ with mlflow.start_run(run_name=architecture):
 
         """EVALUATION ON VALIDATION SET"""
         model.eval()
+        evaluations: List[Evaluation] = []
         with torch.no_grad():
-            for idx in range(len(dataset)):
-                sample = dataset.samples[idx]
+            for idx in validation_indices:
+                sample = repo.get(idx)
                 input_tensor, label = dataset[idx]
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
                 probability = round(output.item(), 3)
-                dataset.samples[idx] = replace(
-                    dataset.samples[idx],
-                    inference=replace(dataset.samples[idx].inference, pass_probability=probability)
-                )
+                evaluations.append(Evaluation(sample.inference.outcome_label, probability))
 
-        validation_samples = [sample for sample in dataset.samples if sample.inference.split == Split.VALIDATION]
-        brier_score = prediction_brier(validation_samples)
-        accuracy = prediction_accuracy(validation_samples)
-        precision, recall, f1_score = predict_precision_recall_f1(validation_samples)
-
-        print(f"Brier Score: {brier_score:.4f}")
-        print(f"Accuracy: {accuracy:.4f}")
-        print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
+        brier_score = prediction_brier(evaluations)
+        accuracy = prediction_accuracy(evaluations)
+        precision, recall, f1_score = predict_precision_recall_f1(evaluations)
 
         """LOGGING"""
         log_parameters = asdict(config)
@@ -241,36 +190,22 @@ with mlflow.start_run(run_name=architecture):
         with mlflow.start_run(nested=True, run_name=str(run_idx)):
             mlflow.log_params(asdict(config))
             mlflow.log_metrics(asdict(test_score))
-            # model_info = mlflow.pytorch.log_model(
-            #     pytorch_model=model,
-            #     artifact_path="model",
-            #     registered_model_name=model_name,
-            # )
 
     """EVALUATION BEST MODEL ON TEST SET"""
     model = best_run.model
+    evaluations: List[Evaluation] = []
     with torch.no_grad():
-        for idx in range(len(dataset)):
-            sample = dataset.samples[idx]
+        for idx in test_indices:
+            sample = repo.get(idx)
             input_tensor, label = dataset[idx]
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            dataset.samples[idx] = replace(
-                dataset.samples[idx],
-                inference=replace(
-                    dataset.samples[idx].inference, pass_probability=probability)
-            )
+            evaluations.append(Evaluation(sample.inference.outcome_label, probability))
 
-    test_samples = [sample for sample in dataset.samples if sample.inference.split == Split.TEST]
-
-    brier_score = prediction_brier(test_samples)
-    accuracy = prediction_accuracy(test_samples)
-    precision, recall, f1_score = predict_precision_recall_f1(test_samples)
-
-    print(f"Brier Score: {brier_score:.4f}")
-    print(f"Accuracy: {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1_score:.4f}")
+    brier_score = prediction_brier(evaluations)
+    accuracy = prediction_accuracy(evaluations)
+    precision, recall, f1_score = predict_precision_recall_f1(evaluations)
 
     test_score = Scores(
         brier_score=brier_score,
@@ -280,24 +215,39 @@ with mlflow.start_run(run_name=architecture):
         accuracy=accuracy,
     )
 
-    """SAVE DATASET"""
-    # Save some to folder
-    with open('dataset.pkl', 'wb') as f:
-        pickle.dump(dataset.samples, f)
+    """SAVE PREDICTIONS TO DATASET"""
+    model = best_run.model
+    with torch.no_grad():
+        for idx in range(len(dataset)):
+            sample = repo.get(idx)
+            input_tensor, label = dataset[idx]
+            input_tensor = input_tensor.unsqueeze(0).to(device)
+            output = model(input_tensor)
+            probability = output.item()
+            sample_with_prediction = replace(
+                sample[idx],
+                inference=replace(sample[idx].inference, pass_probability=probability)
+            )
+            repo.add(sample_with_prediction)
 
-    with open("dataset.json", 'w') as f:
-        json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
-
-    """PLOT SAMPLES"""
-    for idx, sample in enumerate(dataset.samples):
-        if not save_plots:
-            break
-
-        filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
-        fig = plot_sample_with_features(sample)
-        plot_path = os.path.join(str(plot_dir), filename)
-        fig.savefig(plot_path)
-        plt.close(fig)
+    # """SAVE DATASET"""
+    # # Save some to folder
+    # with open('dataset.pkl', 'wb') as f:
+    #     pickle.dump(dataset.samples, f)
+    #
+    # with open("dataset.json", 'w') as f:
+    #     json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
+    #
+    # """PLOT SAMPLES"""
+    # for idx, sample in enumerate(dataset.samples):
+    #     if not save_plots:
+    #         break
+    #
+    #     filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
+    #     fig = plot_sample_with_features(sample)
+    #     plot_path = os.path.join(str(plot_dir), filename)
+    #     fig.savefig(plot_path)
+    #     plt.close(fig)
 
     """EXPORT ONNX"""
     # Path for ONNX file

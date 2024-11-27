@@ -2,19 +2,19 @@ from typing import List, Tuple
 
 from sklearn.metrics import precision_score, recall_score, f1_score
 
-from src.domain.samples import Sample
+from src.domain.run import Evaluation
 
 
-def predict_precision_recall_f1(samples: List[Sample]) -> Tuple[float, float, float]:
+def predict_precision_recall_f1(evaluations: List[Evaluation]) -> Tuple[float, float, float]:
     all_labels = []
     all_predictions = []
 
-    for sample in samples:
-        if sample.inference.pass_probability is None:
-            continue  # Skip samples without a probability
+    for evaluation in evaluations:
+        if evaluation.predicted_label is None:
+            continue  # Skip evaluations without a prediction
 
-        label = int(sample.pass_event.is_a_pass)
-        predicted = 1 if sample.inference.pass_probability >= 0.5 else 0
+        label = int(evaluation.outcome_label)
+        predicted = 1 if evaluation.predicted_label >= 0.5 else 0
 
         all_labels.append(label)
         all_predictions.append(predicted)

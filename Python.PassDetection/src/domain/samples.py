@@ -1,14 +1,41 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace, field
+from pathlib import Path
+from typing import Optional
 
 from src.domain.augmentations import Augmentation, NoAugmentation
 from src.domain.inferences import Inference, NoInference
 from src.domain.recordings import Recording, PassEvent
 
 
+class IngestableRecording:
+    def __init__(self):
+        self.event_file: Optional[Path] = None
+        self.timeseries_file: Optional[Path] = None
+        self.stem: str = str()
+
+    def add_event_file(self, file: Path) -> None:
+        self.event_file = file
+        self.stem = file.stem
+
+    def add_timeseries_file(self, file: Path) -> None:
+        self.timeseries_file = file
+        self.stem = file.stem
+
+    def both_files_present(self) -> bool:
+        return self.event_file is not None and self.timeseries_file is not None
+
+    def __eq__(self, other: IngestableRecording) -> bool:
+        return self.stem == other.stem
+
+    def __hash__(self):
+        return hash(self.stem)
+
+
 @dataclass
 class Sample:
+    id: int
     recording: Recording
     pass_event: PassEvent
     inference: Inference = field(default_factory=NoInference)
@@ -44,7 +71,8 @@ class Sample:
                     pos.rotate_around_y(angle_degrees) for pos in self.recording.input_data.user_dominant_foot_positions
                 ],
                 user_non_dominant_foot_positions=[
-                    pos.rotate_around_y(angle_degrees) for pos in self.recording.input_data.user_non_dominant_foot_positions
+                    pos.rotate_around_y(angle_degrees) for pos in
+                    self.recording.input_data.user_non_dominant_foot_positions
                 ],
             ),
         )

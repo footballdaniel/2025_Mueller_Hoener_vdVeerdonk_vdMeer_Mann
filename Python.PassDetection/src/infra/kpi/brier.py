@@ -1,22 +1,12 @@
 from typing import List
 
-from src.domain.samples import Sample
+from sklearn.metrics import brier_score_loss
+
+from src.domain.run import Evaluation
 
 
-def prediction_brier(samples: List[Sample]) -> float:
-    total_loss = 0.0
-    total = 0
+def prediction_brier(evaluations: List[Evaluation]) -> float:
+    y_true = [evaluation.outcome_label for evaluation in evaluations]
+    y_prob = [evaluation.predicted_label for evaluation in evaluations]
 
-    for sample in samples:
-        if sample.inference.pass_probability is None:
-            continue  # Skip samples without a probability
-
-        label = float(sample.pass_event.is_a_pass)
-        probability = sample.inference.pass_probability
-
-        loss = (probability - label) ** 2
-        total_loss += loss
-        total += 1
-
-    score = total_loss / total if total > 0 else 0.0
-    return score
+    return brier_score_loss(y_true, y_prob)
