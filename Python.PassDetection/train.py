@@ -1,6 +1,7 @@
 import json
 import os
 import pickle
+import subprocess
 from dataclasses import asdict, replace
 from pathlib import Path
 from typing import List
@@ -20,21 +21,23 @@ from src.infra.kpi.brier import prediction_brier
 from src.infra.kpi.f1_scores import predict_precision_recall_f1
 from src.infra.nn.model_registry import ModelRegistry
 from src.infra.nn.pass_dataset import PassDataset
-from src.infra.tiny_db.tiny_db_repository import ReadOnlyRepo
+from src.infra.tiny_db.tiny_db_repository import Repository
 from src.services.feature_engineer import FeatureEngineer
 from src.services.ingester import DataIngester
+from src.services.label_creator import LabelCreator
 from src.services.plotter import plot_sample_with_features
+from src.services.recording_parser import RecordingParser
 from src.services.traintestsplitter import TrainTestValidationSplitter
-from src.utils import CustomEncoder
+from src.utils import CustomEncoder, manage_mlflow_server
 
 """LOGGING"""
-# manage_mlflow_server('127.0.0.1', 8080)
-mlflow.set_experiment("Pass Detection")
+subprocess.Popen(f"mlflow server --host 127.0.0.1 --port 8080")
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_experiment("Pass Detection")
 
 """READING CONFIGURATIONS"""
 architecture = "LSTM"
-number_samples_to_analyze = 20
+number_samples_to_analyze = 1_000_000
 train_percentage = 0.7
 validation_percentage = 0.2
 test_percentage = 0.1
@@ -46,12 +49,14 @@ with mlflow.start_run(run_name=architecture):
     output_dir_model = Path("../Unity.Interactions/Assets/Resources")
     save_plots = False
 
-    """SAMPLING AND AUGMENTATION"""
+    """CREATING SAMPLES"""
     recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
-    repo = ReadOnlyRepo(recordings)
+    parser = RecordingParser()
+    labeler = LabelCreator()
+    repo = Repository(recordings, parser, labeler)
 
     """SPLITTING DATASET"""
-    train_indices, validation_indices, test_indices = TrainTestValidationSplitter.split(
+    train_indices, validation_indices, test_indices, num_samples = TrainTestValidationSplitter.split(
         repo,
         number_samples_to_analyze,
         train_percentage,
@@ -59,8 +64,7 @@ with mlflow.start_run(run_name=architecture):
         test_percentage,
     )
 
-    best_score: float = float('inf')
-    best_run: Run = NoRun()
+    runs: List[Run] = []
     for run_idx, config in enumerate(config_matrix):
         """FEATURE ENGINEERING"""
         engineer = FeatureEngineer()
@@ -69,7 +73,7 @@ with mlflow.start_run(run_name=architecture):
             feature_instance = FeatureRegistry.create(feature)
             engineer.add_feature(feature_instance)
 
-        dataset = PassDataset(repo, number_samples_to_analyze, engineer)
+        dataset = PassDataset(repo, num_samples, engineer)
 
         train_dataset = Subset(dataset, train_indices)
         validation_dataset = Subset(dataset, validation_indices)
@@ -121,7 +125,7 @@ with mlflow.start_run(run_name=architecture):
                 optimizer.step()
                 total_loss += loss.item() * inputs.size(0)
 
-            avg_loss = total_loss / number_samples_to_analyze
+            avg_loss = total_loss / num_samples
             print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
             # Validation
@@ -138,8 +142,8 @@ with mlflow.start_run(run_name=architecture):
                     predicted = (outputs >= 0.5).float()
                     correct += (predicted == labels).sum().item()
 
-            avg_val_loss = total_val_loss / number_samples_to_analyze
-            accuracy = correct / number_samples_to_analyze
+            avg_val_loss = total_val_loss / num_samples
+            accuracy = correct / num_samples
             print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
             # Check for improvement
@@ -174,9 +178,10 @@ with mlflow.start_run(run_name=architecture):
         run = Run(
             model=model,
             config=config,
+            score=brier_score,
         )
 
-        test_score = Scores(
+        test_scores = Scores(
             brier_score=brier_score,
             f1_score=f1_score,
             precision=precision,
@@ -184,15 +189,16 @@ with mlflow.start_run(run_name=architecture):
             accuracy=accuracy,
         )
 
-        if brier_score < best_score:
-            best_run = run
+        runs.append(run)
 
         with mlflow.start_run(nested=True, run_name=str(run_idx)):
             mlflow.log_params(asdict(config))
-            mlflow.log_metrics(asdict(test_score))
+            mlflow.log_metrics(asdict(test_scores))
 
     """EVALUATION BEST MODEL ON TEST SET"""
+    best_run = min(runs, key=lambda r: r.score)
     model = best_run.model
+
     evaluations: List[Evaluation] = []
     with torch.no_grad():
         for idx in test_indices:
@@ -207,7 +213,7 @@ with mlflow.start_run(run_name=architecture):
     accuracy = prediction_accuracy(evaluations)
     precision, recall, f1_score = predict_precision_recall_f1(evaluations)
 
-    test_score = Scores(
+    test_scores = Scores(
         brier_score=brier_score,
         f1_score=f1_score,
         precision=precision,
@@ -216,7 +222,7 @@ with mlflow.start_run(run_name=architecture):
     )
 
     """SAVE PREDICTIONS TO DATASET"""
-    model = best_run.model
+    model = runs = List[Run].model
     with torch.no_grad():
         for idx in range(len(dataset)):
             sample = repo.get(idx)
@@ -299,5 +305,5 @@ with mlflow.start_run(run_name=architecture):
         onnx.save(onnx_model, onnx_file_path)
 
     mlflow.log_params(asdict(config))
-    mlflow.log_metrics(asdict(test_score))
+    mlflow.log_metrics(asdict(test_scores))
     mlflow.log_artifact(onnx_file_paths[0])

@@ -8,13 +8,7 @@ from src.infra.nn.base_nn_model import BaseModel
 class Run:
     model: BaseModel
     config: Configuration
-
-
-@dataclass
-class NoRun(Run):
-
-    def __init__(self):
-        super().__init__(None, None)
+    score: float
 
 
 @dataclass

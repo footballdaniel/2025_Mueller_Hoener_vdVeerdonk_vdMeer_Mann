@@ -5,34 +5,19 @@ from typing import Tuple, List
 from sklearn.model_selection import train_test_split
 
 from src.domain.inferences import Split
-from src.infra.tiny_db.tiny_db_repository import ReadOnlyRepo
+from src.infra.tiny_db.tiny_db_repository import Repository
 
 
 class TrainTestValidationSplitter:
     @staticmethod
     def split(
-            repo: ReadOnlyRepo,
+            repo: Repository,
             number_samples: int,
             train_percentage: float,
             validation_percentage: float,
             test_percentage: float,
             random_state: int = 42
-    ) -> Tuple[List[int], List[int], List[int]]:
-        """
-        Splits the dataset into stratified train, validation, and test indices,
-        updates the repository with split information, and returns the indices.
-
-        Args:
-            repo (ReadOnlyRepo): The repository containing the samples.
-            number_samples (int): Number of samples to fetch from the repository.
-            train_percentage (float): Proportion of data for training.
-            validation_percentage (float): Proportion of data for validation.
-            test_percentage (float): Proportion of data for testing.
-            random_state (int): Random seed for reproducibility.
-
-        Returns:
-            Tuple[List[int], List[int], List[int]]: Indices for train, validation, and test splits.
-        """
+    ) -> Tuple[List[int], List[int], List[int], int]:
         ids = []
         labels = []
         samples_iterator = islice(repo.get_all(), number_samples)
@@ -81,4 +66,6 @@ class TrainTestValidationSplitter:
             sample = replace(samples[idx], inference=replace(samples[idx].inference, split=Split.TEST))
             repo.add(sample)
 
-        return train_indices, val_indices, test_indices
+        number_samples = len(train_indices) + len(val_indices) + len(test_indices)
+
+        return train_indices, val_indices, test_indices, number_samples

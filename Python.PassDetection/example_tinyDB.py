@@ -5,7 +5,7 @@ from typing import List, Iterable, Type, TypeVar
 
 from tinydb import TinyDB, Query
 
-from src.domain.repositories import Repository
+from src.domain.repositories import BaseRepository
 from src.infra.tiny_db.deserializer import custom_from_dict
 from src.infra.tiny_db.serializer import custom_asdict
 

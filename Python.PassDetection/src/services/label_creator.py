@@ -1,12 +1,13 @@
 from dataclasses import replace
 from typing import Iterator, Optional
+
 from src.domain.recordings import Recording, PassEvent, Foot
 from src.domain.samples import Sample
 
 
 class LabelCreator:
-    @staticmethod
-    def generate(recording: Recording, sequence_length: int = 10, start_id: int = 0) -> Iterator[Sample]:
+
+    def generate(self, recording: Recording, sequence_length: int = 10, start_id: int = 0) -> Iterator[Sample]:
         total_samples = len(recording.input_data.user_dominant_foot_positions)
         current_id = start_id
 
@@ -17,8 +18,10 @@ class LabelCreator:
                 pass_events=[pass_event],
                 input_data=replace(
                     recording.input_data,
-                    user_dominant_foot_positions=recording.input_data.user_dominant_foot_positions[start_idx:start_idx + sequence_length],
-                    user_non_dominant_foot_positions=recording.input_data.user_non_dominant_foot_positions[start_idx:start_idx + sequence_length],
+                    user_dominant_foot_positions=recording.input_data.user_dominant_foot_positions[
+                                                 start_idx:start_idx + sequence_length],
+                    user_non_dominant_foot_positions=recording.input_data.user_non_dominant_foot_positions[
+                                                     start_idx:start_idx + sequence_length],
                     timestamps=recording.input_data.timestamps[start_idx:start_idx + sequence_length],
                 ),
                 number_of_frames=sequence_length,

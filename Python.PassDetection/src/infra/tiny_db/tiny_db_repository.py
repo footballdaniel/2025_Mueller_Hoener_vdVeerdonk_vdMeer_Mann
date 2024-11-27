@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import TypeVar, Type, Iterable, List, Iterator
+from typing import TypeVar, List, Iterator
 
 from tinydb import Query, TinyDB
 
-from src.domain.repositories import Repository
+from src.domain.repositories import BaseRepository
 from src.domain.samples import IngestableRecording
 from src.infra.tiny_db.deserializer import custom_from_dict
 from src.infra.tiny_db.serializer import custom_asdict
@@ -13,9 +13,11 @@ from src.services.recording_parser import RecordingParser
 T = TypeVar('T')
 
 
-class ReadOnlyRepo(Repository[T]):
-    def __init__(self, recordings: List[IngestableRecording]):
+class Repository(BaseRepository[T]):
+    def __init__(self, recordings: List[IngestableRecording], parser: RecordingParser, label_creator: LabelCreator):
         self.recordings = recordings
+        self.parser = parser
+        self.label_creator = label_creator
 
     def get(self, id: int) -> T:
         for sample in self._generate_samples():
@@ -29,19 +31,18 @@ class ReadOnlyRepo(Repository[T]):
     def _generate_samples(self) -> Iterator[T]:
         current_id = 0
         for recording in self.recordings:
-            parser = RecordingParser()
-            parser.read_recording_from_json(recording.timeseries_file)
-            parser.read_pass_events_from_csv(recording.event_file)
-            yield from LabelCreator.generate(parser.recording, start_id=current_id)
-            current_id += len(parser.recording.input_data.user_dominant_foot_positions)
+            self.parser.read_recording_from_json(recording.timeseries_file)
+            self.parser.read_pass_events_from_csv(recording.event_file)
+            yield from self.label_creator.generate(self.parser.recording, start_id=current_id)
+            current_id += len(self.parser.recording.input_data.user_dominant_foot_positions)
 
     def add(self, sample):
         pass
 
 
-class ReadOnlyRepoWithTinyDbCache(ReadOnlyRepo):
-    def __init__(self, recordings: List[IngestableRecording], db_path: Path):
-        super().__init__(recordings)
+class RepositoryWithCache(Repository):
+    def __init__(self, recordings: List[IngestableRecording], db_path: Path, parser: RecordingParser, label_creator: LabelCreator):
+        super().__init__(recordings, parser, label_creator)
         self.db = TinyDB(db_path)
 
     def get(self, id: int) -> T:

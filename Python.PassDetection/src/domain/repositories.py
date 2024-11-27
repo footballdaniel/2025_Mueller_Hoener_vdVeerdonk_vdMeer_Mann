@@ -4,7 +4,7 @@ from typing import Generic, TypeVar, Iterable
 T = TypeVar("T")  # Unbounded TypeVar for generic entity
 
 
-class Repository(ABC, Generic[T]):
+class BaseRepository(ABC, Generic[T]):
 
     @abstractmethod
     def get_all(self) -> Iterable[T]:

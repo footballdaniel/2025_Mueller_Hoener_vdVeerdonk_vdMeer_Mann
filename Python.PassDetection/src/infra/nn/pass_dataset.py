@@ -5,7 +5,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from src.domain.repositories import Repository
+from src.domain.repositories import BaseRepository
 from src.domain.samples import Sample
 from src.services.feature_engineer import FeatureEngineer
 
@@ -13,7 +13,7 @@ from src.services.feature_engineer import FeatureEngineer
 @dataclass
 class PassDataset(Dataset):
 
-    def __init__(self, repo: Repository[Sample], number_samples: int, engineer: FeatureEngineer):
+    def __init__(self, repo: BaseRepository[Sample], number_samples: int, engineer: FeatureEngineer):
         self.repo = repo
         self.number_samples = number_samples
         self.engineer = engineer

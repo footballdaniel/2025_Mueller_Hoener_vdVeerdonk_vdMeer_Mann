@@ -25,11 +25,15 @@ def manage_mlflow_server(host: str = '127.0.0.1', port: int = 8080):
             return False
 
     if not is_server_running():
-        mlflow_process = subprocess.Popen(
+        # Start a detached MLflow server process
+        subprocess.Popen(
             f"mlflow server --host {host} --port {port}",
             shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            start_new_session=True
         )
+
 
 
