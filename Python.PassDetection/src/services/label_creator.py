@@ -1,53 +1,77 @@
 from dataclasses import replace
-from typing import Iterator, Optional
+from typing import Iterator
 
-from src.domain.recordings import Recording, PassEvent, Foot
+from src.domain.recordings import Recording  # Assuming Event is the base class for events
 from src.domain.samples import Sample
 
 
 class LabelCreator:
-
-    def generate(self, recording: Recording, sequence_length: int = 10, start_id: int = 0) -> Iterator[Sample]:
-        total_samples = len(recording.input_data.user_dominant_foot_positions)
+    def generate(
+        self, recording: Recording, sequence_length: int = 10, start_id: int = 0
+    ) -> Iterator[Sample]:
+        total_frames = len(recording.input_data.user_dominant_foot_positions)
         current_id = start_id
 
-        for start_idx in range(total_samples - sequence_length + 1):
-            pass_event = LabelCreator._get_pass_event_in_sequence(recording, start_idx, start_idx + sequence_length)
-            updated_recording = replace(
-                recording,
-                pass_events=[pass_event],
-                input_data=replace(
-                    recording.input_data,
-                    user_dominant_foot_positions=recording.input_data.user_dominant_foot_positions[
-                                                 start_idx:start_idx + sequence_length],
-                    user_non_dominant_foot_positions=recording.input_data.user_non_dominant_foot_positions[
-                                                     start_idx:start_idx + sequence_length],
-                    timestamps=recording.input_data.timestamps[start_idx:start_idx + sequence_length],
-                ),
-                number_of_frames=sequence_length,
-                duration=recording.input_data.timestamps[start_idx + sequence_length - 1] - recording.input_data.timestamps[start_idx],
-            )
-            sample = Sample(id=current_id, recording=updated_recording, pass_event=pass_event)
-            current_id += 1
-            yield sample
+        for event in recording.events:
+            event_idx = event.frame_number  # Index of the event
 
-    @staticmethod
-    def _get_pass_event_in_sequence(recording: Recording, start_idx: int, end_idx: int) -> Optional[PassEvent]:
-        """Retrieve the pass event in a specific sequence range."""
-        for event in recording.pass_events:
-            if start_idx <= event.frame_number < end_idx:
-                return PassEvent(
-                    is_a_pass=True,
-                    frame_number=event.frame_number,
-                    foot=event.foot,
-                    pass_id=event.pass_id,
-                    timestamp=event.timestamp,
+            # Generate windows where the event shifts from last to first index
+            for offset in range(sequence_length):
+                start_idx = event_idx - sequence_length + 1 + offset
+                end_idx = start_idx + sequence_length
+
+                # Ensure indices are within valid range
+                if start_idx < 0 or end_idx > total_frames:
+                    continue  # Skip if the window is invalid
+
+                # Position of the event within the sequence
+                event_pos_in_sequence = event_idx - start_idx
+
+                # Extract the subsequence
+                subsequence_dominant = recording.input_data.user_dominant_foot_positions[
+                    start_idx:end_idx
+                ]
+                subsequence_non_dominant = recording.input_data.user_non_dominant_foot_positions[
+                    start_idx:end_idx
+                ]
+                subsequence_timestamps = recording.input_data.timestamps[start_idx:end_idx]
+
+                # Adjust the event frame number relative to the subsequence
+                adjusted_event = replace(
+                    event, frame_number=event_pos_in_sequence
                 )
 
-        return PassEvent(
-            is_a_pass=False,
-            frame_number=0,
-            foot=Foot.UNASSIGNED,
-            pass_id=0,
-            timestamp=0,
-        )
+                # **Implemented TODO**:
+                # If the event is not a pass, but there is a pass event in the sequence, then skip
+                if not adjusted_event.is_pass:
+                    # Collect events in the current window, excluding the current event
+                    events_in_window = [
+                        e for e in recording.events
+                        if start_idx <= e.frame_number < end_idx and e != event
+                    ]
+                    # Check if there's any pass event in the window
+                    if any(e.is_pass for e in events_in_window):
+                        continue  # Skip this window
+
+                # Create updated recording with the subsequence
+                updated_recording = replace(
+                    recording,
+                    events=[adjusted_event],
+                    input_data=replace(
+                        recording.input_data,
+                        user_dominant_foot_positions=subsequence_dominant,
+                        user_non_dominant_foot_positions=subsequence_non_dominant,
+                        timestamps=subsequence_timestamps,
+                    ),
+                    number_of_frames=sequence_length,
+                    duration=subsequence_timestamps[-1] - subsequence_timestamps[0],
+                )
+
+                # Create the sample
+                sample = Sample(
+                    id=current_id,
+                    recording=updated_recording,
+                    event=adjusted_event,  # Assuming pass_event can be any event
+                )
+                current_id += 1
+                yield sample

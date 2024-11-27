@@ -1,9 +1,16 @@
+import os
+from pathlib import Path
+
 from matplotlib import pyplot as plt
 
 from src.domain.samples import Sample
 
 
-def plot_sample_with_features(sample: Sample) -> plt.Figure:
+def plot_sample_with_features(sample: Sample, plot_dir: Path):
+
+    if not plot_dir.exists():
+        plot_dir.mkdir(parents=True, exist_ok=True)
+
     num_features = len(sample.inference.targets)
     fig_height = num_features * 2  # Smaller figure height per feature
     fig, axs = plt.subplots(
@@ -18,7 +25,7 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
     prediction = f"Prediction: {sample.inference.pass_probability:.2f}" if sample.inference.pass_probability is not None else "Prediction: N/A"
 
     # Main title
-    pass_text = 'Pass' if sample.pass_event.is_a_pass else 'No Pass'
+    pass_text = 'Pass' if sample.event.is_pass else 'No Pass'
     fig.suptitle(
         f"Split: {sample.inference.split.name.lower()} Trial Number: {sample.recording.trial_number} - {pass_text} \n"
         f"Start: {start_time}s, End: {end_time}s, {prediction}",
@@ -40,9 +47,9 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
         ax.grid(True)
 
         # If there is a pass event, add vertical line
-        if sample.pass_event.is_a_pass and sample.pass_event.pass_id is not None:
+        if sample.event.is_pass and sample.event.pass_id is not None:
             ax.axvline(
-                x=sample.pass_event.timestamp,
+                x=sample.event.timestamp,
                 color='green',
                 linestyle='--',
                 linewidth=2,
@@ -53,7 +60,10 @@ def plot_sample_with_features(sample: Sample) -> plt.Figure:
             if 'Pass Event' not in labels:
                 ax.legend(handles, labels)
 
-    return fig
+    filename = f"sample_{sample.id}_pass{sample.event.is_pass}.png"
+    plot_path = os.path.join(str(plot_dir), filename)
+    fig.savefig(plot_path)
+    plt.close(fig)
 
 
 def plot_sample(sample: Sample):
@@ -88,4 +98,3 @@ def plot_sample(sample: Sample):
     plt.legend()
 
     plt.tight_layout()
-    plt.show()

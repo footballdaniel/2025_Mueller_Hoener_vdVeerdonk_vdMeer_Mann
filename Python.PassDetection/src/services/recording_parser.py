@@ -4,7 +4,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from src.domain.common import Vector3
-from src.domain.recordings import PassEvent, Foot, Recording, InputData
+from src.domain.recordings import Event, Foot, Recording, InputData
 
 
 class RecordingParser:
@@ -46,13 +46,29 @@ class RecordingParser:
             reader = csv.reader(csvfile)
             for index, row in enumerate(reader):
                 frame_number = int(row[0])
-                foot = Foot.RIGHT if row[1] == 'R' else Foot.LEFT
-                event = PassEvent(
-                    frame_number=frame_number,
-                    foot=foot,
-                    is_a_pass=True,
-                    pass_id=index,
-                    timestamp=self.recording.input_data.timestamps[frame_number])
-                events.append(event)
 
-        self._recording = replace(self.recording, pass_events=events)
+                if 'R' in row[1]:
+                    foot = Foot.RIGHT
+                if 'L' in row[1]:
+                    foot = Foot.LEFT
+
+                if 'P' in row[1]:
+                    event = Event(
+                        frame_number=frame_number,
+                        foot=foot,
+                        is_pass=True,
+                        pass_id=index,
+                        timestamp=self.recording.input_data.timestamps[frame_number])
+                    events.append(event)
+
+                if 'T' or 'F' in row[1]:
+                    event = Event(
+                        frame_number=frame_number,
+                        foot=foot,
+                        is_pass=False,
+                        pass_id=index,
+                        timestamp=self.recording.input_data.timestamps[frame_number])
+                    events.append(event)
+                    continue
+
+        self._recording = replace(self.recording, events=events)

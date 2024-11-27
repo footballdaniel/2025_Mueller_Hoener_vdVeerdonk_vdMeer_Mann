@@ -17,8 +17,8 @@ class Foot(Enum):
 
 
 @dataclass(frozen=True)
-class PassEvent:
-    is_a_pass: bool
+class Event:
+    is_pass: bool
     frame_number: int
     foot: Foot
     pass_id: int
@@ -42,4 +42,4 @@ class Recording:
     trial_number: int
     duration: float
     input_data: InputData = field(default_factory=InputData)
-    pass_events: List[PassEvent] = field(default_factory=list)
+    events: List[Event] = field(default_factory=list)

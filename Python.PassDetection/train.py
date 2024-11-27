@@ -10,18 +10,17 @@ import mlflow
 import onnx
 import torch
 import torch.nn as nn
-from matplotlib import pyplot as plt
 from torch.utils.data import Subset, DataLoader
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.run import Run, Scores, Evaluation, NoRun
+from src.domain.run import Run, Scores, Evaluation
 from src.features.feature_registry import FeatureRegistry
 from src.infra.kpi.accuracy import prediction_accuracy
 from src.infra.kpi.brier import prediction_brier
 from src.infra.kpi.f1_scores import predict_precision_recall_f1
 from src.infra.nn.model_registry import ModelRegistry
 from src.infra.nn.pass_dataset import PassDataset
-from src.infra.tiny_db.tiny_db_repository import Repository
+from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 from src.services.feature_engineer import FeatureEngineer
 from src.services.ingester import DataIngester
 from src.services.label_creator import LabelCreator
@@ -31,29 +30,35 @@ from src.services.traintestsplitter import TrainTestValidationSplitter
 from src.utils import CustomEncoder, manage_mlflow_server
 
 """LOGGING"""
-subprocess.Popen(f"mlflow server --host 127.0.0.1 --port 8080")
+subprocess.Popen(
+    f"mlflow server --host 127.0.0.1 --port 8080",
+    shell=True,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    stdin=subprocess.DEVNULL,
+    start_new_session=True
+)
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment("Pass Detection")
 
-"""READING CONFIGURATIONS"""
+"""CONFIGURATIONS"""
 architecture = "LSTM"
 number_samples_to_analyze = 1_000_000
 train_percentage = 0.7
 validation_percentage = 0.2
 test_percentage = 0.1
-config_matrix = ConfigurationParser.generate_configurations(Path("config.yaml"))
+plot_dir = Path("plots")
+output_dir_model = Path("../Unity.Interactions/Assets/Resources")
+save_plots = True
 
+
+"""PIPELIINE"""
 with mlflow.start_run(run_name=architecture):
-    """Config"""
-    plot_dir = Path("plots")
-    output_dir_model = Path("../Unity.Interactions/Assets/Resources")
-    save_plots = False
-
     """CREATING SAMPLES"""
     recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
     parser = RecordingParser()
     labeler = LabelCreator()
-    repo = Repository(recordings, parser, labeler)
+    repo = RepositoryWithInMemoryCache(recordings, parser, labeler)
 
     """SPLITTING DATASET"""
     train_indices, validation_indices, test_indices, num_samples = TrainTestValidationSplitter.split(
@@ -65,6 +70,7 @@ with mlflow.start_run(run_name=architecture):
     )
 
     runs: List[Run] = []
+    config_matrix = ConfigurationParser.generate_configurations(Path("config.yaml"))
     for run_idx, config in enumerate(config_matrix):
         """FEATURE ENGINEERING"""
         engineer = FeatureEngineer()
@@ -125,7 +131,7 @@ with mlflow.start_run(run_name=architecture):
                 optimizer.step()
                 total_loss += loss.item() * inputs.size(0)
 
-            avg_loss = total_loss / num_samples
+            avg_loss = total_loss / len(train_indices)
             print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
             # Validation
@@ -142,8 +148,8 @@ with mlflow.start_run(run_name=architecture):
                     predicted = (outputs >= 0.5).float()
                     correct += (predicted == labels).sum().item()
 
-            avg_val_loss = total_val_loss / num_samples
-            accuracy = correct / num_samples
+            avg_val_loss = total_val_loss / len(validation_indices)
+            accuracy = correct / len(validation_indices)
             print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
             # Check for improvement
@@ -222,7 +228,13 @@ with mlflow.start_run(run_name=architecture):
     )
 
     """SAVE PREDICTIONS TO DATASET"""
-    model = runs = List[Run].model
+    model = best_run.model
+    engineer = FeatureEngineer()
+    for feature in best_run.config.features:
+        feature_instance = FeatureRegistry.create(feature)
+        engineer.add_feature(feature_instance)
+    dataset = PassDataset(repo, num_samples, engineer)
+
     with torch.no_grad():
         for idx in range(len(dataset)):
             sample = repo.get(idx)
@@ -230,30 +242,27 @@ with mlflow.start_run(run_name=architecture):
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
+            sample_with_targets = engineer.engineer(sample)
             sample_with_prediction = replace(
-                sample[idx],
-                inference=replace(sample[idx].inference, pass_probability=probability)
+                sample_with_targets,
+                inference=replace(sample_with_targets.inference, pass_probability=probability)
             )
             repo.add(sample_with_prediction)
 
-    # """SAVE DATASET"""
-    # # Save some to folder
-    # with open('dataset.pkl', 'wb') as f:
-    #     pickle.dump(dataset.samples, f)
-    #
-    # with open("dataset.json", 'w') as f:
-    #     json.dump([asdict(sample) for sample in dataset.samples], f, cls=CustomEncoder, indent=4)
-    #
-    # """PLOT SAMPLES"""
-    # for idx, sample in enumerate(dataset.samples):
-    #     if not save_plots:
-    #         break
-    #
-    #     filename = f"sample_{sample.recording.trial_number}_{idx}_pass{sample.pass_event.is_a_pass}.png"
-    #     fig = plot_sample_with_features(sample)
-    #     plot_path = os.path.join(str(plot_dir), filename)
-    #     fig.savefig(plot_path)
-    #     plt.close(fig)
+    """SAVE DATASET"""
+    samples = [repo.get(idx) for idx in test_indices]
+    # Save some to folder
+    with open('dataset.pkl', 'wb') as f:
+        pickle.dump(samples, f)
+
+    with open("dataset.json", 'w') as f:
+        json.dump(samples, f, cls=CustomEncoder)
+
+    """PLOT SAMPLES"""
+    for idx, sample in enumerate(samples):
+        if not save_plots:
+            break
+        plot_sample_with_features(sample, plot_dir)
 
     """EXPORT ONNX"""
     # Path for ONNX file

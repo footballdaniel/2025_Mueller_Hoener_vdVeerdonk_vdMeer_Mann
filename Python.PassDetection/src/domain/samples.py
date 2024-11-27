@@ -6,7 +6,7 @@ from typing import Optional
 
 from src.domain.augmentations import Augmentation, NoAugmentation
 from src.domain.inferences import Inference, NoInference
-from src.domain.recordings import Recording, PassEvent
+from src.domain.recordings import Recording, Event
 
 
 class IngestableRecording:
@@ -37,7 +37,7 @@ class IngestableRecording:
 class Sample:
     id: int
     recording: Recording
-    pass_event: PassEvent
+    event: Event
     inference: Inference = field(default_factory=NoInference)
     augmentation: Augmentation = field(default_factory=NoAugmentation)
 

@@ -18,14 +18,14 @@ class FeatureEngineer:
             calculated = calculator.calculate(sample.recording.input_data)
             targets.extend(calculated)  # Each calculator returns a list of Features
 
-        outcome = int(sample.pass_event.is_a_pass)
+        outcome = int(sample.event.is_pass)
 
         return replace(
             sample,
-            inference=replace(
-                sample.inference,
-                targets=targets,
-                outcome_label=outcome
+            inference=Inference(
+                targets,
+                outcome,
+                split=sample.inference.split
             )
         )
 

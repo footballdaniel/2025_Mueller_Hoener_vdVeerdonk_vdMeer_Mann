@@ -5,13 +5,13 @@ from typing import Tuple, List
 from sklearn.model_selection import train_test_split
 
 from src.domain.inferences import Split
-from src.infra.tiny_db.tiny_db_repository import Repository
+from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 
 
 class TrainTestValidationSplitter:
     @staticmethod
     def split(
-            repo: Repository,
+            repo: RepositoryWithInMemoryCache,
             number_samples: int,
             train_percentage: float,
             validation_percentage: float,
@@ -25,7 +25,7 @@ class TrainTestValidationSplitter:
         samples = []
         for sample in samples_iterator:
             ids.append(sample.id)
-            labels.append(int(sample.pass_event.is_a_pass))
+            labels.append(int(sample.event.is_pass))
             samples.append(sample)
 
         # Normalize percentages

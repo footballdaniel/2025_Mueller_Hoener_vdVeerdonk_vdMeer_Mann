@@ -13,34 +13,62 @@ from src.services.recording_parser import RecordingParser
 T = TypeVar('T')
 
 
-class Repository(BaseRepository[T]):
-    def __init__(self, recordings: List[IngestableRecording], parser: RecordingParser, label_creator: LabelCreator):
+class RepositoryWithInMemoryCache(BaseRepository[T]):
+    def __init__(
+            self,
+            recordings: List[IngestableRecording],
+            parser: RecordingParser,
+            label_creator: LabelCreator,
+    ):
         self.recordings = recordings
         self.parser = parser
         self.label_creator = label_creator
+        self._samples = {}  # In-memory storage: id -> sample
+        self._all_samples_loaded = False  # Flag to check if all samples are loaded
 
     def get(self, id: int) -> T:
+        # Check if the sample is already in the in-memory storage
+        if id in self._samples:
+            return self._samples[id]
+
+        # If not, generate samples until we find it
         for sample in self._generate_samples():
-            if sample.id == id:  # Assuming each sample has a unique `id` attribute
+            if sample.id == id:
+                self._samples[id] = sample  # Cache the sample
                 return sample
+
         raise ValueError(f"Entity with id {id} not found")
 
     def get_all(self) -> Iterator[T]:
-        return self._generate_samples()
+        # If all samples are already loaded, return them from the cache
+        if self._all_samples_loaded:
+            return iter(self._samples.values())
+
+        # Otherwise, generate all samples and cache them
+        for sample in self._generate_samples():
+            self._samples[sample.id] = sample
+
+        self._all_samples_loaded = True  # Set the flag after loading all samples
+        return iter(self._samples.values())
 
     def _generate_samples(self) -> Iterator[T]:
         current_id = 0
         for recording in self.recordings:
             self.parser.read_recording_from_json(recording.timeseries_file)
             self.parser.read_pass_events_from_csv(recording.event_file)
-            yield from self.label_creator.generate(self.parser.recording, start_id=current_id)
-            current_id += len(self.parser.recording.input_data.user_dominant_foot_positions)
+            samples = self.label_creator.generate(
+                self.parser.recording, start_id=current_id
+            )
+            for sample in samples:
+                yield sample
+                current_id += 1  # Increment ID for each sample
 
-    def add(self, sample):
-        pass
+    def add(self, sample: T):
+        # Add the new sample to the in-memory storage
+        self._samples[sample.id] = sample
 
 
-class RepositoryWithCache(Repository):
+class RepositoryWithCache(RepositoryWithInMemoryCache):
     def __init__(self, recordings: List[IngestableRecording], db_path: Path, parser: RecordingParser, label_creator: LabelCreator):
         super().__init__(recordings, parser, label_creator)
         self.db = TinyDB(db_path)

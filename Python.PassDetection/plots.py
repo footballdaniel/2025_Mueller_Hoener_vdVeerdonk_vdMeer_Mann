@@ -30,7 +30,7 @@ for idx, sample in enumerate(samples):
         continue
 
 
-    filename = f"Sample_{sample.recording.trial_number}_{idx}_Pass_{sample.pass_event.is_a_pass}.png"
+    filename = f"Sample_{sample.recording.trial_number}_{idx}_Pass_{sample.event.is_pass}.png"
     fig = plot_sample_with_features(sample)
     plot_path = os.path.join(plot_dir, filename)
     fig.savefig(plot_path)
