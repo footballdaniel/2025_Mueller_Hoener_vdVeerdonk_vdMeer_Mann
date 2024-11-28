@@ -34,7 +34,7 @@ class PassDataset(Dataset):
         flattened_values = self.engineer.engineer(input_data)
 
         input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
-        input_tensor = input_tensor.view(len(sample.recording.timestamps), self.engineer.feature_size)
+        input_tensor = input_tensor.view(self.engineer.shape)
         label = torch.tensor(sample.contains_a_pass(), dtype=torch.float32)
 
         return input_tensor, label
