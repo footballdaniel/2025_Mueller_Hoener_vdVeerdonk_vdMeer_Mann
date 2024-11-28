@@ -1,10 +1,11 @@
 import json
 import subprocess
-import time
 from dataclasses import is_dataclass, asdict
 from enum import Enum
 
 import requests
+
+from src.domain.inferences import Feature
 
 
 class CustomEncoder(json.JSONEncoder):
@@ -13,6 +14,11 @@ class CustomEncoder(json.JSONEncoder):
             return o.name  # Serialize Enums as their name
         if is_dataclass(o):  # Support nested dataclasses
             return asdict(o)
+        if isinstance(o, Feature):
+            return {
+                "name": o.name,
+                "values": o.values,
+            }
         return super().default(o)
 
 

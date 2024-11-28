@@ -28,6 +28,6 @@ class PassDataset(Dataset):
 
         input_tensor = torch.tensor(engineered_input.flattened_values, dtype=torch.float32)
         input_tensor = input_tensor.view(engineered_input.dimensions[0], engineered_input.dimensions[1])
-        label = torch.tensor(engineered_input.outcome, dtype=torch.float32)
+        label = torch.tensor(sample.recording.contains_a_pass, dtype=torch.float32)
 
         return input_tensor, label

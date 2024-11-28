@@ -9,15 +9,16 @@ from src.domain.recordings import InputData
 from src.features.feature_registry import FeatureRegistry
 
 
+@dataclass(frozen=True)
+class Input:
+    name: str
+    values: List[float]
+
+
 class Feature(abc.ABC, metaclass=FeatureRegistry):
 
     @abc.abstractmethod
-    def calculate(self, input_data: InputData) -> None:
-        ...
-
-    @property
-    @abc.abstractmethod
-    def values(self) -> List[float]:
+    def calculate(self, input_data: InputData) -> Input:
         ...
 
     @property
@@ -33,25 +34,25 @@ class Split(Enum):
 
 
 @dataclass(frozen=True)
-class EngineeredInputData:
+class ComputedFeatures:
     flattened_values: List[float]
-    outcome: int
     dimensions: Tuple[int, int]
-    features: List[Feature]
+    features: List[Input]
 
 
 @dataclass(frozen=True)
-class NoEngineeredInput(EngineeredInputData):
+class NoComputedFeatures(ComputedFeatures):
 
     def __init__(self):
-        super().__init__(flattened_values=[], outcome=0, dimensions=(0, 0), features=[])
+        super().__init__(flattened_values=[], dimensions=(0, 0), features=[])
 
 
 @dataclass(frozen=True)
 class Inference:
-    pass_probability: float = 0.0
+    label: bool = False
+    prediction: float = 0.0
     split: Split = Split.UNASSIGNED
-    engineered_input: EngineeredInputData = field(default_factory=NoEngineeredInput)
+    computed_features: ComputedFeatures = field(default_factory=NoComputedFeatures)
 
 
 @dataclass(frozen=True)

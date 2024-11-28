@@ -4,6 +4,7 @@ from pathlib import Path
 import onnxruntime as ort
 import torch
 
+from src.domain.recordings import InputData
 from src.services.feature_engineer import FeatureEngineer
 from src.services.recording_parser import RecordingParser
 
@@ -37,18 +38,18 @@ for timestamp in recording.input_data.timestamps:
     non_dominant_foot_positions = recording.input_data.user_non_dominant_foot_positions[start_idx:end_idx]
     timestamps = recording.input_data.timestamps[start_idx:end_idx]
 
-    targets = engineer.engineer(recording.input_data)
+    input_data = InputData(
+        user_dominant_foot_positions=dominant_foot_positions,
+        user_non_dominant_foot_positions=non_dominant_foot_positions,
+        timestamps=timestamps,
+    )
+
+    computed_features = engineer.engineer(recording.input_data)
 
     batch_size = 1
-    timeseries_length = 10
-    target_count = len(targets)
 
-    flattened_values = []
-    for feature in targets:
-        flattened_values.extend(feature.values)
-
-    input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
-    input_tensor = input_tensor.view(batch_size, timeseries_length, target_count)
+    input_tensor = torch.tensor(computed_features.flattened_values, dtype=torch.float32)
+    input_tensor = input_tensor.view(batch_size, timeseries_length, computed_features.dimensions[1])
 
     input_numpy = input_tensor.cpu().numpy()
     onnx_inputs = {onnx_session.get_inputs()[0].name: input_numpy}
@@ -63,3 +64,4 @@ for timestamp in recording.input_data.timestamps:
         with open('input_tensor.txt', 'w') as f:
             for value in flat_input:
                 f.write(f"{value:.3f}\n")
+                print(f"{value:.3f}")

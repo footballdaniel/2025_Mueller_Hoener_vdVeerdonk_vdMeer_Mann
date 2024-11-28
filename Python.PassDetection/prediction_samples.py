@@ -19,7 +19,7 @@ for sample in samples:
     # Prepare the input tensor
     batch_size = 1
     timeseries_length = 10
-    features = sample.inference.targets
+    features = sample.inference.computed_features.features
     features_count = len(features)
 
     flattened_values = [value for feature in features for value in feature.values]
@@ -38,5 +38,5 @@ for sample in samples:
     print(
         f"Trial {sample.recording.trial_number}, Timestamp: {sample.recording.input_data.timestamps[0]:.3f} - "
         f"Predicted Probability: {predicted_probability:.3f}, "
-        f"Actual Probability: {sample.inference.pass_probability:.3f}"
+        f"Actual Probability: {sample.inference.prediction:.3f}"
     )

@@ -1,5 +1,4 @@
 import json
-import os
 import pickle
 import subprocess
 from dataclasses import asdict, replace
@@ -13,6 +12,7 @@ import torch.nn as nn
 from torch.utils.data import Subset, DataLoader
 
 from src.domain.configurations import ConfigurationParser
+from src.domain.inferences import Inference
 from src.domain.run import Run, Scores, Evaluation
 from src.features.feature_registry import FeatureRegistry
 from src.infra.kpi.accuracy import prediction_accuracy
@@ -27,7 +27,7 @@ from src.services.label_creator import LabelCreator
 from src.services.plotter import plot_sample_with_features
 from src.services.recording_parser import RecordingParser
 from src.services.traintestsplitter import TrainTestValidationSplitter
-from src.utils import CustomEncoder, manage_mlflow_server
+from src.utils import CustomEncoder
 
 """LOGGING"""
 subprocess.Popen(
@@ -51,8 +51,7 @@ plot_dir = Path("plots")
 output_dir_model = Path("../Unity.Interactions/Assets/Resources")
 save_plots = True
 
-
-"""PIPELIINE"""
+"""PIPELINE"""
 with mlflow.start_run(run_name=architecture):
     """CREATING SAMPLES"""
     recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
@@ -172,7 +171,7 @@ with mlflow.start_run(run_name=architecture):
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
                 probability = round(output.item(), 3)
-                evaluations.append(Evaluation(sample.recording.input_data.is_pass, probability))
+                evaluations.append(Evaluation(sample.inference.label, probability))
 
         brier_score = prediction_brier(evaluations)
         accuracy = prediction_accuracy(evaluations)
@@ -213,7 +212,7 @@ with mlflow.start_run(run_name=architecture):
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            evaluations.append(Evaluation(sample.recording.input_data.is_pass, probability))
+            evaluations.append(Evaluation(sample.inference.label, probability))
 
     brier_score = prediction_brier(evaluations)
     accuracy = prediction_accuracy(evaluations)
@@ -227,46 +226,48 @@ with mlflow.start_run(run_name=architecture):
         accuracy=accuracy,
     )
 
-    """SAVE PREDICTIONS TO DATASET"""
-    model = best_run.model
-    engineer = FeatureEngineer()
-    for feature in best_run.config.features:
-        feature_instance = FeatureRegistry.create(feature)
-        engineer.add_feature(feature_instance)
-    dataset = PassDataset(repo, num_samples, engineer)
+    # """SAVE PREDICTIONS TO DATASET"""
+    # model = best_run.model
+    # engineer = FeatureEngineer()
+    # for feature in best_run.config.features:
+    #     feature_instance = FeatureRegistry.create(feature)
+    #     engineer.add_feature(feature_instance)
 
-    with torch.no_grad():
-        for idx in range(len(dataset)):
-            sample = repo.get(idx)
-            input_tensor, label = dataset[idx]
-            input_tensor = input_tensor.unsqueeze(0).to(device)
-            output = model(input_tensor)
-            probability = output.item()
-            engineered_input = engineer.engineer(sample.recording.input_data)
-            sample_with_prediction = replace(
-                sample,
-                inference=replace(
-                    sample.inference,
-                    pass_probability=probability,
-                    engineered_input=engineered_input
-                )
-            )
-            repo.add(sample_with_prediction)
+    # dataset = PassDataset(repo, num_samples, engineer)
+    #
+    # with torch.no_grad():
+    #     for idx in range(num_samples):
+    #         input_tensor, label = dataset[idx]
+    #         input_tensor = input_tensor.unsqueeze(0).to(device)
+    #         output = model(input_tensor)
+    #         probability = output.item()
+    #         sample = repo.get(idx)
+    #         computed_features = engineer.engineer(sample.recording.input_data)
+    #         sample_with_prediction = replace(
+    #             sample,
+    #             inference=Inference(
+    #                 prediction=probability,
+    #                 split=sample.inference.split,
+    #                 computed_features=computed_features,
+    #                 label=sample.recording.contains_a_pass,
+    #             )
+    #         )
+    #         repo.add(sample_with_prediction)
 
-    """SAVE DATASET"""
-    samples = [repo.get(idx) for idx in test_indices]
-    # Save some to folder
-    with open('dataset.pkl', 'wb') as f:
-        pickle.dump(samples, f)
-
-    with open("dataset.json", 'w') as f:
-        json.dump(samples, f, cls=CustomEncoder)
-
-    """PLOT SAMPLES"""
-    for idx, sample in enumerate(samples):
-        if not save_plots:
-            break
-        plot_sample_with_features(sample, plot_dir)
+    # """SAVE DATASET"""
+    # samples = [repo.get(idx) for idx in test_indices]
+    # # Save some to folder
+    # with open('dataset.pkl', 'wb') as f:
+    #     pickle.dump(samples, f)
+    #
+    # with open("dataset.json", 'w') as f:
+    #     json.dump(samples, f, cls=CustomEncoder)
+    #
+    # """PLOT SAMPLES"""
+    # for idx, id in enumerate(samples):
+    #     if not save_plots:
+    #         break
+    #     plot_sample_with_features(id, plot_dir)
 
     """EXPORT ONNX"""
     # Path for ONNX file

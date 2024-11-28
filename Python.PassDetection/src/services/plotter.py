@@ -11,7 +11,7 @@ def plot_sample_with_features(sample: Sample, plot_dir: Path):
     if not plot_dir.exists():
         plot_dir.mkdir(parents=True, exist_ok=True)
 
-    num_features = len(sample.inference.engineered_input.features)
+    num_features = len(sample.inference.computed_features.features)
     fig_height = num_features * 2  # Smaller figure height per feature
     fig, axs = plt.subplots(
         num_features, 1, figsize=(10, fig_height),
@@ -22,7 +22,7 @@ def plot_sample_with_features(sample: Sample, plot_dir: Path):
     end_time = round(sample.recording.input_data.timestamps[-1], 1) if sample.recording.input_data.timestamps else 0.0
 
     # Pass probability
-    prediction = f"Prediction: {sample.inference.pass_probability:.2f}" if sample.inference.pass_probability is not None else "Prediction: N/A"
+    prediction = f"Prediction: {sample.inference.prediction:.2f}" if sample.inference.prediction is not None else "Prediction: N/A"
 
     # Main title
     pass_text = 'Pass' if sample.event.is_pass else 'No Pass'
@@ -37,7 +37,7 @@ def plot_sample_with_features(sample: Sample, plot_dir: Path):
 
     for i in range(num_features):
         ax = axs[i]
-        feature = sample.inference.engineered_input.features[i]
+        feature = sample.inference.computed_features.features[i]
         time = sample.recording.input_data.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)

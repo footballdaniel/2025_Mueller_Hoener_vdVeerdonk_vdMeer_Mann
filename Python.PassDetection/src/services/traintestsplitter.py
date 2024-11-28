@@ -25,7 +25,7 @@ class TrainTestValidationSplitter:
         samples = []
         for sample in samples_iterator:
             ids.append(sample.id)
-            labels.append(int(sample.event.is_pass))
+            labels.append(int(sample.recording.contains_a_pass))
             samples.append(sample)
 
         # Normalize percentages

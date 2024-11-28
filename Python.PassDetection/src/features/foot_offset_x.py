@@ -1,21 +1,15 @@
-from typing import List
-
-from src.domain.inferences import Feature
+from src.domain.inferences import Feature, Input
 from src.domain.recordings import InputData
 
 
 class FootOffsetX(Feature):
-    def __init__(self):
-        self._values = []
 
-    def calculate(self, input_data: InputData) -> None:
+    def calculate(self, input_data: InputData) -> Input:
         dominant_positions = input_data.user_dominant_foot_positions
         non_dominant_positions = input_data.user_non_dominant_foot_positions
-        self._values = [
+        values = [
             non_dominant_positions[i].x - dominant_positions[i].x
             for i in range(len(dominant_positions))
         ]
 
-    @property
-    def values(self) -> List[float]:
-        return self._values
+        return Input(self.name, values)

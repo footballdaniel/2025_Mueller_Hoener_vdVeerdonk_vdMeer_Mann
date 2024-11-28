@@ -33,7 +33,6 @@ class InputData:
     user_dominant_foot_positions: List[Vector3] = field(default_factory=list)
     user_non_dominant_foot_positions: List[Vector3] = field(default_factory=list)
     timestamps: List[float] = field(default_factory=list)
-    is_pass: bool = False
 
 
 @dataclass(frozen=True)
@@ -49,3 +48,4 @@ class Recording:
     duration: float
     input_data: InputData = field(default_factory=InputData)
     events: List[Event] = field(default_factory=list)
+    contains_a_pass: bool = False

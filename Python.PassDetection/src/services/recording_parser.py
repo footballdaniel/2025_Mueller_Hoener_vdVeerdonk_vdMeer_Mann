@@ -60,7 +60,7 @@ class RecordingParser:
                         pass_id=index,
                         timestamp=self.recording.input_data.timestamps[frame_number])
                     events.append(event)
-                    self._recording = replace(self.recording, input_data=replace(self.recording.input_data, is_pass=True))
+                    self._recording = replace(self.recording, contains_a_pass=True)
 
                 if 'T' or 'F' in row[1]:
                     event = Event(

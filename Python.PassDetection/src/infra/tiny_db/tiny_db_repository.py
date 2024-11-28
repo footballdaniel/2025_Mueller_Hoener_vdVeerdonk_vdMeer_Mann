@@ -66,6 +66,7 @@ class RepositoryWithInMemoryCache(BaseRepository[T]):
     def add(self, sample: T):
         # Add the new sample to the in-memory storage
         self._samples[sample.id] = sample
+        a = 1
 
 
 class RepositoryWithCache(RepositoryWithInMemoryCache):
