@@ -27,10 +27,9 @@ namespace PassDetection.Replay
 		void Start()
 		{
 			var dataPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../../Data/Pilot_4"));
-
 			
 			var jsonFiles = Directory.GetFiles(dataPath, "*.json");
-			var jsonFile = jsonFiles[0];
+			var jsonFile = jsonFiles[1];
 
 			Debug.Log("Found json file: " + jsonFile);
 			var mp4File = Path.ChangeExtension(jsonFile, ".mp4");

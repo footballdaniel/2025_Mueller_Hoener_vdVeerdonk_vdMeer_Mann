@@ -10,7 +10,7 @@ using Unity.Sentis;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace PassDetection.Valwidation
+namespace PassDetection.Validation
 {
 	public class PassValidationApp : MonoBehaviour
 	{

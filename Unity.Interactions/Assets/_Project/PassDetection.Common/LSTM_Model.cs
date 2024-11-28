@@ -15,9 +15,9 @@ namespace PassDetection.Replay
 			var asset = Resources.Load<ModelAsset>(assetWithMetadata.ModelAssetPath);
 			var model = ModelLoader.Load(asset);
 
-			_features = new List<BaseFeature<InputData>>();
+			_featureEngineer = new FeatureEngineer<InputData>();
 			foreach (var featureName in assetWithMetadata.FeatureNames)
-				_features.Add(FeatureRegistry.Create<InputData>(featureName));
+				_featureEngineer.AddFeature(FeatureRegistry.Create<InputData>(featureName));
 			
 			_worker = new Worker(model, BackendType.GPUCompute);
 		}
@@ -30,25 +30,15 @@ namespace PassDetection.Replay
 
 		public float Evaluate(InputData data)
 		{
-			var targets = new List<Target>();
-			
-			foreach (var feature in _features)
-				targets.AddRange(feature.Calculate(data));
+			var flattenedValues = new List<float>();
+				flattenedValues.AddRange(_featureEngineer.Engineer(data));
 
-			var timeseriesCount = targets[0].Values.Count;
-			var featureCount = targets.Count;
+			var timeseriesCount = 10;
+			var featureCount = _featureEngineer.FeatureSize;
 			var batchSize = 1;
 
 			var shape = new TensorShape(batchSize, timeseriesCount, featureCount);
-			var flattenedValues = new float[timeseriesCount * featureCount];
-
-			var index = 0;
-
-			foreach (var feature in targets)
-			foreach (var value in feature.Values)
-				flattenedValues[index++] = value;
-
-			var input = new Tensor<float>(shape, flattenedValues);
+			var input = new Tensor<float>(shape, flattenedValues.ToArray());
 
 			_worker.Schedule(input);
 			var outputTensor = _worker.PeekOutput() as Tensor<float>;
@@ -62,6 +52,6 @@ namespace PassDetection.Replay
 		}
 
 		readonly Worker _worker;
-		readonly List<BaseFeature<InputData>> _features;
+		readonly FeatureEngineer<InputData> _featureEngineer;
 	}
 }
