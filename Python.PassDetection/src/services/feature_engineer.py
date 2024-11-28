@@ -18,5 +18,5 @@ class FeatureEngineer:
         return inputs
 
     @property
-    def input_size(self) -> int:
+    def feature_size(self) -> int:
         return len(self.features)

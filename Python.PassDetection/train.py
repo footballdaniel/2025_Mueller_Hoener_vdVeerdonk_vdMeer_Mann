@@ -84,7 +84,7 @@ with mlflow.start_run(run_name=architecture):
         testing_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
 
         """MODEL"""
-        input_size = engineer.input_size
+        input_size = engineer.feature_size
         learning_rate = config.learning_rate
         num_epochs = config.epochs
         patience = config.early_stopping_patience
