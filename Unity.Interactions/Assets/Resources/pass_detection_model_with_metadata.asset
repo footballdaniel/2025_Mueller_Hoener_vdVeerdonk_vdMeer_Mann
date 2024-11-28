@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e81e42152c7486f954ca57c4dfaddce, type: 3}
   m_Name: pass_detection_model_with_metadata
   m_EditorClassIdentifier: 
-  <ModelAssetPath>k__BackingField: pass_detection_model
-  <FeatureNames>k__BackingField:
-  - VelocityMagnitudeDominantFoot
-  - VelocityMagnitudeNonDominantFoot
-  _metaData:
+  modelAssetPath: pass_detection_model
+  metaData:
     DocString: LSTM Model for pass detection
     Domain: com.tactivesport.feedback
     IRVersion: 8
@@ -25,13 +22,41 @@ MonoBehaviour:
     ModelVersion: 1
     m_MetadataKeys:
     - features
-    - example_input
-    - example_output
+    - input_shape
+    - sample_input
+    - sample_output
     m_MetadataValues:
     - '["VelocityMagnitudeDominantFoot", "VelocityMagnitudeNonDominantFoot"]'
-    - '[[[0.0, 2.8249220848083496], [2.7162420749664307, 2.9991354942321777], [1.637165904045105,
-      0.4080095887184143], [0.30887746810913086, 0.7194290161132812], [0.5093351006507874,
-      1.0435363054275513], [0.0, 0.13039670884609222], [0.1909647136926651, 0.04853671044111252],
-      [0.1567256897687912, 0.6624512672424316], [2.0273959636688232, 2.369267463684082],
-      [1.6640660762786865, 0.5629588961601257]]]'
-    - 0.2708481252193451
+    - '[1, 10, 2]'
+    - '[0.0, 2.8249220848083496, 2.7162420749664307, 2.9991354942321777, 1.637165904045105,
+      0.4080095887184143, 0.30887746810913086, 0.7194290161132812, 0.5093351006507874,
+      1.0435363054275513, 0.0, 0.13039670884609222, 0.1909647136926651, 0.04853671044111252,
+      0.1567256897687912, 0.6624512672424316, 2.0273959636688232, 2.369267463684082,
+      1.6640660762786865, 0.5629588961601257]'
+    - 0.1370900720357895
+  featureNames:
+  - VelocityMagnitudeDominantFoot
+  - VelocityMagnitudeNonDominantFoot
+  inputShape: 010000000a00000002000000
+  sampleInput:
+  - 0
+  - 2.824922
+  - 2.716242
+  - 2.9991355
+  - 1.6371659
+  - 0.4080096
+  - 0.30887747
+  - 0.719429
+  - 0.5093351
+  - 1.0435363
+  - 0
+  - 0.13039671
+  - 0.19096471
+  - 0.04853671
+  - 0.15672569
+  - 0.66245127
+  - 2.027396
+  - 2.3692675
+  - 1.6640661
+  - 0.5629589
+  sampleOutput: 0.13709007

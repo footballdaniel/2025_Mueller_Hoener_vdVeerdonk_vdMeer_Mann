@@ -23,17 +23,8 @@ namespace PassDetection.Validation
 			var model = ModelLoader.Load(asset);
 			
 			_worker = new Worker(model, BackendType.GPUCompute);
-			var shape = new TensorShape(_modelWithMetadata.ExampleInput[0].Length, _modelWithMetadata.ExampleInput[1].Length, _modelWithMetadata.ExampleInput[2].Length);
-
-			var exampleInput = _modelWithMetadata.ExampleInput;
-			var flattenedValues = new List<float>();
-
-			foreach (var example in exampleInput)
-			foreach (var example2 in example)
-			foreach (var example3 in example2)
-				flattenedValues.Add(example3);
-
-			var input = new Tensor<float>(shape, flattenedValues.ToArray());
+			var shape = new TensorShape(_modelWithMetadata.InputShape.ToArray());
+			var input = new Tensor<float>(shape, _modelWithMetadata.SampleInput.ToArray());
 
 			_worker.Schedule(input);
 			var outputTensor = _worker.PeekOutput() as Tensor<float>;
@@ -44,7 +35,7 @@ namespace PassDetection.Validation
 			input.Dispose();
 
 			Debug.Log("Result: " + result);
-			Debug.Log("Original" + _modelWithMetadata.ExampleOutput);
+			Debug.Log("Original" + _modelWithMetadata.SampleOutput);
 			return result;
 		}
 	}

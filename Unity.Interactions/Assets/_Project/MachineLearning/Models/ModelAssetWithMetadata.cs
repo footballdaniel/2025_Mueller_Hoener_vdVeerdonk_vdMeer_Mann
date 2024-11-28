@@ -5,32 +5,43 @@ using UnityEngine;
 
 namespace Tactive.MachineLearning.Models
 {
+	[CreateAssetMenu(fileName = "ModelAssetWithMetadata", menuName = "ScriptableObjects/ModelAssetWithMetadata")]
 	public class ModelAssetWithMetadata : ScriptableObject
 	{
-		[field: SerializeReference] public string ModelAssetPath { get; private set; }
-		public ONNXModelMetadata MetaData => _metaData;
-		[field: SerializeReference] public List<string> FeatureNames { get; private set; }
-		[field:SerializeReference] public float[][][] ExampleInput { get; private set; }
-		[field:SerializeReference] public float ExampleOutput { get; private set; }
-	
+		[SerializeField] string modelAssetPath;
+
+		[SerializeField] ONNXModelMetadata metaData;
+
+		[SerializeField] List<string> featureNames;
+
+		[SerializeField] List<int> inputShape;
+
+		[SerializeField] List<float> sampleInput;
+
+		[SerializeField] float sampleOutput;
+		public string ModelAssetPath => modelAssetPath;
+		public ONNXModelMetadata MetaData => metaData;
+		public List<string> FeatureNames => featureNames;
+		public List<int> InputShape => inputShape;
+		public List<float> SampleInput => sampleInput;
+		public float SampleOutput => sampleOutput;
 
 		public void Initialize(ONNXModelMetadata metadata, string modelAssetPath)
 		{
-			ModelAssetPath = modelAssetPath;
-			_metaData = metadata;
+			this.modelAssetPath = modelAssetPath;
+			metaData = metadata;
 
-			if (metadata.MetadataProps.TryGetValue("features", out var featureNames))
-				FeatureNames = JsonConvert.DeserializeObject<List<string>>(featureNames);
-			
-			if (metadata.MetadataProps.TryGetValue("example_input", out var exampleInput))
-				ExampleInput = JsonConvert.DeserializeObject<float[][][]>(exampleInput);
-			
-			if (metadata.MetadataProps.TryGetValue("example_output", out var exampleOutput))
-				ExampleOutput = JsonConvert.DeserializeObject<float>(exampleOutput);
+			if (metadata.MetadataProps.TryGetValue("features", out var featureNamesJson))
+				featureNames = JsonConvert.DeserializeObject<List<string>>(featureNamesJson);
+
+			if (metadata.MetadataProps.TryGetValue("input_shape", out var inputShapeJson))
+				inputShape = JsonConvert.DeserializeObject<List<int>>(inputShapeJson);
+
+			if (metadata.MetadataProps.TryGetValue("sample_input", out var sampleInputJson))
+				sampleInput = JsonConvert.DeserializeObject<List<float>>(sampleInputJson);
+
+			if (metadata.MetadataProps.TryGetValue("sample_output", out var sampleOutputJson))
+				sampleOutput = JsonConvert.DeserializeObject<float>(sampleOutputJson);
 		}
-
-		List<string> _featureNames;
-		[SerializeField] ONNXModelMetadata _metaData;
-
 	}
 }
