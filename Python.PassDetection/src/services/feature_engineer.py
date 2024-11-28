@@ -1,8 +1,7 @@
-from dataclasses import replace
-from typing import List
+from typing import List, Tuple
 
-from src.domain.inferences import BaseFeature, Inference
-from src.domain.samples import Sample
+from src.domain.inferences import BaseFeature
+from src.domain.recordings import InputData, EngineeredInputData
 
 
 class FeatureEngineer:
@@ -12,25 +11,23 @@ class FeatureEngineer:
     def add_feature(self, feature_calculator: BaseFeature):
         self.feature_calculators.append(feature_calculator)
 
-    def engineer(self, sample: Sample) -> Sample:
+    def engineer(self, input_data: InputData) -> EngineeredInputData:
         targets = []
         for calculator in self.feature_calculators:
-            calculated = calculator.calculate(sample.recording.input_data)
+            calculated = calculator.calculate(input_data)
             targets.extend(calculated)  # Each calculator returns a list of Features
 
-        outcome = int(sample.event.is_pass)
+        flattened_values = []
+        for target in targets:
+            flattened_values.extend(target.values)
 
-        return replace(
-            sample,
-            inference=Inference(
-                targets,
-                outcome,
-                split=sample.inference.split
-            )
-        )
+        outcome = int(input_data.is_pass)
+
+        desired_shape = len(targets[0].values), len(targets)
+        engineered_input_data = EngineeredInputData(flattened_values, outcome, desired_shape)
+        return engineered_input_data
 
     @property
     def input_size(self) -> int:
         # Sum the sizes of each feature calculator to get the input size
         return sum(feature.size for feature in self.feature_calculators)
-

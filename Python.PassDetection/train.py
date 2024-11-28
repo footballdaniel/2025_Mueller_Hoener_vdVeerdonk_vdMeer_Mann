@@ -172,7 +172,7 @@ with mlflow.start_run(run_name=architecture):
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
                 probability = round(output.item(), 3)
-                evaluations.append(Evaluation(sample.inference.outcome_label, probability))
+                evaluations.append(Evaluation(sample.recording.input_data.is_pass, probability))
 
         brier_score = prediction_brier(evaluations)
         accuracy = prediction_accuracy(evaluations)
@@ -213,7 +213,7 @@ with mlflow.start_run(run_name=architecture):
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            evaluations.append(Evaluation(sample.inference.outcome_label, probability))
+            evaluations.append(Evaluation(sample.recording.input_data.is_pass, probability))
 
     brier_score = prediction_brier(evaluations)
     accuracy = prediction_accuracy(evaluations)
@@ -242,10 +242,13 @@ with mlflow.start_run(run_name=architecture):
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            sample_with_targets = engineer.engineer(sample)
+            engineered_input = engineer.engineer(sample.recording.input_data)
             sample_with_prediction = replace(
-                sample_with_targets,
-                inference=replace(sample_with_targets.inference, pass_probability=probability)
+                sample,
+                inference=replace(
+                    sample.inference,
+                    pass_probability=probability
+                )
             )
             repo.add(sample_with_prediction)
 

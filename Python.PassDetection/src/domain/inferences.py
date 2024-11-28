@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-from src.domain.recordings import InputData
+from src.domain.recordings import InputData, NoInputData, EngineeredInputData, NoEngineeredInput
 from src.features.feature_registry import FeatureRegistry
 
 
@@ -40,10 +40,9 @@ class Split(Enum):
 
 @dataclass(frozen=True)
 class Inference:
-    targets: List[Target] = field(default_factory=list)
-    outcome_label: int = 0
     pass_probability: float = 0.0
     split: Split = Split.UNASSIGNED
+    engineered_input: EngineeredInputData = field(default_factory=NoEngineeredInput)
 
 
 @dataclass(frozen=True)

@@ -24,17 +24,10 @@ class PassDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
         sample = self.repo.get(idx)
 
-        engineered_sample = self.engineer.engineer(sample)
+        engineered_input = self.engineer.engineer(sample.recording.input_data)
 
-        timeseries_length = len(engineered_sample.inference.targets[0].values)
-        features_count = len(engineered_sample.inference.targets)
-
-        flattened_values = []
-        for feature in engineered_sample.inference.targets:
-            flattened_values.extend(feature.values)
-
-        input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
-        input_tensor = input_tensor.view(timeseries_length, features_count)
-        label = torch.tensor(engineered_sample.inference.outcome_label, dtype=torch.float32)
+        input_tensor = torch.tensor(engineered_input.flattened_values, dtype=torch.float32)
+        input_tensor = input_tensor.view(engineered_input.dimensions[0], engineered_input.dimensions[1])
+        label = torch.tensor(engineered_input.outcome, dtype=torch.float32)
 
         return input_tensor, label
