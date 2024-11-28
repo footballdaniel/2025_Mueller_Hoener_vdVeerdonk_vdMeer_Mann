@@ -1,4 +1,5 @@
 using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Scripts.Domain;
 
 namespace _Project.Interactions.Scripts.Domain
 {

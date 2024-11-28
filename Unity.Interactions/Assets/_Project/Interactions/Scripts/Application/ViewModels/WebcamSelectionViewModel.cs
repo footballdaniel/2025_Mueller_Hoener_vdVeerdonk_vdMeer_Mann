@@ -1,0 +1,26 @@
+using System.Collections.Generic;
+using _Project.Interactions.Scripts.Domain.VideoRecorder;
+
+namespace Interactions.Scripts.Application.ViewModels
+{
+	public class WebcamSelectionViewModel
+	{
+		public WebcamSelectionViewModel(IRepository<IWebcamRecorder> webcamRepository, global::Interactions.Scripts.Application.App app)
+		{
+			_app = app;
+			Webcams = webcamRepository.GetAll();
+		}
+
+		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }
+
+
+		public void Select(IWebcamRecorder webcam)
+		{
+			_app.Experiment.WebcamRecorder = webcam;
+			_app.Experiment.WebcamRecorder.RecordWith(_app.RecordingFrameRateHz);
+			_app.Transitions.InitiateRecorder.Execute();
+		}
+
+		readonly global::Interactions.Scripts.Application.App _app;
+	}
+}

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Interactions.Scripts.Domain;
+using Interactions.Scripts.Domain;
 using UnityEngine;
 
 namespace _Project.Replay.Scripts

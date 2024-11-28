@@ -1,4 +1,4 @@
-using _Project.Interactions.Scripts.App.ViewModels;
+using Interactions.Scripts.Application.ViewModels;
 using TMPro;
 using UnityEngine;
 

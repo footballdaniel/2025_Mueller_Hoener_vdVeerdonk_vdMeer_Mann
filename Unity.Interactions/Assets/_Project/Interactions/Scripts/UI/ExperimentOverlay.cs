@@ -1,6 +1,6 @@
 using System;
-using _Project.Interactions.Scripts.App.ViewModels;
 using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Scripts.Application.ViewModels;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
+using Interactions.Scripts.Domain;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Video;

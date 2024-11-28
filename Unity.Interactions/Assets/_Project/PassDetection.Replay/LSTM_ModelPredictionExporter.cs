@@ -3,6 +3,7 @@ using System.IO;
 using _Project.Interactions.Scripts.Common;
 using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Common;
+using Interactions.Scripts.Domain;
 using Newtonsoft.Json;
 using Tactive.MachineLearning.Models;
 using UnityEditor;

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using _Project.Interactions.Scripts.Common;
+using _Project.Interactions.Scripts.Domain;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Domain
+namespace Interactions.Scripts.Domain
 {
 	public class Trial
 	{
@@ -38,7 +39,7 @@ namespace _Project.Interactions.Scripts.Domain
 
 			var jsonData = JsonConvert.SerializeObject(this, jsonSettings);
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-			var path = Path.Combine(Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
+			var path = Path.Combine(UnityEngine.Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
 			File.WriteAllText(path, jsonData);
 		}
 

@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Linq;
-using _Project.Interactions.Scripts.App;
+using Interactions.Scripts.Application;
 using UnityEditor;
 using UnityEngine;
 
