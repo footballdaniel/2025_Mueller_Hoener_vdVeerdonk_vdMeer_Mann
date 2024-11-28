@@ -1,7 +1,6 @@
 import json
-import pickle
 import subprocess
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from pathlib import Path
 from typing import List
 
@@ -12,7 +11,6 @@ import torch.nn as nn
 from torch.utils.data import Subset, DataLoader
 
 from src.domain.configurations import ConfigurationParser
-from src.domain.inferences import Inference
 from src.domain.run import Run, Scores, Evaluation
 from src.features.feature_registry import FeatureRegistry
 from src.infra.kpi.accuracy import prediction_accuracy
@@ -23,11 +21,8 @@ from src.infra.nn.pass_dataset import PassDataset
 from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 from src.services.feature_engineer import FeatureEngineer
 from src.services.ingester import DataIngester
-from src.services.label_creator import LabelCreator
-from src.services.plotter import plot_sample_with_features
-from src.services.recording_parser import RecordingParser
+from src.services.sample_generator import SampleGenerator
 from src.services.traintestsplitter import TrainTestValidationSplitter
-from src.utils import CustomEncoder
 
 """LOGGING"""
 subprocess.Popen(
@@ -43,7 +38,7 @@ mlflow.set_experiment("Pass Detection")
 
 """CONFIGURATIONS"""
 architecture = "LSTM"
-number_samples_to_analyze = 1_000_000
+max_samples = 1_000_000
 train_percentage = 0.7
 validation_percentage = 0.2
 test_percentage = 0.1
@@ -53,19 +48,19 @@ save_plots = True
 
 """PIPELINE"""
 with mlflow.start_run(run_name=architecture):
+
     """CREATING SAMPLES"""
     recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
-    parser = RecordingParser()
-    labeler = LabelCreator()
-    repo = RepositoryWithInMemoryCache(recordings, parser, labeler)
+    samples_iterator = SampleGenerator.generate(recordings)
+    repo = RepositoryWithInMemoryCache(samples_iterator)
 
     """SPLITTING DATASET"""
-    train_indices, validation_indices, test_indices, num_samples = TrainTestValidationSplitter.split(
+    splitter = TrainTestValidationSplitter(
         repo,
-        number_samples_to_analyze,
+        max_samples,
         train_percentage,
         validation_percentage,
-        test_percentage,
+        test_percentage
     )
 
     runs: List[Run] = []
@@ -78,11 +73,11 @@ with mlflow.start_run(run_name=architecture):
             feature_instance = FeatureRegistry.create(feature)
             engineer.add_feature(feature_instance)
 
-        dataset = PassDataset(repo, num_samples, engineer)
+        dataset = PassDataset(repo, splitter.number_samples, engineer)
 
-        train_dataset = Subset(dataset, train_indices)
-        validation_dataset = Subset(dataset, validation_indices)
-        test_dataset = Subset(dataset, test_indices)
+        train_dataset = Subset(dataset, splitter.train_indices)
+        validation_dataset = Subset(dataset, splitter.validation_indices)
+        test_dataset = Subset(dataset, splitter.test_indices)
 
         training_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
         validation_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False)
@@ -130,7 +125,7 @@ with mlflow.start_run(run_name=architecture):
                 optimizer.step()
                 total_loss += loss.item() * inputs.size(0)
 
-            avg_loss = total_loss / len(train_indices)
+            avg_loss = total_loss / len(splitter.train_indices)
             print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}")
 
             # Validation
@@ -147,8 +142,8 @@ with mlflow.start_run(run_name=architecture):
                     predicted = (outputs >= 0.5).float()
                     correct += (predicted == labels).sum().item()
 
-            avg_val_loss = total_val_loss / len(validation_indices)
-            accuracy = correct / len(validation_indices)
+            avg_val_loss = total_val_loss / len(splitter.validation_indices)
+            accuracy = correct / len(splitter.validation_indices)
             print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
             # Check for improvement
@@ -165,13 +160,13 @@ with mlflow.start_run(run_name=architecture):
         model.eval()
         evaluations: List[Evaluation] = []
         with torch.no_grad():
-            for idx in validation_indices:
+            for idx in splitter.validation_indices:
                 sample = repo.get(idx)
                 input_tensor, label = dataset[idx]
                 input_tensor = input_tensor.unsqueeze(0).to(device)
                 output = model(input_tensor)
                 probability = round(output.item(), 3)
-                evaluations.append(Evaluation(sample.inference.label, probability))
+                evaluations.append(Evaluation(sample.contains_a_pass(), probability))
 
         brier_score = prediction_brier(evaluations)
         accuracy = prediction_accuracy(evaluations)
@@ -206,13 +201,13 @@ with mlflow.start_run(run_name=architecture):
 
     evaluations: List[Evaluation] = []
     with torch.no_grad():
-        for idx in test_indices:
+        for idx in splitter.test_indices:
             sample = repo.get(idx)
             input_tensor, label = dataset[idx]
             input_tensor = input_tensor.unsqueeze(0).to(device)
             output = model(input_tensor)
             probability = output.item()
-            evaluations.append(Evaluation(sample.inference.label, probability))
+            evaluations.append(Evaluation(sample.contains_a_pass(), probability))
 
     brier_score = prediction_brier(evaluations)
     accuracy = prediction_accuracy(evaluations)
@@ -225,49 +220,6 @@ with mlflow.start_run(run_name=architecture):
         recall=recall,
         accuracy=accuracy,
     )
-
-    # """SAVE PREDICTIONS TO DATASET"""
-    # model = best_run.model
-    # engineer = FeatureEngineer()
-    # for feature in best_run.config.features:
-    #     feature_instance = FeatureRegistry.create(feature)
-    #     engineer.add_feature(feature_instance)
-
-    # dataset = PassDataset(repo, num_samples, engineer)
-    #
-    # with torch.no_grad():
-    #     for idx in range(num_samples):
-    #         input_tensor, label = dataset[idx]
-    #         input_tensor = input_tensor.unsqueeze(0).to(device)
-    #         output = model(input_tensor)
-    #         probability = output.item()
-    #         sample = repo.get(idx)
-    #         computed_features = engineer.engineer(sample.recording.input_data)
-    #         sample_with_prediction = replace(
-    #             sample,
-    #             inference=Inference(
-    #                 prediction=probability,
-    #                 split=sample.inference.split,
-    #                 computed_features=computed_features,
-    #                 label=sample.recording.contains_a_pass,
-    #             )
-    #         )
-    #         repo.add(sample_with_prediction)
-
-    # """SAVE DATASET"""
-    # samples = [repo.get(idx) for idx in test_indices]
-    # # Save some to folder
-    # with open('dataset.pkl', 'wb') as f:
-    #     pickle.dump(samples, f)
-    #
-    # with open("dataset.json", 'w') as f:
-    #     json.dump(samples, f, cls=CustomEncoder)
-    #
-    # """PLOT SAMPLES"""
-    # for idx, id in enumerate(samples):
-    #     if not save_plots:
-    #         break
-    #     plot_sample_with_features(id, plot_dir)
 
     """EXPORT ONNX"""
     # Path for ONNX file

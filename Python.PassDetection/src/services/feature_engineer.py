@@ -1,7 +1,6 @@
-from typing import List, Tuple
+from typing import List
 
-from src.domain.inferences import Feature, ComputedFeatures
-from src.domain.recordings import InputData
+from src.domain.inferences import Feature, InputData
 
 
 class FeatureEngineer:
@@ -11,19 +10,12 @@ class FeatureEngineer:
     def add_feature(self, feature_calculator: Feature):
         self.features.append(feature_calculator)
 
-    def engineer(self, input_data: InputData) -> ComputedFeatures:
-
+    def engineer(self, input_data: InputData) -> List[float]:
         inputs = []
         for feature in self.features:
-            inputs.append(feature.calculate(input_data))
+            inputs.extend(feature.calculate(input_data))
 
-        flattened_values = []
-        for input in inputs:
-            flattened_values.extend(input.values)
-
-        desired_shape = len(inputs[0].values), len(self.features)
-        engineered_input_data = ComputedFeatures(flattened_values, desired_shape, inputs)
-        return engineered_input_data
+        return inputs
 
     @property
     def input_size(self) -> int:

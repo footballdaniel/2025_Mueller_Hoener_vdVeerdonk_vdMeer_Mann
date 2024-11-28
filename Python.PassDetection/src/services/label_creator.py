@@ -1,15 +1,17 @@
 from dataclasses import replace
 from typing import Iterator
 
-from src.domain.recordings import Recording  # Assuming Event is the base class for events
-from src.domain.samples import Sample
+from src.domain.samples import Sample, Recording, Event
 
 
-class LabelCreator:
+class Sampler:
+    @staticmethod
     def generate(
-        self, recording: Recording, sequence_length: int = 10, start_id: int = 0
+            recording: Recording,
+            sequence_length: int = 10,
+            start_id: int = 0
     ) -> Iterator[Sample]:
-        total_frames = len(recording.input_data.user_dominant_foot_positions)
+        total_frames = len(recording.user_dominant_foot_positions)
         current_id = start_id
 
         for event in recording.events:
@@ -27,21 +29,13 @@ class LabelCreator:
                 # Position of the event within the sequence
                 event_pos_in_sequence = event_idx - start_idx
 
-                # Extract the subsequence
-                subsequence_dominant = recording.input_data.user_dominant_foot_positions[
-                    start_idx:end_idx
-                ]
-                subsequence_non_dominant = recording.input_data.user_non_dominant_foot_positions[
-                    start_idx:end_idx
-                ]
-                subsequence_timestamps = recording.input_data.timestamps[start_idx:end_idx]
+                subsequence_dominant = recording.user_dominant_foot_positions[start_idx:end_idx]
+                subsequence_non_dominant = recording.user_non_dominant_foot_positions[start_idx:end_idx]
+                subsequence_timestamps = recording.timestamps[start_idx:end_idx]
 
                 # Adjust the event frame number relative to the subsequence
-                adjusted_event = replace(
-                    event, frame_number=event_pos_in_sequence
-                )
+                adjusted_event = replace(event, frame_number=event_pos_in_sequence)
 
-                # **Implemented TODO**:
                 # If the event is not a pass, but there is a pass event in the sequence, then skip
                 if not adjusted_event.is_pass:
                     # Collect events in the current window, excluding the current event
@@ -57,21 +51,17 @@ class LabelCreator:
                 updated_recording = replace(
                     recording,
                     events=[adjusted_event],
-                    input_data=replace(
-                        recording.input_data,
-                        user_dominant_foot_positions=subsequence_dominant,
-                        user_non_dominant_foot_positions=subsequence_non_dominant,
-                        timestamps=subsequence_timestamps,
-                    ),
+                    user_dominant_foot_positions=subsequence_dominant,
+                    user_non_dominant_foot_positions=subsequence_non_dominant,
+                    timestamps=subsequence_timestamps,
                     number_of_frames=sequence_length,
-                    duration=subsequence_timestamps[-1] - subsequence_timestamps[0],
+                    duration=subsequence_timestamps[-1] - subsequence_timestamps[0]
                 )
 
-                # Create the sample
                 sample = Sample(
                     id=current_id,
                     recording=updated_recording,
-                    event=adjusted_event,  # Assuming pass_event can be any event
                 )
-                current_id += 1
+
                 yield sample
+                current_id += 1  # Increment ID for each sample

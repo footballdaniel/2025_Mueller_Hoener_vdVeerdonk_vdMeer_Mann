@@ -1,23 +1,21 @@
-from dataclasses import replace
 from itertools import islice
-from typing import Tuple, List
+from typing import List
 
 from sklearn.model_selection import train_test_split
 
-from src.domain.inferences import Split
 from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 
 
 class TrainTestValidationSplitter:
-    @staticmethod
-    def split(
+
+    def __init__(
+            self,
             repo: RepositoryWithInMemoryCache,
             number_samples: int,
             train_percentage: float,
             validation_percentage: float,
             test_percentage: float,
-            random_state: int = 42
-    ) -> Tuple[List[int], List[int], List[int], int]:
+            random_state: int = 42):
         ids = []
         labels = []
         samples_iterator = islice(repo.get_all(), number_samples)
@@ -25,7 +23,7 @@ class TrainTestValidationSplitter:
         samples = []
         for sample in samples_iterator:
             ids.append(sample.id)
-            labels.append(int(sample.recording.contains_a_pass))
+            labels.append(int(sample.contains_a_pass()))
             samples.append(sample)
 
         # Normalize percentages
@@ -55,17 +53,22 @@ class TrainTestValidationSplitter:
             random_state=random_state
         )
 
-        # Update repository with split information
-        for idx in train_indices:
-            sample = replace(samples[idx], inference=replace(samples[idx].inference, split=Split.TRAIN))
-            repo.add(sample)
-        for idx in val_indices:
-            sample = replace(samples[idx], inference=replace(samples[idx].inference, split=Split.VALIDATION))
-            repo.add(sample)
-        for idx in test_indices:
-            sample = replace(samples[idx], inference=replace(samples[idx].inference, split=Split.TEST))
-            repo.add(sample)
+        self._train_indices = train_indices
+        self._validation_indices = val_indices
+        self._test_indices = test_indices
 
-        number_samples = len(train_indices) + len(val_indices) + len(test_indices)
+    @property
+    def validation_indices(self) -> List[int]:
+        return self._validation_indices
 
-        return train_indices, val_indices, test_indices, number_samples
+    @property
+    def test_indices(self) -> List[int]:
+        return self._test_indices
+
+    @property
+    def train_indices(self) -> List[int]:
+        return self._train_indices
+
+    @property
+    def number_samples(self) -> int:
+        return len(self._train_indices) + len(self._validation_indices) + len(self._test_indices)

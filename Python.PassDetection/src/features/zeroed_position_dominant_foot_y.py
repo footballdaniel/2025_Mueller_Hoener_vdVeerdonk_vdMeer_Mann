@@ -1,24 +1,15 @@
 from typing import List
 
-from src.domain.inferences import Feature
-from src.domain.recordings import InputData
+from src.domain.inferences import Feature, InputData
 
 
 class ZeroedPositionDominantFootY(Feature):
-    def __init__(self):
-        self._values = []
 
-    @property
-    def size(self) -> int:
-        return 1
-
-    def calculate(self, input_data: InputData) -> None:
+    def calculate(self, input_data: InputData) -> List[float]:
         dominant_positions = input_data.user_dominant_foot_positions
         origin = dominant_positions[0]
-        self._values = [
+        values = [
             p.y - origin.y for p in dominant_positions
         ]
+        return values
 
-    @property
-    def values(self) -> List[float]:
-        return self._values

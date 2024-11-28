@@ -4,7 +4,7 @@ from pathlib import Path
 import onnxruntime as ort
 import torch
 
-from src.domain.recordings import InputData
+from src.domain.inferences import InputData
 from src.services.feature_engineer import FeatureEngineer
 from src.services.recording_parser import RecordingParser
 

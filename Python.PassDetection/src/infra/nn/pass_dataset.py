@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Tuple
 
 import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
+from src.domain.inferences import InputData
 from src.domain.repositories import BaseRepository
 from src.domain.samples import Sample
 from src.services.feature_engineer import FeatureEngineer
@@ -24,10 +25,16 @@ class PassDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
         sample = self.repo.get(idx)
 
-        engineered_input = self.engineer.engineer(sample.recording.input_data)
+        input_data = InputData(
+            sample.recording.user_dominant_foot_positions,
+            sample.recording.user_non_dominant_foot_positions,
+            sample.recording.timestamps
+        )
 
-        input_tensor = torch.tensor(engineered_input.flattened_values, dtype=torch.float32)
-        input_tensor = input_tensor.view(engineered_input.dimensions[0], engineered_input.dimensions[1])
-        label = torch.tensor(sample.recording.contains_a_pass, dtype=torch.float32)
+        flattened_values = self.engineer.engineer(input_data)
+
+        input_tensor = torch.tensor(flattened_values, dtype=torch.float32)
+        input_tensor = input_tensor.view(len(sample.recording.timestamps), self.engineer.input_size)
+        label = torch.tensor(sample.contains_a_pass(), dtype=torch.float32)
 
         return input_tensor, label

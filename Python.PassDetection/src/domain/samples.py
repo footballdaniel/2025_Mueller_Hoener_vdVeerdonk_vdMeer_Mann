@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace, field
+from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
-from src.domain.augmentations import Augmentation, NoAugmentation
-from src.domain.inferences import Inference, NoInference
-from src.domain.recordings import Recording, Event
+from src.domain.common import Vector3
 
 
 class IngestableRecording:
@@ -33,73 +32,40 @@ class IngestableRecording:
         return hash(self.stem)
 
 
+class Foot(Enum):
+    UNASSIGNED = 0
+    RIGHT = 1
+    LEFT = 2
+
+    def mirror(self):
+        return Foot.LEFT if self == Foot.RIGHT else Foot.RIGHT
+
+
+@dataclass(frozen=True)
+class Event:
+    is_pass: bool
+    frame_number: int
+    foot: Foot
+    pass_id: int
+    timestamp: float
+
+
+@dataclass
+class Recording:
+    frame_rate_hz: int
+    number_of_frames: int
+    trial_number: int
+    duration: float
+    user_dominant_foot_positions: List[Vector3]
+    user_non_dominant_foot_positions: List[Vector3]
+    timestamps: List[float]
+    events: List[Event] = field(default_factory=list)
+
+
 @dataclass
 class Sample:
     id: int
     recording: Recording
-    event: Event
-    inference: Inference = field(default_factory=NoInference)
-    augmentation: Augmentation = field(default_factory=NoAugmentation)
 
-    def mirror(self) -> Sample:
-        """Return a mirrored version of the sample."""
-        new_recording = replace(
-            self.recording,
-            input_data=replace(
-                self.recording.input_data,
-                user_dominant_foot_positions=[pos.mirror_x() for pos in
-                                              self.recording.input_data.user_dominant_foot_positions],
-                user_non_dominant_foot_positions=[pos.mirror_x() for pos in
-                                                  self.recording.input_data.user_non_dominant_foot_positions],
-            ),
-        )
-        return replace(
-            self,
-            recording=new_recording,
-            augmentation=replace(
-                self.augmentation,
-                swapped_feet=True
-            ),
-        )
-
-    def rotate_around_y(self, angle_degrees: float) -> Sample:
-        new_recording = replace(
-            self.recording,
-            input_data=replace(
-                self.recording.input_data,
-                user_dominant_foot_positions=[
-                    pos.rotate_around_y(angle_degrees) for pos in self.recording.input_data.user_dominant_foot_positions
-                ],
-                user_non_dominant_foot_positions=[
-                    pos.rotate_around_y(angle_degrees) for pos in
-                    self.recording.input_data.user_non_dominant_foot_positions
-                ],
-            ),
-        )
-        return replace(
-            self,
-            recording=new_recording,
-            augmentation=replace(
-                self.augmentation,
-                rotation_angle=angle_degrees
-            ),
-        )
-
-    def swap_feet(self) -> Sample:
-        """Return a version of the sample with dominant and non-dominant foot positions swapped."""
-        new_recording = replace(
-            self.recording,
-            input_data=replace(
-                self.recording.input_data,
-                user_dominant_foot_positions=self.recording.input_data.user_non_dominant_foot_positions.copy(),
-                user_non_dominant_foot_positions=self.recording.input_data.user_dominant_foot_positions.copy(),
-            ),
-        )
-        return replace(
-            self,
-            recording=new_recording,
-            augmentation=replace(
-                self.augmentation,
-                swapped_feet=True
-            ),
-        )
+    def contains_a_pass(self) -> int:
+        return int(any([event.is_pass for event in self.recording.events]))

@@ -1,10 +1,11 @@
-from src.domain.inferences import Feature, Input
-from src.domain.recordings import InputData
+from typing import List
+
+from src.domain.inferences import Feature, InputData
 
 
 class VelocityMagnitudeDominantFoot(Feature):
 
-    def calculate(self, input_data: InputData) -> Input:
+    def calculate(self, input_data: InputData) -> List[float]:
         dominant_positions = input_data.user_dominant_foot_positions
         timestamps = input_data.timestamps
         values = []
@@ -20,4 +21,4 @@ class VelocityMagnitudeDominantFoot(Feature):
             values.append(magnitude)
 
         values.insert(0, 0.0)  # Insert a zero magnitude at the start
-        return Input(self.name, values)
+        return values
