@@ -247,7 +247,8 @@ with mlflow.start_run(run_name=architecture):
                 sample,
                 inference=replace(
                     sample.inference,
-                    pass_probability=probability
+                    pass_probability=probability,
+                    engineered_input=engineered_input
                 )
             )
             repo.add(sample_with_prediction)

@@ -4,7 +4,7 @@ from src.domain.inferences import Feature
 from src.domain.recordings import InputData
 
 
-class VelocityMagnitudeDominantFoot(Feature):
+class VelocityDominantFootX(Feature):
     def __init__(self):
         self._values = []
 
@@ -18,12 +18,9 @@ class VelocityMagnitudeDominantFoot(Feature):
             if dt == 0:
                 dt = 1e-6
             dx = (dominant_positions[i].x - dominant_positions[i - 1].x) / dt
-            dy = (dominant_positions[i].y - dominant_positions[i - 1].y) / dt
-            dz = (dominant_positions[i].z - dominant_positions[i - 1].z) / dt
-            magnitude = (dx ** 2 + dy ** 2 + dz ** 2) ** 0.5
-            self._values.append(magnitude)
+            self._values.append(dx)
 
-        self._values.insert(0, 0.0)  # Insert a zero magnitude at the start
+        self._values.insert(0, 0)  # Insert a zero velocity at the start
 
     @property
     def values(self) -> List[float]:

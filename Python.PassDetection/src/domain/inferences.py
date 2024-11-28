@@ -3,20 +3,21 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List
+from typing import List, Tuple
 
-from src.domain.recordings import InputData, NoInputData, EngineeredInputData, NoEngineeredInput
+from src.domain.recordings import InputData
 from src.features.feature_registry import FeatureRegistry
 
 
-class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
-    @property
-    @abc.abstractmethod
-    def size(self) -> int:
-        ...
+class Feature(abc.ABC, metaclass=FeatureRegistry):
 
     @abc.abstractmethod
-    def calculate(self, input_data: InputData) -> List[Target]:
+    def calculate(self, input_data: InputData) -> None:
+        ...
+
+    @property
+    @abc.abstractmethod
+    def values(self) -> List[float]:
         ...
 
     @property
@@ -24,18 +25,26 @@ class BaseFeature(abc.ABC, metaclass=FeatureRegistry):
         return self.__class__.__name__
 
 
-@dataclass(frozen=True)
-class Target:
-    """Represents a feature that has been calculated. This is part of the input for the model"""
-    name: str
-    values: List[float]
-
-
 class Split(Enum):
     UNASSIGNED = 0
     TRAIN = 1
     VALIDATION = 2
     TEST = 3
+
+
+@dataclass(frozen=True)
+class EngineeredInputData:
+    flattened_values: List[float]
+    outcome: int
+    dimensions: Tuple[int, int]
+    features: List[Feature]
+
+
+@dataclass(frozen=True)
+class NoEngineeredInput(EngineeredInputData):
+
+    def __init__(self):
+        super().__init__(flattened_values=[], outcome=0, dimensions=(0, 0), features=[])
 
 
 @dataclass(frozen=True)

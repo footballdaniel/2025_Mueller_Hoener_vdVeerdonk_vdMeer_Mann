@@ -11,7 +11,7 @@ def plot_sample_with_features(sample: Sample, plot_dir: Path):
     if not plot_dir.exists():
         plot_dir.mkdir(parents=True, exist_ok=True)
 
-    num_features = len(sample.inference.targets)
+    num_features = len(sample.inference.engineered_input.features)
     fig_height = num_features * 2  # Smaller figure height per feature
     fig, axs = plt.subplots(
         num_features, 1, figsize=(10, fig_height),
@@ -37,7 +37,7 @@ def plot_sample_with_features(sample: Sample, plot_dir: Path):
 
     for i in range(num_features):
         ax = axs[i]
-        feature = sample.inference.targets[i]
+        feature = sample.inference.engineered_input.features[i]
         time = sample.recording.input_data.timestamps
         ax.set_title(feature.name)
         ax.plot(time, feature.values, label=feature.name)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Tuple
+from typing import List
 
 from src.domain.common import Vector3
 
@@ -39,19 +39,6 @@ class InputData:
 @dataclass(frozen=True)
 class NoInputData(InputData):
     pass
-
-
-@dataclass(frozen=True)
-class EngineeredInputData:
-    flattened_values: List[float]
-    outcome: int
-    dimensions: Tuple[int, int]
-
-@dataclass(frozen=True)
-class NoEngineeredInput(EngineeredInputData):
-
-    def __init__(self):
-        super().__init__(flattened_values=[], outcome=0, dimensions=(0, 0))
 
 
 @dataclass
