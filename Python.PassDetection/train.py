@@ -45,6 +45,8 @@ test_percentage = 0.1
 plot_dir = Path("plots")
 output_dir_model = Path("../Unity.Interactions/Assets/Resources")
 save_plots = True
+# set pytorch seed
+torch.manual_seed(0)
 
 """PIPELINE"""
 with mlflow.start_run(run_name=architecture):
@@ -84,7 +86,7 @@ with mlflow.start_run(run_name=architecture):
         testing_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False)
 
         """MODEL"""
-        input_size = engineer.feature_size
+        input_size = engineer.input_size
         learning_rate = config.learning_rate
         num_epochs = config.epochs
         patience = config.early_stopping_patience
@@ -147,7 +149,7 @@ with mlflow.start_run(run_name=architecture):
             print(f"Validation Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.4f}")
 
             # Check for improvement
-            if avg_val_loss < best_val_loss:
+            if best_val_loss - avg_val_loss > config.early_stopping_delta:
                 best_val_loss = avg_val_loss
                 epochs_no_improve = 0
             else:
@@ -229,6 +231,7 @@ with mlflow.start_run(run_name=architecture):
 
     # Grab only the first sample from the last batch of val_loader for export
     example_input = inputs[0:1].cpu()  # First sample of last batch with batch size 1
+    example_input_flattened = example_input.view(-1).tolist()
     with torch.no_grad():
         example_output = model(example_input)
         example_output_values = example_output.squeeze().tolist()
@@ -262,12 +265,16 @@ with mlflow.start_run(run_name=architecture):
         metadata_props.value = json.dumps(feature_names)  # Serialize the list of feature names as JSON
 
         metadata_props = onnx_model.metadata_props.add()
-        metadata_props.key = "example_input"
-        metadata_props.value = str(example_input.tolist())  # Store example input as string
+        metadata_props.key = "input_shape"
+        metadata_props.value = json.dumps(engineer.shape.add_batch_dimension(1))  # Store input shape as string
 
         metadata_props = onnx_model.metadata_props.add()
-        metadata_props.key = "example_output"
-        metadata_props.value = str(example_output_values)  # Store example output as string
+        metadata_props.key = "sample_input"
+        metadata_props.value = str(example_input_flattened)  # Store example input as string
+
+        metadata_props = onnx_model.metadata_props.add()
+        metadata_props.key = "sample_output"
+        metadata_props.value = json.dumps(example_output_values)  # Store example output as string
         onnx.save(onnx_model, onnx_file_path)
 
     mlflow.log_params(asdict(config))

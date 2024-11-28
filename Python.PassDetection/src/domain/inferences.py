@@ -24,3 +24,16 @@ class Feature(abc.ABC, metaclass=FeatureRegistry):
     @property
     def name(self) -> str:
         return self.__class__.__name__
+
+
+class Shape(tuple):
+    def __new__(cls, *args):
+        if not all(isinstance(arg, int) for arg in args):
+            raise TypeError("All elements of a Shape must be integers.")
+        return super().__new__(cls, args)
+
+    def add_dimension(self, dimension: int) -> Shape:
+        return Shape(*self, dimension)
+
+    def add_batch_dimension(self, batch_size: int) -> Shape:
+        return Shape(batch_size, *self)
