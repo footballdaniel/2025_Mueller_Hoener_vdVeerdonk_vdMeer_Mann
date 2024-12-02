@@ -3,7 +3,7 @@ using System.Linq;
 using _Project.PassDetection.Common;
 using UnityEngine;
 
-namespace Interactions.Scripts.Infra.LSTM
+namespace Interactions.Scripts.Infra
 {
 	public class InputDataQueue
 	{

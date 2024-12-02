@@ -1,5 +1,5 @@
 ﻿using _Project.Interactions.Scripts.Domain;
-using Interactions.Scripts.Infra.LSTM;
+using Interactions.Scripts.Infra;
 using UnityEngine;
 
 namespace Interactions.Scripts.Application.States

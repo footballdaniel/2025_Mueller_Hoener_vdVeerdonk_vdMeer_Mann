@@ -1,14 +1,10 @@
-﻿using Interactions.Scripts.Application.States;
+﻿using _Project.Interactions.Scripts.UI;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.Scripts.UI
 {
 	public class LabUI : UIScreen
 	{
 		
-		public void Bind(LabTrialViewModel viewModel)
-		{
-			
-		}
 		
 	}
 }
