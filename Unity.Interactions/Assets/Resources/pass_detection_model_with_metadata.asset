@@ -12,33 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e81e42152c7486f954ca57c4dfaddce, type: 3}
   m_Name: pass_detection_model_with_metadata
   m_EditorClassIdentifier: 
-  modelAssetPath: pass_detection_model
-  metaData:
-    DocString: LSTM Model for pass detection
-    Domain: com.tactivesport.feedback
-    IRVersion: 8
-    ProducerName: Tactive Sport
-    ProducerVersion: 1
-    ModelVersion: 1
-    m_MetadataKeys:
-    - features
-    - input_shape
-    - sample_input
-    - sample_output
-    m_MetadataValues:
-    - '["VelocityMagnitudeDominantFoot", "VelocityMagnitudeNonDominantFoot"]'
-    - '[1, 10, 2]'
-    - '[0.0, 2.8249220848083496, 2.7162420749664307, 2.9991354942321777, 1.637165904045105,
-      0.4080095887184143, 0.30887746810913086, 0.7194290161132812, 0.5093351006507874,
-      1.0435363054275513, 0.0, 0.13039670884609222, 0.1909647136926651, 0.04853671044111252,
-      0.1567256897687912, 0.6624512672424316, 2.0273959636688232, 2.369267463684082,
-      1.6640660762786865, 0.5629588961601257]'
-    - 0.1370900720357895
-  featureNames:
+  _modelAssetPath: pass_detection_model
+  _featureNames:
   - VelocityMagnitudeDominantFoot
   - VelocityMagnitudeNonDominantFoot
-  inputShape: 010000000a00000002000000
-  sampleInput:
+  _inputShape: 010000000a00000002000000
+  _sampleInput:
   - 0
   - 2.824922
   - 2.716242
@@ -59,4 +38,4 @@ MonoBehaviour:
   - 2.3692675
   - 1.6640661
   - 0.5629589
-  sampleOutput: 0.13709007
+  _sampleOutput: 0.13709007

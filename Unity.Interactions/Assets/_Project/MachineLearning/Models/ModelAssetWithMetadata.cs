@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Unity.Sentis;
 using UnityEngine;
 
 namespace Tactive.MachineLearning.Models
@@ -8,40 +6,28 @@ namespace Tactive.MachineLearning.Models
 	[CreateAssetMenu(fileName = "ModelAssetWithMetadata", menuName = "ScriptableObjects/ModelAssetWithMetadata")]
 	public class ModelAssetWithMetadata : ScriptableObject
 	{
-		[SerializeField] string modelAssetPath;
+		[SerializeField] string _modelAssetPath;
 
-		[SerializeField] ONNXModelMetadata metaData;
+		[SerializeField] List<string> _featureNames;
 
-		[SerializeField] List<string> featureNames;
+		[SerializeField] List<int> _inputShape;
 
-		[SerializeField] List<int> inputShape;
+		[SerializeField] List<float> _sampleInput;
 
-		[SerializeField] List<float> sampleInput;
+		[SerializeField] float _sampleOutput;
+		public string ModelAssetPath => _modelAssetPath;
+		public List<string> FeatureNames => _featureNames;
+		public List<int> InputShape => _inputShape;
+		public List<float> SampleInput => _sampleInput;
+		public float SampleOutput => _sampleOutput;
 
-		[SerializeField] float sampleOutput;
-		public string ModelAssetPath => modelAssetPath;
-		public ONNXModelMetadata MetaData => metaData;
-		public List<string> FeatureNames => featureNames;
-		public List<int> InputShape => inputShape;
-		public List<float> SampleInput => sampleInput;
-		public float SampleOutput => sampleOutput;
-
-		public void Initialize(ONNXModelMetadata metadata, string modelAssetPath)
+		public void Initialize(List<string> metadata, List<int> inputShape, List<float> sampleInput, float sampleOutput, string modelAssetPath)
 		{
-			this.modelAssetPath = modelAssetPath;
-			metaData = metadata;
-
-			if (metadata.MetadataProps.TryGetValue("features", out var featureNamesJson))
-				featureNames = JsonConvert.DeserializeObject<List<string>>(featureNamesJson);
-
-			if (metadata.MetadataProps.TryGetValue("input_shape", out var inputShapeJson))
-				inputShape = JsonConvert.DeserializeObject<List<int>>(inputShapeJson);
-
-			if (metadata.MetadataProps.TryGetValue("sample_input", out var sampleInputJson))
-				sampleInput = JsonConvert.DeserializeObject<List<float>>(sampleInputJson);
-
-			if (metadata.MetadataProps.TryGetValue("sample_output", out var sampleOutputJson))
-				sampleOutput = JsonConvert.DeserializeObject<float>(sampleOutputJson);
+			_featureNames = metadata;
+			_inputShape = inputShape;
+			_sampleInput = sampleInput;
+			_sampleOutput = sampleOutput;
+			_modelAssetPath = modelAssetPath;
 		}
 	}
 }

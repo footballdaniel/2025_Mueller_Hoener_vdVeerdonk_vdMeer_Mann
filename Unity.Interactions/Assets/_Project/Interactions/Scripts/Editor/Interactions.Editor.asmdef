@@ -1,0 +1,18 @@
+{
+    "name": "Interactions.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4f4864879987c63429f81b3fd17aab6b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

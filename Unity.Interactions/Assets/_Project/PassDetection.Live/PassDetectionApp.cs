@@ -10,7 +10,7 @@ namespace _Project.PassDetection.Live
 		[Header("Dependencies"), SerializeField] XRTracker _dominantFootTracker;
 		[SerializeField] XRTracker _nonDominantFootTracker;
 		[SerializeField] ModelAssetWithMetadata _lstmModelAsset;
-		
+		[SerializeField] AudioClip _passSound;
 		
 		InputDataQueue _inputDataQueue;
 		float _timeSinceLevelStart;
@@ -44,7 +44,13 @@ namespace _Project.PassDetection.Live
 				_inputDataQueue.EnQueue(dominantFootPosition, nonDominantFootPosition, time);
 				var prediction = _lstmModel.Evaluate(_inputDataQueue.ToInputData());
 				
-				Debug.Log(prediction);
+				
+				
+				if (prediction > 0.95f)
+				{
+					Debug.Log(prediction);
+					AudioSource.PlayClipAtPoint(_passSound, Camera.main.transform.position);
+				}
 
 				_updateTimer -= deltaTime;
 			}
