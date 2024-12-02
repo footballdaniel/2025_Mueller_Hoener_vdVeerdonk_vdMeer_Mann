@@ -22,10 +22,14 @@ namespace _Project.PassDetection.Live
 			_inputDataQueue = new InputDataQueue();
 			_timeSinceLevelStart = Time.time;
 			_lstmModel = new LstmModel(_lstmModelAsset);
+			
 		}
 
 		void Update()
 		{
+			Application.targetFrameRate = 60; // or any desired value
+			
+			
 			var frameRateHz = 10f;
 			var deltaTime = 1f / frameRateHz;
 			_updateTimer += Time.fixedDeltaTime;
