@@ -15,10 +15,10 @@ namespace Interactions.Application
 	{
 		[Header("Settings")]
 		public bool RecordVideo;
-
 		public int RecordingFrameRateHz = 10;
 		public Side DominantFootSide;
 		public ModelAssetWithMetadata LstmModelAsset;
+		public AudioClip PassSoundClip;
 
 		[Header("Services")] public MainUI UI { get; private set; }
 		public ExperimentalCondition ExperimentalCondition { get; set; }
@@ -33,6 +33,7 @@ namespace Interactions.Application
 		public StateMachine StateMachine { get; private set; }
 
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
+		
 
 		void Start()
 		{

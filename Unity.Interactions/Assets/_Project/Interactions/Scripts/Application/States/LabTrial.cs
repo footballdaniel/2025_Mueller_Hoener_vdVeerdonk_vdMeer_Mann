@@ -9,6 +9,7 @@ namespace Interactions.Application.States
 		bool _hasPassed;
 		InputDataQueue _inputDataQueue;
 		float _updateTimer;
+		float _lastPassTime;
 
 		public LabTrial(App app) : base(app)
 		{
@@ -22,13 +23,15 @@ namespace Interactions.Application.States
 			_app.Experiment.Ball = Object.Instantiate(_app.BallPrefab);
 			_app.Experiment.Opponent.Set(_app.User);
 
-			_app.User.DominantFoot.Passed += OnPassed;
+			// _app.User.DominantFoot.Passed += OnPassed;
+			
+			_lastPassTime = Time.time;
 		}
 
 		public override void Exit()
 		{
 			_hasPassed = false;
-			_app.User.DominantFoot.Passed -= OnPassed;
+			// _app.User.DominantFoot.Passed -= OnPassed;
 		}
 
 		public override void Tick()
@@ -47,7 +50,20 @@ namespace Interactions.Application.States
 				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
 
 				_inputDataQueue.EnQueue(_app.User.DominantFoot.transform.position, _app.User.NonDominantFoot.transform.position, _app.Experiment.CurrentTrial.Duration);
-				Debug.Log(_app.LstmModel.Evaluate(_inputDataQueue.ToInputData()));
+				
+				var prediction = _app.LstmModel.Evaluate(_inputDataQueue.ToInputData());
+
+				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
+				{
+					
+					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
+					_lastPassTime = Time.time; // Update the last pass time
+
+					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
+					
+					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passVelocity.normalized);
+					OnPassed(pass);
+				}
 
 				_app.Experiment.WebcamRecorder.Tick();
 				_updateTimer -= deltaTime;
@@ -60,7 +76,7 @@ namespace Interactions.Application.States
 
 			_hasPassed = true;
 			_app.Experiment.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-			_app.Experiment.Ball.Set(pass);
+			_app.Experiment.Ball.Play(pass);
 		}
 	}
 }

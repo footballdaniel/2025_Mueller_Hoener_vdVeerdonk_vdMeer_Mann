@@ -7,37 +7,9 @@ namespace Interactions.Infra
 {
 	public class InputDataQueue
 	{
-		readonly int _maxSize;
-
-		Queue<Vector3> _dominantFootPositions = new();
-		Queue<Vector3> _nonDominantFootPositions = new();
-		Queue<float> _timestamps = new();
-
 		public InputDataQueue(int maxSize = 10)
 		{
 			_maxSize = maxSize;
-		}
-
-		public InputData ToInputData()
-		{
-			// Convert queues to lists
-			var dominantFootList = _dominantFootPositions.ToList();
-			var nonDominantFootList = _nonDominantFootPositions.ToList();
-			var timestampList = _timestamps.ToList();
-
-			// Left pad each list to _maxSize with default values
-			PadLeft(dominantFootList, Vector3.zero, _maxSize);
-			PadLeft(nonDominantFootList, Vector3.zero, _maxSize);
-			PadLeft(timestampList, 0f, _maxSize);
-
-			// Create InputData object
-			return new InputData(dominantFootList, nonDominantFootList, timestampList);
-		}
-
-		void PadLeft<T>(List<T> list, T defaultValue, int targetSize)
-		{
-			while (list.Count < targetSize)
-				list.Insert(0, defaultValue); // Add default value to the beginning of the list
 		}
 
 		public void EnQueue(Vector3 dominantFootPosition, Vector3 nonDominantFootPosition, float timestamp)
@@ -53,5 +25,57 @@ namespace Interactions.Infra
 			_nonDominantFootPositions.Enqueue(nonDominantFootPosition);
 			_timestamps.Enqueue(timestamp);
 		}
+
+		public Vector3 CalculateGetHighestObservedVelocity()
+		{
+			var dominantFootList = _dominantFootPositions.ToList();
+			var timestampList = _timestamps.ToList();
+
+			if (dominantFootList.Count < 2 || timestampList.Count < 2)
+				return Vector3.zero;
+
+			var highestVelocity = Vector3.zero;
+
+			for (var i = 1; i < dominantFootList.Count; i++)
+			{
+				var deltaPosition = dominantFootList[i] - dominantFootList[i - 1];
+				var deltaTime = timestampList[i] - timestampList[i - 1];
+
+				if (deltaTime > 0)
+				{
+					var velocity = deltaPosition / deltaTime;
+
+					if (velocity.magnitude > highestVelocity.magnitude)
+						highestVelocity = velocity;
+				}
+			}
+
+			return highestVelocity;
+		}
+
+		public InputData ToInputData()
+		{
+			var dominantFootList = _dominantFootPositions.ToList();
+			var nonDominantFootList = _nonDominantFootPositions.ToList();
+			var timestampList = _timestamps.ToList();
+
+			PadLeft(dominantFootList, Vector3.zero, _maxSize);
+			PadLeft(nonDominantFootList, Vector3.zero, _maxSize);
+			PadLeft(timestampList, 0f, _maxSize);
+
+			return new InputData(dominantFootList, nonDominantFootList, timestampList);
+		}
+
+		void PadLeft<T>(List<T> list, T defaultValue, int targetSize)
+		{
+			while (list.Count < targetSize)
+				list.Insert(0, defaultValue);
+		}
+
+		readonly Queue<Vector3> _dominantFootPositions = new();
+
+		readonly int _maxSize;
+		readonly Queue<Vector3> _nonDominantFootPositions = new();
+		readonly Queue<float> _timestamps = new();
 	}
 }

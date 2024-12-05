@@ -4763,6 +4763,7 @@ MonoBehaviour:
   RecordingFrameRateHz: 10
   DominantFootSide: 0
   LstmModelAsset: {fileID: 11400000, guid: a0277abb140ae2c498c3bcc052e47bd2, type: 2}
+  PassSoundClip: {fileID: 8300000, guid: 16f8e268a70602f4ebd9d9789d950d86, type: 3}
 --- !u!1 &1856460593
 GameObject:
   m_ObjectHideFlags: 0
