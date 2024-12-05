@@ -62,6 +62,8 @@ namespace Interactions.Application.States
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
 					var ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					ball.Play(pass);
+					
+					_app.Experiment.Opponent.Intercept(ball);
 			
 					_app.Experiment.Ball = ball;
 				}
