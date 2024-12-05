@@ -264,6 +264,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 597534765}
+  - component: {fileID: 597534766}
   - component: {fileID: 597534764}
   m_Layer: 0
   m_Name: UI
@@ -307,6 +308,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &597534766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597534763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a44ae78bf7e3c94db088224b4770fe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiDocument: {fileID: 597534764}
 --- !u!1 &751687338
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,6 +619,7 @@ MonoBehaviour:
   _nonDominantFootTracker: {fileID: 751687339}
   _lstmModelAsset: {fileID: 11400000, guid: a0277abb140ae2c498c3bcc052e47bd2, type: 2}
   _passSound: {fileID: 8300000, guid: 16f8e268a70602f4ebd9d9789d950d86, type: 3}
+  _ui: {fileID: 597534766}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

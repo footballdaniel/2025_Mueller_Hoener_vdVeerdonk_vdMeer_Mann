@@ -52,6 +52,7 @@ namespace Interactions.Scripts.Application
 
 			// States
 			var xrStartupState = new XRStartupState(this);
+			var selectCondition = new SelectConditionState(this);
 			var init = new InitState(this);
 			var webcamSelection = new SelectWebcamState(this);
 			var waitForNextTrial = new WaitForNextTrialState(this);
@@ -64,7 +65,8 @@ namespace Interactions.Scripts.Application
 			var inSituTrial = new InSituTrialState(this);
 
 			// Flow for starting app
-			Transitions.Init = new Transition(this, xrStartupState, init);
+			Transitions.SelectCondition = new Transition(this, xrStartupState, selectCondition);
+			Transitions.Init = new Transition(this, selectCondition, init);	
 
 			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
@@ -95,7 +97,8 @@ namespace Interactions.Scripts.Application
 
 			// Cheats to transition between states
 			if (Keyboard.current.digit1Key.wasPressedThisFrame)
-				Transitions.Init.Execute();
+				Transitions.SelectCondition.Execute();
 		}
 	}
+
 }

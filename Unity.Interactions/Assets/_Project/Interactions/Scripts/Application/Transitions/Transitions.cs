@@ -17,6 +17,7 @@ namespace Interactions.Scripts.Application.Transitions
 		public Transition EndInSituTrial { get; set; }
 		public Transition EndLabTrialAfterExporting { get; set; }
 		public Transition WaitForNextTrialInSitu { get; set; }
+		public Transition SelectCondition { get; set; }
 		public Transition Init { get; set; }
 	}
 }

@@ -5,7 +5,7 @@ namespace Interactions.Scripts.Application.States
 	internal class InitState : State
 	{
 
-		public InitState(global::Interactions.Scripts.Application.App app) : base(app)
+		public InitState(App app) : base(app)
 		{
 		}
 
@@ -14,7 +14,7 @@ namespace Interactions.Scripts.Application.States
 		{
 			var experimentViewModel = new ExperimentViewModel(_app);
 			_app.UI.experimentOverlay.Bind(experimentViewModel);
-			
+
 			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
 				_app.UI.InSituUI.Show();
 		}
@@ -26,7 +26,5 @@ namespace Interactions.Scripts.Application.States
 			else
 				_app.Transitions.BeginExperiment.Execute();
 		}
-		
-		
 	}
 }

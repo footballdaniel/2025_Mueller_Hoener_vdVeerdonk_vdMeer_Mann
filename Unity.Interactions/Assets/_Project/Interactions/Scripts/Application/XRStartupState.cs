@@ -17,7 +17,7 @@ namespace Interactions.Scripts.Application
 			_app.UI.XRStatusUI.Show();
 			
 			if (!XRStatus.HasXRErrors())
-				_app.Transitions.Init.Execute();
+				_app.Transitions.SelectCondition.Execute();
 		}
 		
 		public override void Exit()

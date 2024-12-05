@@ -3,5 +3,9 @@
     <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center; justify-content: center; min-width: 991px; align-content: auto;">
         <engine:Label text="Pass Probability" style="-unity-font-definition: url(&quot;project://database/Library/unity%20editor%20resources?fileID=3413707813048797061&amp;guid=0000000000000000d000000000000000&amp;type=0#Inter-Regular&quot;); font-size: 60px;" />
         <engine:Slider label="Slider" value="42" high-value="100" name="MySlider" style="min-width: 300px;" />
+        <engine:VisualElement name="PassCount" style="flex-grow: 0; flex-direction: row;">
+            <engine:Label text="Number of passes:" />
+            <engine:Label text="0" binding-path="0" name="pass-count" />
+        </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
