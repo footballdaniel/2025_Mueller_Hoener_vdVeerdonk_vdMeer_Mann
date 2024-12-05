@@ -1,12 +1,14 @@
-﻿using Interactions.Scripts.Application.States;
-using Interactions.Scripts.Application.ViewModels;
+﻿using Interactions.Application.States;
+using Interactions.Application.ViewModels;
+using Interactions.Domain;
 using UnityEngine;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	internal class InSituTrial : State
 	{
 		float _updateTimer;
+		InSituOpponent _opponent;
 
 		public InSituTrial(App app) : base(app)
 		{
@@ -15,6 +17,7 @@ namespace Interactions.Scripts.Application
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
+			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
 
 			var viewModel = new InSituTrialViewModel(_app);
 			_app.UI.InSituUI.Bind(viewModel);
@@ -22,6 +25,7 @@ namespace Interactions.Scripts.Application
 
 		public override void Exit()
 		{
+			Object.Destroy(_opponent.gameObject);
 			_app.Experiment.WebcamRecorder.StopRecording();
 			_app.Experiment.CurrentTrial.Save();
 		}
@@ -34,7 +38,7 @@ namespace Interactions.Scripts.Application
 
 			if (_updateTimer >= deltaTime - epsilon)
 			{
-				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.InSituOpponent.Hips);
+				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_opponent.Hips);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);

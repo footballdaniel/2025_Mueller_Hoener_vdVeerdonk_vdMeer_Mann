@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public abstract class UIScreen : MonoBehaviour
 	{

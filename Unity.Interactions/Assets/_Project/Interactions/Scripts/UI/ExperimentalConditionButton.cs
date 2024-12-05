@@ -1,9 +1,9 @@
-using Interactions.Scripts.Application;
+using Interactions.Application;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class ExperimentalConditionButton : MonoBehaviour
 	{

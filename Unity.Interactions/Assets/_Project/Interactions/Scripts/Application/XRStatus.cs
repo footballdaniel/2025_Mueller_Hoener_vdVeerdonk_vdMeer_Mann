@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.XR.Management;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	internal class XRStatus
 	{

@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorder;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Infra
+namespace Interactions.Infra
 {
 	public class FFMpegWebcamRecorder : IWebcamRecorder
 	{
@@ -14,7 +14,7 @@ namespace _Project.Interactions.Scripts.Infra
 			_progress = progress;
 			_exportFramerate = 10f;
 
-			_frameFolderPath = Path.Combine(Application.persistentDataPath, "CapturedFrames");
+			_frameFolderPath = Path.Combine(UnityEngine.Application.persistentDataPath, "CapturedFrames");
 		}
 
 		public Texture2D Frame => _texture2D;
@@ -29,7 +29,7 @@ namespace _Project.Interactions.Scripts.Infra
 		{
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 			var fileName = $"trial_{trialNumber}_{fileNameWithDateTime}.mp4";
-			var videoOutputPath = Path.Combine(Application.persistentDataPath, fileName);
+			var videoOutputPath = Path.Combine(UnityEngine.Application.persistentDataPath, fileName);
 
 
 			FFMpegExporter.ExportCompleted += OnExportCompleted;

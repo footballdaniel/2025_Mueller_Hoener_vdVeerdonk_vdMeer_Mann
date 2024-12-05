@@ -1,11 +1,11 @@
 using System;
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
-using Interactions.Scripts.Application.ViewModels;
+using Interactions.Application.ViewModels;
+using Interactions.Domain.VideoRecorder;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class ExperimentOverlay : MonoBehaviour
 	{

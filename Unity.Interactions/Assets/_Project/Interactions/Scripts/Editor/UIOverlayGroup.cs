@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using _Project.Interactions.Scripts.UI;
-using Interactions.Scripts.UI;
+using Interactions.UI;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -9,7 +8,7 @@ using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace _Project.Interactions.Scripts.Editor
+namespace _Project.Interactions.Editor
 {
 	[InitializeOnLoad, Overlay(typeof(SceneView), "ID_UISelectionOverlay", "UI Selection", defaultDisplay = true)]
 	internal class UIOverlay : IMGUIOverlay, ITransientOverlay, IPreprocessBuildWithReport

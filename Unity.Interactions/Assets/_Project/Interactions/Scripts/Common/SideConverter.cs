@@ -1,8 +1,8 @@
 using System;
-using _Project.Interactions.Scripts.Domain;
+using Interactions.Domain;
 using Newtonsoft.Json;
 
-namespace _Project.Interactions.Scripts.Common
+namespace Interactions.Common
 {
 	public class SideEnumConverter : JsonConverter
 	{

@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b88f07c8f13784495e50735ef914d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  experimentOverlay: {fileID: 403343059}
+  ExperimentOverlay: {fileID: 403343059}
   WebcamSelectionUI: {fileID: 1310024550}
   InSituUI: {fileID: 630029420}
   XRStatusUI: {fileID: 1944435368}
@@ -609,54 +609,6 @@ RectTransform:
   m_AnchoredPosition: {x: 195.9, y: -47.78}
   m_SizeDelta: {x: 100, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &212727357
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 212727359}
-  - component: {fileID: 212727358}
-  m_Layer: 0
-  m_Name: DefenderHips
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &212727358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 212727357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9390a5ab238d474883731f758db70bfd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _positionAction: {fileID: -7951496117301714602, guid: 53a08a6060541574788d1f5191c83ae0,
-    type: 3}
-  _isXForward: 1
-  <TrackerMappingName>k__BackingField: Waist
---- !u!4 &212727359
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 212727357}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 370643115}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &217655546
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,7 +957,6 @@ Transform:
   - {fileID: 6364217007249889605}
   - {fileID: 6364217008209439675}
   - {fileID: 1932555424}
-  - {fileID: 212727359}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &395314954
@@ -2172,51 +2123,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &560600254
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 560600256}
-  - component: {fileID: 560600255}
-  m_Layer: 0
-  m_Name: InSituOpponent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &560600255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 560600254}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6538c133917bba545b60a0259aea2453, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hipsTracker: {fileID: 212727358}
---- !u!4 &560600256
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 560600254}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &630029419
 GameObject:
   m_ObjectHideFlags: 0
@@ -3222,11 +3128,11 @@ MonoBehaviour:
   _prefabs:
   - {fileID: 5493152933407461402, guid: 318d89d166f7740499eaf4c02847f448, type: 3}
   - {fileID: 5629581505529870963, guid: 7b86594d773929c46823c0342271ad3c, type: 3}
+  - {fileID: 7020358179557859020, guid: 6224fb796e9c81b47b1a9d94fd9deddb, type: 3}
   _monobehaviours:
   - {fileID: 101493838}
   - {fileID: 893183428}
   - {fileID: 1549007961}
-  - {fileID: 560600254}
   _nonMonoBehaviours: []
 --- !u!1 &1015579754
 GameObject:
@@ -3664,7 +3570,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6ba471db894fe7bfac325862bb1400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _webcamConfigButtonPrefab: {fileID: 0}
+  _webcamConfigButtonPrefab: {fileID: 7561531539574190614, guid: 29615973d15b1584cb4093d1e9c2783c,
+    type: 3}
   _webcamConfigRoot: {fileID: 936901984}
 --- !u!1 &1316850403
 GameObject:
@@ -5723,5 +5630,4 @@ SceneRoots:
   - {fileID: 128303749}
   - {fileID: 101493840}
   - {fileID: 893183430}
-  - {fileID: 560600256}
   - {fileID: 370643115}

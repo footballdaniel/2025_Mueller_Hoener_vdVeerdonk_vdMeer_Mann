@@ -1,10 +1,10 @@
-using Interactions.Scripts.Application.States;
+using Interactions.Application.States;
 
-namespace Interactions.Scripts.Application.Transitions
+namespace Interactions.Application.Transitions
 {
 	public class Transition
 	{
-		public Transition(global::Interactions.Scripts.Application.App app, State from, State to, IPredicate predicate = null)
+		public Transition(global::Interactions.Application.App app, State from, State to, IPredicate predicate = null)
 		{
 			_stateMachine = app.StateMachine;
 			_from = from;

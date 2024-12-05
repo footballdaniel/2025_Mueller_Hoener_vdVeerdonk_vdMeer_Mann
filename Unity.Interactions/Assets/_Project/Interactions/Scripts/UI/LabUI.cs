@@ -1,6 +1,4 @@
-﻿using _Project.Interactions.Scripts.UI;
-
-namespace Interactions.Scripts.UI
+﻿namespace Interactions.UI
 {
 	public class LabUI : UIScreen
 	{

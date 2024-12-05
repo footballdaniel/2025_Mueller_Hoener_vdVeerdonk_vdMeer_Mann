@@ -1,9 +1,8 @@
-﻿using _Project.Interactions.Scripts.UI;
-using Interactions.Scripts.Application.ViewModels;
+﻿using Interactions.Application.ViewModels;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class InSituUI : UIScreen
 	{

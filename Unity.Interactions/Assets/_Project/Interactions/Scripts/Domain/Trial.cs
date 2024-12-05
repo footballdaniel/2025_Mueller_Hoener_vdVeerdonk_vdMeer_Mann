@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using _Project.Interactions.Scripts.Common;
-using _Project.Interactions.Scripts.Domain;
+using Interactions.Common;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 	public class Trial
 	{

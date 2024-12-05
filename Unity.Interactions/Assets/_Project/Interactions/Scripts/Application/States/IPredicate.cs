@@ -1,4 +1,4 @@
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	public interface IPredicate
 	{

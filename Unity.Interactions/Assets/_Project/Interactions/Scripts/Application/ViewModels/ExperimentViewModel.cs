@@ -1,8 +1,8 @@
 ﻿using System;
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorder;
 using UnityEditor;
 
-namespace Interactions.Scripts.Application.ViewModels
+namespace Interactions.Application.ViewModels
 {
 	public class ExperimentViewModel
 	{

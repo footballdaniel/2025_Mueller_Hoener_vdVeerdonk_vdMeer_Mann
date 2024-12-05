@@ -1,8 +1,7 @@
 ﻿using System;
-using _Project.Interactions.Scripts.Domain;
 using UnityEngine;
 
-namespace Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 	public class DominantFoot : MonoBehaviour
 	{

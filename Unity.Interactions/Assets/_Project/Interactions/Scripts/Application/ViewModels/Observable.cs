@@ -1,6 +1,6 @@
 using System;
 
-namespace Interactions.Scripts.Application.ViewModels
+namespace Interactions.Application.ViewModels
 {
 	public class Observable<T>
 	{

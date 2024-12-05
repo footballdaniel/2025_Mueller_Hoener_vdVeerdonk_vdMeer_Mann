@@ -1,8 +1,7 @@
-using Interactions.Scripts.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class MainUI : MonoBehaviour
 	{

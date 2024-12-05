@@ -1,14 +1,14 @@
-﻿using _Project.Interactions.Scripts.Domain.VideoRecorder;
+﻿using Interactions.Domain.VideoRecorder;
 using UnityEngine;
 
-namespace Interactions.Scripts.Application.ViewModels
+namespace Interactions.Application.ViewModels
 {
 	public class InSituTrialViewModel
 	{
-		readonly global::Interactions.Scripts.Application.App _app;
+		readonly global::Interactions.Application.App _app;
 		readonly IWebcamRecorder _recorder;
 
-		public InSituTrialViewModel(global::Interactions.Scripts.Application.App app)
+		public InSituTrialViewModel(global::Interactions.Application.App app)
 		{
 			_app = app;
 		}

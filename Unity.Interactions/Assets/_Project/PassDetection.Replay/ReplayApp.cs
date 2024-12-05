@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
-using _Project.Interactions.Scripts.Common;
-using _Project.Interactions.Scripts.Domain;
 using _Project.PassDetection.Common;
 using _Project.PassDetectionReplay;
-using Interactions.Scripts.Domain;
+using Interactions.Common;
+using Interactions.Domain;
 using Newtonsoft.Json;
 using Tactive.MachineLearning.Models;
 using UnityEngine;

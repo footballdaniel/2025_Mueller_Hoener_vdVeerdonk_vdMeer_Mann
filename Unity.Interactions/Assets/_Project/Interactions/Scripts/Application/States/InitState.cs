@@ -1,6 +1,6 @@
-﻿using Interactions.Scripts.Application.ViewModels;
+﻿using Interactions.Application.ViewModels;
 
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	internal class InitState : State
 	{

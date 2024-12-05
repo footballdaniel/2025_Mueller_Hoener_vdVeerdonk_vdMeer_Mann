@@ -1,10 +1,10 @@
-﻿namespace Interactions.Scripts.Application.States
+﻿namespace Interactions.Application.States
 {
 	public class State
 	{
-		protected readonly global::Interactions.Scripts.Application.App _app;
+		protected readonly global::Interactions.Application.App _app;
 
-		protected State(global::Interactions.Scripts.Application.App app)
+		protected State(global::Interactions.Application.App app)
 		{
 			_app = app;
 		}

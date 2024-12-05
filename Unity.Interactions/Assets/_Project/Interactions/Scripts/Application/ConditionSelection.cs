@@ -1,6 +1,6 @@
-using Interactions.Scripts.Application.States;
+using Interactions.Application.States;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	public class ConditionSelection : State
 	{

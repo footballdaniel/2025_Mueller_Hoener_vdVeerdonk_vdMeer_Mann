@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using _Project.Interactions.Scripts.Infra;
+using Interactions.Infra;
 using UnityEngine;
 using UnityEngine.Windows.WebCam;
 
-namespace _Project.Interactions.Scripts.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorder
 {
 	public class WebcamRecorderRepository : MonoBehaviour, IRepository<IWebcamRecorder>
 	{

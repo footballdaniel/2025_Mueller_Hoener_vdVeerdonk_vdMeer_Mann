@@ -1,6 +1,6 @@
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorder;
 
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	internal class ExportVideo : State
 	{

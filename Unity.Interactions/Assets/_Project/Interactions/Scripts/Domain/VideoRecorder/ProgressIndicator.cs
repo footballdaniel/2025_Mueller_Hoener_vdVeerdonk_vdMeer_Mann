@@ -1,6 +1,6 @@
 using System;
 
-namespace _Project.Interactions.Scripts.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorder
 {
 	public class ProgressIndicator : IProgress<int>
 	{

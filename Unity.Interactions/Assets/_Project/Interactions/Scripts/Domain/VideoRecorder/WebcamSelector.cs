@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Interactions.Scripts.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorder
 {
 	public class WebcamSelector : MonoBehaviour
 	{

@@ -1,7 +1,6 @@
-using Interactions.Scripts.Domain;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 	public class User : MonoBehaviour, IUser
 	{

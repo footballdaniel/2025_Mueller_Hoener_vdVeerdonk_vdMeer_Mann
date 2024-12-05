@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Interactions.Scripts.Editor
+namespace _Project.Interactions.Editor
 {
 	public static class SteamVRConfigModifier
 	{

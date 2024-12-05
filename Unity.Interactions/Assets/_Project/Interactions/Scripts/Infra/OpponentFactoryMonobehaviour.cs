@@ -1,8 +1,7 @@
-using _Project.Interactions.Scripts.Domain;
-using Interactions.Scripts.Domain;
+using Interactions.Domain;
 using UnityEngine;
 
-namespace Interactions.Scripts.Infra
+namespace Interactions.Infra
 {
 	public class OpponentFactoryMonobehaviour : MonoBehaviour, IFactory<IOpponent>
 	{

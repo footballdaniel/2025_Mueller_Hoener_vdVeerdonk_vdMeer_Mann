@@ -1,4 +1,4 @@
-﻿using Interactions.Scripts.Infra;
+﻿using Interactions.Infra;
 using PassDetection.Replay;
 using Tactive.MachineLearning.Models;
 using UnityEngine;

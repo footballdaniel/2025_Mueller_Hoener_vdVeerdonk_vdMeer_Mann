@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
     internal class LabTrialEnd : State
     {
-        public LabTrialEnd(global::Interactions.Scripts.Application.App app) : base(app)
+        public LabTrialEnd(global::Interactions.Application.App app) : base(app)
         {
         }
 

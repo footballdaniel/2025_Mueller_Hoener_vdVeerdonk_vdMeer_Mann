@@ -1,9 +1,9 @@
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorder;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class WebcamConfigButton : MonoBehaviour
 	{

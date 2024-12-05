@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Common
+namespace Interactions.Common
 {
 	public class Vector3Converter : JsonConverter<Vector3>
 	{

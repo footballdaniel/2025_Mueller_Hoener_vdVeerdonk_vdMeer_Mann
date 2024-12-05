@@ -1,4 +1,4 @@
-﻿namespace Interactions.Scripts.Application
+﻿namespace Interactions.Application
 {
 	public enum ExperimentalCondition
 	{

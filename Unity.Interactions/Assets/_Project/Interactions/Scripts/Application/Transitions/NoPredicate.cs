@@ -1,6 +1,6 @@
-using Interactions.Scripts.Application.States;
+using Interactions.Application.States;
 
-namespace Interactions.Scripts.Application.Transitions
+namespace Interactions.Application.Transitions
 {
 	public class NoPredicate : IPredicate
 	{

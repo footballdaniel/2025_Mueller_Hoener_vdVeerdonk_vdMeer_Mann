@@ -1,15 +1,14 @@
-using _Project.Interactions.Scripts.Domain;
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
-using _Project.Interactions.Scripts.UI;
-using Interactions.Scripts.Application.States;
-using Interactions.Scripts.Application.Transitions;
-using Interactions.Scripts.Domain;
+using Interactions.Application.States;
+using Interactions.Application.Transitions;
+using Interactions.Domain;
+using Interactions.Domain.VideoRecorder;
+using Interactions.UI;
 using PassDetection.Replay;
 using Tactive.MachineLearning.Models;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	public class App : MonoBehaviour
 	{
@@ -24,7 +23,7 @@ namespace Interactions.Scripts.Application
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
 		public LstmModel LstmModel { get; private set; }
 		[Header("Entities")] public User User { get; private set; }
-		public InSituOpponent InSituOpponent { get; private set; }
+		public InSituOpponent InSituOpponentPrefab { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
 		[Header("State")] public Experiment Experiment { get; set; }
@@ -42,10 +41,11 @@ namespace Interactions.Scripts.Application
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
-			InSituOpponent = ServiceLocator.Get<InSituOpponent>();
+			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
+			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			BallPrefab = ServiceLocator.Get<Ball>();
 
 			// State machine
@@ -97,9 +97,20 @@ namespace Interactions.Scripts.Application
 		{
 			StateMachine.Tick();
 
-			// Cheats to transition between states
+
+			Cheats();
+		}
+
+		void Cheats()
+		{
 			if (Keyboard.current.digit1Key.wasPressedThisFrame)
 				Transitions.SelectCondition.Execute();
+
+			if (Keyboard.current.digit2Key.wasPressedThisFrame)
+			{
+				ExperimentalCondition = ExperimentalCondition.Laboratory;
+				Transitions.Init.Execute();
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-namespace _Project.Interactions.Scripts.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorder
 {
 	public record WebCamConfiguration(string DeviceName, int Width, int Height);
 }

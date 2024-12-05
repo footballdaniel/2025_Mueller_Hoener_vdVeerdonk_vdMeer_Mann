@@ -1,4 +1,4 @@
-namespace Interactions.Scripts.Application.Transitions
+namespace Interactions.Application.Transitions
 {
 	public class Transitions
 	{

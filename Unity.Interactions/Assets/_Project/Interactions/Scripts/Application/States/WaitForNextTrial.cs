@@ -1,4 +1,4 @@
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	internal class WaitForNextTrial : State
 	{

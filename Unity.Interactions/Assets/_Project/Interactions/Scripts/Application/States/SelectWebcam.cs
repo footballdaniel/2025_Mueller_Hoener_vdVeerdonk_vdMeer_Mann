@@ -1,10 +1,10 @@
-using Interactions.Scripts.Application.ViewModels;
+using Interactions.Application.ViewModels;
 
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	internal class SelectWebcam : State
 	{
-		public SelectWebcam(global::Interactions.Scripts.Application.App app) : base(app)
+		public SelectWebcam(global::Interactions.Application.App app) : base(app)
 		{
 		}
 

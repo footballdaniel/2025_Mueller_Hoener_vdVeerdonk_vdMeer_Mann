@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using _Project.Interactions.Scripts.Domain;
+using Interactions.Domain;
 using UnityEngine;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	[Serializable]
 	public class ServiceTypeReference

@@ -1,9 +1,8 @@
-using Interactions.Scripts.Application.ViewModels;
-using Interactions.Scripts.UI;
+using Interactions.Application.ViewModels;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class WebcamSelectionUI : UIScreen
 	{

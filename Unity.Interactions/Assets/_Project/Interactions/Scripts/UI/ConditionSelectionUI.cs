@@ -1,8 +1,8 @@
 using System;
-using Interactions.Scripts.Application;
+using Interactions.Application;
 using UnityEngine;
 
-namespace Interactions.Scripts.UI
+namespace Interactions.UI
 {
 	public class ConditionSelectionUI : UIScreen
 	{

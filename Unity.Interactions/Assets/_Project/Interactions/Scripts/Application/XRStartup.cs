@@ -1,7 +1,7 @@
-using Interactions.Scripts.Application.States;
-using Interactions.Scripts.Application.ViewModels;
+using Interactions.Application.States;
+using Interactions.Application.ViewModels;
 
-namespace Interactions.Scripts.Application
+namespace Interactions.Application
 {
 	internal class XRStartup : State
 	{

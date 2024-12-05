@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using System;
 using System.Linq;
-using Interactions.Scripts.Application;
+using Interactions.Application;
 using UnityEditor;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Editor
+namespace _Project.Interactions.Editor
 {
     [CustomPropertyDrawer(typeof(ServiceTypeReference))]
     public class ServiceTypeReferenceDrawer : PropertyDrawer

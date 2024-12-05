@@ -1,4 +1,4 @@
-namespace _Project.Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 	public enum Side
 	{

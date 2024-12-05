@@ -1,8 +1,8 @@
-﻿using _Project.Interactions.Scripts.Domain;
-using Interactions.Scripts.Infra;
+﻿using Interactions.Domain;
+using Interactions.Infra;
 using UnityEngine;
 
-namespace Interactions.Scripts.Application.States
+namespace Interactions.Application.States
 {
 	internal class LabTrial : State
 	{

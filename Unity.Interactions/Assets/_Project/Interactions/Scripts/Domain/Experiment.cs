@@ -1,7 +1,6 @@
-using _Project.Interactions.Scripts.Domain.VideoRecorder;
-using Interactions.Scripts.Domain;
+using Interactions.Domain.VideoRecorder;
 
-namespace _Project.Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 	public class Experiment
 	{

@@ -1,8 +1,8 @@
-﻿namespace Interactions.Scripts.Application.States
+﻿namespace Interactions.Application.States
 {
 	internal class InitiateVideoRecorder : State
 	{
-		public InitiateVideoRecorder(global::Interactions.Scripts.Application.App app) : base(app)
+		public InitiateVideoRecorder(global::Interactions.Application.App app) : base(app)
 		{
 		}
 

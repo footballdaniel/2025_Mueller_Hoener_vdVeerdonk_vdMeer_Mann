@@ -1,9 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using UnityEngine;
 
-namespace _Project.Interactions.Scripts.Infra
+namespace Interactions.Infra
 {
 	public static class FFMpegExporter
 	{
@@ -11,7 +10,7 @@ namespace _Project.Interactions.Scripts.Infra
 
 		public static void Export(string inputFramePath, string videoOutputPath, float frameRate, int totalFrames, IProgress<int> progress, string ffmpegPath = null)
 		{
-			ffmpegPath ??= Path.Combine(Application.streamingAssetsPath, "ffmpeg", "ffmpeg.exe");
+			ffmpegPath ??= Path.Combine(UnityEngine.Application.streamingAssetsPath, "ffmpeg", "ffmpeg.exe");
 
 			var arguments = $"-r {frameRate} -i \"{inputFramePath}/frame_%06d.png\" -vf \"drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
 

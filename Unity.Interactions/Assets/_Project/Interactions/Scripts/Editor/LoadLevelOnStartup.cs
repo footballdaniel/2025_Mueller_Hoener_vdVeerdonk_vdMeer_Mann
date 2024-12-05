@@ -1,4 +1,4 @@
-﻿namespace _Project.Interactions.Scripts.Editor
+﻿namespace _Project.Interactions.Editor
 {
 	public class LoadLevelOnStartup
 	{

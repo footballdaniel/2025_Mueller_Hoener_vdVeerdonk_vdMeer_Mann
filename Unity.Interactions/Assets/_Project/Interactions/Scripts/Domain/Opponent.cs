@@ -1,8 +1,7 @@
-using _Project.Interactions.Scripts.Domain;
 using UnityEngine;
 using Random = System.Random;
 
-namespace Interactions.Scripts.Domain
+namespace Interactions.Domain
 {
 
 
