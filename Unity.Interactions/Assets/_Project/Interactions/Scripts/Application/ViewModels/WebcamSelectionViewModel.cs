@@ -5,15 +5,14 @@ namespace Interactions.Application.ViewModels
 {
 	public class WebcamSelectionViewModel
 	{
-		public WebcamSelectionViewModel(IRepository<IWebcamRecorder> webcamRepository, global::Interactions.Application.App app)
+		public WebcamSelectionViewModel( App app)
 		{
 			_app = app;
-			Webcams = webcamRepository.GetAll();
+			Webcams = app.WebCamRecorders.GetAll();
 		}
 
 		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }
-
-
+		
 		public void Select(IWebcamRecorder webcam)
 		{
 			_app.Experiment.WebcamRecorder = webcam;
@@ -21,6 +20,6 @@ namespace Interactions.Application.ViewModels
 			_app.Transitions.InitiateRecorder.Execute();
 		}
 
-		readonly global::Interactions.Application.App _app;
+		readonly App _app;
 	}
 }

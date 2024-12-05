@@ -1,5 +1,6 @@
 using Interactions.Application.States;
 using Interactions.Application.Transitions;
+using Interactions.Application.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.VideoRecorder;
 using Interactions.UI;
@@ -12,12 +13,13 @@ namespace Interactions.Application
 {
 	public class App : MonoBehaviour
 	{
-		[Header("Settings")] 
+		[Header("Settings")]
 		public bool RecordVideo;
+
 		public int RecordingFrameRateHz = 10;
 		public Side DominantFootSide;
 		public ModelAssetWithMetadata LstmModelAsset;
-		
+
 		[Header("Services")] public MainUI UI { get; private set; }
 		public ExperimentalCondition ExperimentalCondition { get; set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
@@ -30,13 +32,14 @@ namespace Interactions.Application
 		public Transitions.Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 
+		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
+
 		void Start()
 		{
-			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide);
-
 			// Services
+			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide);
 			LstmModel = new LstmModel(LstmModelAsset);
-			
+
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
@@ -66,9 +69,12 @@ namespace Interactions.Application
 			// in situ trials
 			var inSituTrial = new InSituTrial(this);
 
+			// View models for showing data on the UI
+			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
+
 			// Flow for starting app
 			Transitions.SelectCondition = new Transition(this, xrStartupState, selectCondition);
-			Transitions.Init = new Transition(this, selectCondition, init);	
+			Transitions.Init = new Transition(this, selectCondition, init);
 
 			// Flow for recording trials
 			Transitions.SelectWebcam = new Transition(this, init, webcamSelection);
@@ -97,7 +103,6 @@ namespace Interactions.Application
 		{
 			StateMachine.Tick();
 
-
 			Cheats();
 		}
 
@@ -110,6 +115,13 @@ namespace Interactions.Application
 			{
 				ExperimentalCondition = ExperimentalCondition.Laboratory;
 				Transitions.Init.Execute();
+			}
+
+			if (Keyboard.current.digit3Key.wasPressedThisFrame)
+			{
+				var recorder = WebCamRecorders.Get(0);
+				WebcamSelectionViewModel.Select(recorder);
+				Transitions.InitiateRecorder.Execute();
 			}
 		}
 	}

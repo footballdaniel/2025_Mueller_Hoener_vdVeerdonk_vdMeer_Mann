@@ -9,7 +9,7 @@ namespace Interactions.UI
 		[SerializeField] WebcamConfigButton _webcamConfigButtonPrefab;
 		[SerializeField] VerticalLayoutGroup _webcamConfigRoot;
 
-		public void Set(WebcamSelectionViewModel viewModel)
+		public void Bind(WebcamSelectionViewModel viewModel)
 		{
 			foreach (var webcam in viewModel.Webcams)
 			{
