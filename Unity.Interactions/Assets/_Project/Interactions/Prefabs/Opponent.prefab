@@ -132,11 +132,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ba9fb7a2b3b3aa4698a5685ef96dac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 6
-  _acceleration: 10
-  _interpersonalDistance: 3
-  _decelerationStartDistance: 3.5
-  _defendTarget: {fileID: 0}
+  _animator: {fileID: 6631056919050492578}
+  distanceFromAttacker: 2
+  maxSpeed: 5
+  acceleration: 5
+  maxRotationSpeedDegreesY: 90
 --- !u!1001 &967335535744263987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -230,6 +230,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Football_Player_Base_LOD1
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: dce5d2f312a4d20408d1d3c7029a1840,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: e85b653080220ef4a9456aa9489d81cd, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -238,6 +243,12 @@ PrefabInstance:
 --- !u!4 &785337132642943192 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dce5d2f312a4d20408d1d3c7029a1840,
+    type: 3}
+  m_PrefabInstance: {fileID: 967335535744263987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6631056919050492578 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: dce5d2f312a4d20408d1d3c7029a1840,
     type: 3}
   m_PrefabInstance: {fileID: 967335535744263987}
   m_PrefabAsset: {fileID: 0}

@@ -20,8 +20,7 @@ namespace Interactions.Application.States
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			
-			_app.Experiment.Opponent.Set(_app.User);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal);
 
 			// _app.User.DominantFoot.Passed += OnPassed;
 			

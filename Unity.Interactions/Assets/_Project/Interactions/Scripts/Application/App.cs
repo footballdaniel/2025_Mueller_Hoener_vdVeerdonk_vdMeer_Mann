@@ -15,6 +15,7 @@ namespace Interactions.Application
 	{
 		[Header("Settings")]
 		public bool RecordVideo;
+
 		public int RecordingFrameRateHz = 10;
 		public Side DominantFootSide;
 		public ModelAssetWithMetadata LstmModelAsset;
@@ -33,7 +34,11 @@ namespace Interactions.Application
 		public StateMachine StateMachine { get; private set; }
 
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
-		
+
+		public RightGoal RightGoal { get; private set; }
+
+		public LeftGoal LeftGoal { get; private set; }
+
 
 		void Start()
 		{
@@ -46,6 +51,8 @@ namespace Interactions.Application
 			User = ServiceLocator.Get<User>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
+			LeftGoal = ServiceLocator.Get<LeftGoal>();
+			RightGoal = ServiceLocator.Get<RightGoal>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();

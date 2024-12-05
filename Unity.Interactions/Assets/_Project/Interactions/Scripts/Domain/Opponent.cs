@@ -1,171 +1,80 @@
 using UnityEngine;
-using Random = System.Random;
 
 namespace Interactions.Domain
 {
-
-
-	#region Dynamic IPD
-
-	// with dynamic ipd
-	public class Opponent : MonoBehaviour, IOpponent
+	public class Opponent : MonoBehaviour
 	{
-		[SerializeField] protected float _maxSpeed = 5f;
-		[SerializeField] protected float _acceleration = 3f;
-		[SerializeField] protected float _interpersonalDistance = 3.5f;
-		[SerializeField] protected float _decelerationStartDistance = 5f;
-		[SerializeField] Transform _defendTarget;
+		[SerializeField] Animator _animator;
 
-		float _currentSpeed = 0f;
-		bool _isGoingRight;
-		Vector3 _targetPosition;
-		IUser _user;
+		[SerializeField] float distanceFromAttacker = 2f;
+		[SerializeField] float maxSpeed = 5f;
+		[SerializeField] float acceleration = 5f;
+		[SerializeField] float maxRotationSpeedDegreesY = 90f;
 
-		void Start()
-		{
-			_defendTarget = GameObject.Find("Goal").transform;
-			var random = new Random();
-			_isGoingRight = random.Next(0, 2) == 0;
-		}
-
-		void Update()
-		{
-			if (_user == null || _defendTarget == null) return;
-
-			// Get positions
-			var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
-			var targetPosition = _defendTarget.position;
-			var opponentPosition = transform.position;
-
-			// Calculate the direction from the target to the user
-			var targetToUserDirection = (userPosition - targetPosition).normalized;
-
-			// Calculate the desired position along the line at the specified interpersonal distance
-			_targetPosition = userPosition - targetToUserDirection * _interpersonalDistance;
-
-			// Adjust target position slightly along z-axis based on _isGoingRight
-			if (_isGoingRight)
-				_targetPosition.z += 0.4f;
-			else
-				_targetPosition.z -= 0.4f;
-
-			// Calculate movement direction and distance
-			var moveDirection = _targetPosition - opponentPosition;
-			var distance = moveDirection.magnitude;
-
-			if (distance > 0.1f)
-			{
-				// Acceleration and deceleration logic
-				if (distance > _decelerationStartDistance)
-					_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
-				else
-				{
-					var speedFactor = (distance - 0.1f) / (_decelerationStartDistance - 0.1f);
-					var targetSpeed = Mathf.Lerp(0, _maxSpeed, speedFactor);
-					_currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, _acceleration * Time.deltaTime);
-				}
-
-				// Move the opponent towards the desired position
-				var velocity = moveDirection.normalized * _currentSpeed;
-				transform.position += velocity * Time.deltaTime;
-
-				// Rotate the opponent to face the user
-				var lookDirection = userPosition - opponentPosition;
-
-				if (lookDirection.sqrMagnitude > 0.001f)
-				{
-					var targetRotation = Quaternion.LookRotation(lookDirection);
-					transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-				}
-			}
-			else
-				_currentSpeed = 0;
-		}
-
-		#endregion
-
-		public void Set(IUser user)
+		public void Bind(IUser user, LeftGoal goalLeft, RightGoal goalRight)
 		{
 			_user = user;
+			_goalLeft = goalLeft;
+			_goalRight = goalRight;
 		}
-	}
+		
+		void Update()
+		{
+			var positionBetweenGoals = (_goalLeft.transform.position + _goalRight.transform.position) / 2;
+			var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
 
-	//
-	// #region Static
-	//
-	// public class Opponent : MonoBehaviour
-	// {
-	// 	[SerializeField] protected float _maxSpeed = 5f;
-	// 	[SerializeField] protected float _acceleration = 3f;
-	// 	[SerializeField] protected float _interpersonalDistance = 3.5f;
-	// 	[SerializeField] protected float _decelerationStartDistance = 5f;
-	//
-	// 	float _currentSpeed = 0f;
-	// 	bool _isGoingRight;
-	// 	Vector3 _targetPosition;
-	// 	IUser _user;
-	//
-	// 	void Start()
-	// 	{
-	// 		// random boolean
-	// 		var random = new Random();
-	// 		_isGoingRight = random.Next(0, 2) == 0;
-	// 		
-	// 		
-	// 		var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
-	// 		var direction = userPosition - transform.position;
-	//
-	// 		_targetPosition = userPosition - direction.normalized * _interpersonalDistance;
-	//
-	// 		// add 0.5m to target position based on bool
-	// 		if (_isGoingRight)
-	// 			_targetPosition.z += 0.4f;
-	// 		else
-	// 			_targetPosition.z -= 0.4f;
-	// 	}
-	//
-	// 	void Update()
-	// 	{
-	// 		if (_user == null) return;
-	//
-	// 		var userPosition = new Vector3(_user.Position.x, 0, _user.Position.y);
-	// 		var direction = userPosition - transform.position;
-	// 		var distance = direction.magnitude;
-	//
-	// 		_targetPosition = userPosition - direction.normalized * _interpersonalDistance;
-	//
-	// 		// add 0.5m to target position based on bool
-	// 		if (_isGoingRight)
-	// 			_targetPosition.z += 0.4f;
-	// 		else
-	// 			_targetPosition.z -= 0.4f;
-	//
-	// 		if (distance > _interpersonalDistance)
-	// 		{
-	// 			if (distance > _decelerationStartDistance)
-	// 				_currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxSpeed, _acceleration * Time.deltaTime);
-	// 			else
-	// 			{
-	// 				var speedFactor = (distance - _interpersonalDistance) / (_decelerationStartDistance - _interpersonalDistance);
-	// 				var targetSpeed = Mathf.Lerp(0, _maxSpeed, speedFactor);
-	// 				_currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, _acceleration * Time.deltaTime);
-	// 			}
-	//
-	// 			var velocity = (new Vector3(_targetPosition.x, 0, _targetPosition.z) - transform.position).normalized * _currentSpeed;
-	// 			transform.position += velocity * Time.deltaTime;
-	//
-	// 			var angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
-	// 			transform.rotation = Quaternion.Euler(0, angle, 0);
-	// 		}
-	// 		else
-	// 			_currentSpeed = 0;
-	// 	}
-	//
-	// 	public void Set(IUser user)
-	// 	{
-	// 		_user = user;
-	// 	}
-	// }
-	//
-	// #endregion
+			// Calculate the direction from the goal to the attacker
+			var goalToAttackerDirection = (userPosition - positionBetweenGoals).normalized;
+
+			// Calculate the desired position 2 meters away from the attacker, on the line between attacker and goal
+			var desiredPosition = userPosition - goalToAttackerDirection * distanceFromAttacker;
+
+			// Compute movement direction towards the desired position
+			var targetDirection = desiredPosition - transform.position;
+			targetDirection.y = 0; // Keep movement on the horizontal plane
+			var distanceToTarget = targetDirection.magnitude;
+
+			// Update velocity with acceleration
+			if (distanceToTarget > 0.1f) // Small threshold to prevent jitter
+			{
+				targetDirection.Normalize();
+				var targetVelocity = targetDirection * maxSpeed;
+				_currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVelocity, acceleration * Time.deltaTime);
+
+				transform.position += _currentVelocity * Time.deltaTime;
+
+				// Set animator parameters based on local velocity
+				var localVelocity = transform.InverseTransformDirection(_currentVelocity);
+				_animator.SetFloat(VelocityX, localVelocity.x);
+				_animator.SetFloat(VelocityY, localVelocity.z);
+			}
+			else
+			{
+				// Stop the velocity and animator parameters when target position is reached
+				_currentVelocity = Vector3.zero;
+				_animator.SetFloat(VelocityX, 0);
+				_animator.SetFloat(VelocityY, 0);
+			}
+
+			// Rotate to face the attacker
+			var lookDirection = userPosition - transform.position;
+			lookDirection.y = 0; // Ensure rotation stays on the horizontal plane
+
+			if (lookDirection.sqrMagnitude > 0.001f) // Prevent jitter when very close
+			{
+				var targetRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+				transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, maxRotationSpeedDegreesY * Time.deltaTime);
+			}
+		}
+
+
+
+		readonly static int VelocityX = Animator.StringToHash("VelocityX");
+		readonly static int VelocityY = Animator.StringToHash("VelocityY");
+
+		Vector3 _currentVelocity = Vector3.zero;
+		LeftGoal _goalLeft;
+		RightGoal _goalRight;
+		IUser _user;
+	}
 }
