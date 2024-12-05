@@ -13,7 +13,7 @@ namespace Interactions.Scripts.Application.States
 		public override void Enter()
 		{
 			var experimentViewModel = new ExperimentViewModel(_app);
-			_app.UI.experimentOverlay.Bind(experimentViewModel);
+			_app.UI.ExperimentOverlay.Bind(experimentViewModel);
 
 			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
 				_app.UI.InSituUI.Show();

@@ -5,5 +5,10 @@ namespace Interactions.Scripts.Application.States
 		public WaitForNextTrial(App app) : base(app)
 		{
 		}
+
+		public override void Enter()
+		{
+			_app.UI.ExperimentOverlay.Show();
+		}
 	}
 }

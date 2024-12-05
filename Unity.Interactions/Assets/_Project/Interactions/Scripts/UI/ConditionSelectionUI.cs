@@ -1,22 +1,23 @@
 using System;
-using _Project.Interactions.Scripts.UI;
 using Interactions.Scripts.Application;
 using UnityEngine;
 
-public class ConditionSelectionUI : MonoBehaviour
+namespace Interactions.Scripts.UI
 {
-	[SerializeField] ExperimentalConditionButton _conditionButtonPrefab;
-	[SerializeField] Transform _conditionButtonContainer;
-	
-	
-	public void Bind(ConditionSelection conditionSelection)
+	public class ConditionSelectionUI : UIScreen
 	{
-		foreach (var condition in Enum.GetValues(typeof(ExperimentalCondition)))
-		{
-			var button = Instantiate(_conditionButtonPrefab, _conditionButtonContainer);
-			button.Set((ExperimentalCondition) condition);
-			button.onClick.AddListener(() => conditionSelection.ConditionSelected((ExperimentalCondition) condition));
-		}
+		[SerializeField] ExperimentalConditionButton _conditionButtonPrefab;
+		[SerializeField] Transform _conditionButtonContainer;
 
+
+		public void Bind(ConditionSelection conditionSelection)
+		{
+			foreach (var condition in Enum.GetValues(typeof(ExperimentalCondition)))
+			{
+				var conditionButton = Instantiate(_conditionButtonPrefab, _conditionButtonContainer);
+				conditionButton.Set((ExperimentalCondition)condition);
+				conditionButton.Button.onClick.AddListener(() => conditionSelection.ConditionSelected((ExperimentalCondition)condition));
+			}
+		}
 	}
 }

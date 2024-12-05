@@ -12,6 +12,7 @@ namespace Interactions.Scripts.Application
 		public override void Enter()
 		{
 			_app.UI.ConditionSelectionUI.Bind(this);
+			_app.UI.ConditionSelectionUI.Show();
 		}
 
 		public void ConditionSelected(ExperimentalCondition condition)
@@ -19,5 +20,12 @@ namespace Interactions.Scripts.Application
 			_app.ExperimentalCondition = condition;
 			_app.Transitions.Init.Execute();
 		}
+		
+		public override void Exit()
+		{
+			_app.UI.ConditionSelectionUI.Hide();
+		}
 	}
+	
+	
 }

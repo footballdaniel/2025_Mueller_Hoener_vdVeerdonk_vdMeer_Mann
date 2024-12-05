@@ -17,6 +17,11 @@ namespace _Project.Interactions.Scripts.UI
 		[SerializeField] Button _exitButton;
 		[SerializeField] TMP_Text _progressText;
 		[SerializeField] Slider _progressSlider;
+		
+		public void Show()
+		{
+			gameObject.SetActive(true);
+		}	
 
 		void Update()
 		{

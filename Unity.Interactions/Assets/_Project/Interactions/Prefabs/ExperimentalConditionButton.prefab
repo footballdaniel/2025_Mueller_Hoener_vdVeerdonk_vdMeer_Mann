@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 4192130597866974110}
   - component: {fileID: 8084294391917744890}
   - component: {fileID: 1191443638322509561}
-  - component: {fileID: -1264975234006682690}
+  - component: {fileID: 5270205995182826738}
+  - component: {fileID: -8476639034950260832}
   m_Layer: 5
   m_Name: ExperimentalConditionButton
   m_TagString: Untagged
@@ -77,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &-1264975234006682690
+--- !u!114 &5270205995182826738
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,7 +87,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1242994631602500164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 937ac6c24f99492ba660ff7372ba6fed, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -121,7 +122,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-  _text: {fileID: 0}
+--- !u!114 &-8476639034950260832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242994631602500164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 937ac6c24f99492ba660ff7372ba6fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Button>k__BackingField: {fileID: 5270205995182826738}
+  _text: {fileID: 7689912000664007367}
 --- !u!1 &6485820546909773227
 GameObject:
   m_ObjectHideFlags: 0

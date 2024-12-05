@@ -6,7 +6,7 @@ namespace _Project.Interactions.Scripts.UI
 {
 	public class MainUI : MonoBehaviour
 	{
-		[FormerlySerializedAs("ExperimentUI")] public ExperimentOverlay experimentOverlay;
+		[FormerlySerializedAs("ExperimentUI")] public ExperimentOverlay ExperimentOverlay;
 		public WebcamSelectionUI WebcamSelectionUI;
 		public InSituUI InSituUI;
 		public XRStatusUI XRStatusUI;

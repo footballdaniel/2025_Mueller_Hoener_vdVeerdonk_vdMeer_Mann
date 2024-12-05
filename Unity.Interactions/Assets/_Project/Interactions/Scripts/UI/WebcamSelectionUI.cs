@@ -1,4 +1,5 @@
 using Interactions.Scripts.Application.ViewModels;
+using Interactions.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
