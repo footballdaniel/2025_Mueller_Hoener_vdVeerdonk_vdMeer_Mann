@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Interactions.Scripts.Application.States
 {
-	internal class LabTrialState : State
+	internal class LabTrial : State
 	{
 		bool _hasPassed;
 		InputDataQueue _inputDataQueue;
 		float _updateTimer;
 
-		public LabTrialState(App app) : base(app)
+		public LabTrial(App app) : base(app)
 		{
 		}
 

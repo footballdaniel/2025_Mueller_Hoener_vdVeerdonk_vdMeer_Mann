@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Interactions.Scripts.Application
 {
-	internal class InSituTrialState : State
+	internal class InSituTrial : State
 	{
 		float _updateTimer;
 
-		public InSituTrialState(App app) : base(app)
+		public InSituTrial(App app) : base(app)
 		{
 		}
 

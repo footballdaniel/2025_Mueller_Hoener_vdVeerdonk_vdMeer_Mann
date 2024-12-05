@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace _Project.Interactions.Scripts.UI
 {
-	public class UIWebcamConfigEntry : MonoBehaviour
+	public class WebcamConfigButton : MonoBehaviour
 	{
 		[field: SerializeReference] public Button Button { get; private set; }
 		[SerializeField] TMP_Text _text;
@@ -15,4 +15,5 @@ namespace _Project.Interactions.Scripts.UI
 			_text.text = recorder.Info.DeviceName + " " + " " + recorder.Info.Width + "x" + recorder.Info.Height;
 		}
 	}
+
 }

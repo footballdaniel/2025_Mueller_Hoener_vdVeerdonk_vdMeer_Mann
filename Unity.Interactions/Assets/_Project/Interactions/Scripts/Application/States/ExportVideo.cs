@@ -2,9 +2,9 @@ using _Project.Interactions.Scripts.Domain.VideoRecorder;
 
 namespace Interactions.Scripts.Application.States
 {
-	internal class ExportVideoState : State
+	internal class ExportVideo : State
 	{
-		public ExportVideoState(global::Interactions.Scripts.Application.App app) : base(app)
+		public ExportVideo(App app) : base(app)
 		{
 		}
 
@@ -20,8 +20,8 @@ namespace Interactions.Scripts.Application.States
 		{
 			if (!_app.Experiment.WebcamRecorder.IsExportComplete)
 				return;
-			
-			
+
+
 			switch (_app.ExperimentalCondition)
 			{
 				case ExperimentalCondition.Laboratory:

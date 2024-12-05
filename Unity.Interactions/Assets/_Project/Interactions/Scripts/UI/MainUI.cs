@@ -10,5 +10,6 @@ namespace _Project.Interactions.Scripts.UI
 		public WebcamSelectionUI WebcamSelectionUI;
 		public InSituUI InSituUI;
 		public XRStatusUI XRStatusUI;
+		public ConditionSelectionUI ConditionSelectionUI;
 	}
 }

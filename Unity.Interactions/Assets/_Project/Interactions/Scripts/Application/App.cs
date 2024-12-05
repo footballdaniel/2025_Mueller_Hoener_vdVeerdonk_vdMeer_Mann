@@ -13,12 +13,14 @@ namespace Interactions.Scripts.Application
 {
 	public class App : MonoBehaviour
 	{
-		[Header("Settings")] public ExperimentalCondition ExperimentalCondition;
+		[Header("Settings")] 
 		public bool RecordVideo;
 		public int RecordingFrameRateHz = 10;
 		public Side DominantFootSide;
 		public ModelAssetWithMetadata LstmModelAsset;
+		
 		[Header("Services")] public MainUI UI { get; private set; }
+		public ExperimentalCondition ExperimentalCondition { get; set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
 		public LstmModel LstmModel { get; private set; }
 		[Header("Entities")] public User User { get; private set; }
@@ -51,18 +53,18 @@ namespace Interactions.Scripts.Application
 			Transitions = new Transitions.Transitions();
 
 			// States
-			var xrStartupState = new XRStartupState(this);
-			var selectCondition = new SelectConditionState(this);
+			var xrStartupState = new XRStartup(this);
+			var selectCondition = new ConditionSelection(this);
 			var init = new InitState(this);
-			var webcamSelection = new SelectWebcamState(this);
-			var waitForNextTrial = new WaitForNextTrialState(this);
+			var webcamSelection = new SelectWebcam(this);
+			var waitForNextTrial = new WaitForNextTrial(this);
 			var initiateRecorder = new InitiateVideoRecorder(this);
-			var export = new ExportVideoState(this);
+			var export = new ExportVideo(this);
 			// laboratoryTrials
-			var labTrial = new LabTrialState(this);
-			var labTrialEnd = new LabTrialEndState(this);
+			var labTrial = new LabTrial(this);
+			var labTrialEnd = new LabTrialEnd(this);
 			// in situ trials
-			var inSituTrial = new InSituTrialState(this);
+			var inSituTrial = new InSituTrial(this);
 
 			// Flow for starting app
 			Transitions.SelectCondition = new Transition(this, xrStartupState, selectCondition);

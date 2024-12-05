@@ -2,9 +2,9 @@
 
 namespace Interactions.Scripts.Application.States
 {
-    internal class LabTrialEndState : State
+    internal class LabTrialEnd : State
     {
-        public LabTrialEndState(global::Interactions.Scripts.Application.App app) : base(app)
+        public LabTrialEnd(global::Interactions.Scripts.Application.App app) : base(app)
         {
         }
 
