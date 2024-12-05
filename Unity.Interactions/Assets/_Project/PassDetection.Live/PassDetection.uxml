@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/_Project/PassDetection.Live/PassDetection.uss?fileID=7433441132597879392&amp;guid=8384f76ac8b4d4241a1a6168145f7bd2&amp;type=3#PassDetection" />
     <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center; justify-content: center; min-width: 991px; align-content: auto;">
         <engine:Label text="Pass Probability" style="-unity-font-definition: url(&quot;project://database/Library/unity%20editor%20resources?fileID=3413707813048797061&amp;guid=0000000000000000d000000000000000&amp;type=0#Inter-Regular&quot;); font-size: 60px;" />
-        <engine:Slider label="Slider" value="42" high-value="100" name="MySlider" style="min-width: 300px;" />
+        <engine:Slider label="Slider" value="42" high-value="1" name="MySlider" style="min-width: 300px;" />
         <engine:VisualElement name="PassCount" style="flex-grow: 0; flex-direction: row;">
             <engine:Label text="Number of passes:" />
             <engine:Label text="0" binding-path="0" name="pass-count" />

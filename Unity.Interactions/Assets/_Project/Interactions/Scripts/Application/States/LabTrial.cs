@@ -40,15 +40,14 @@ namespace Interactions.Application.States
 			var deltaTime = 1f / frameRateHz;
 			_updateTimer += Time.fixedDeltaTime;
 			var epsilon = 0.0001f;
-
+			
+			_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
 			if (_updateTimer >= deltaTime - epsilon)
 			{
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
-				_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
-
 				_inputDataQueue.EnQueue(_app.User.DominantFoot.transform.position, _app.User.NonDominantFoot.transform.position, _app.Experiment.CurrentTrial.Duration);
 				
 				var prediction = _app.LstmModel.Evaluate(_inputDataQueue.ToInputData());
@@ -60,22 +59,16 @@ namespace Interactions.Application.States
 					_lastPassTime = Time.time; // Update the last pass time
 
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
-					
-					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passVelocity.normalized);
-					OnPassed(pass);
+					var passDirection = new Vector3(passVelocity.normalized.x, 0, passVelocity.normalized.z);
+					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
+					var ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
+					ball.Play(pass);
+			
+					_app.Experiment.Ball = ball;
 				}
-
-				_app.Experiment.WebcamRecorder.Tick();
+				
 				_updateTimer -= deltaTime;
 			}
-		}
-
-		void OnPassed(Pass pass)
-		{
-			var ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-			ball.Play(pass);
-			
-			_app.Experiment.Ball = ball;
 		}
 	}
 }

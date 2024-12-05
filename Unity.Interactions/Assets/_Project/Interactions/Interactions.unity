@@ -4759,7 +4759,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bef2547dbd828847bff4e6c5f781ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RecordVideo: 1
+  RecordVideo: 0
   RecordingFrameRateHz: 10
   DominantFootSide: 0
   LstmModelAsset: {fileID: 11400000, guid: a0277abb140ae2c498c3bcc052e47bd2, type: 2}
