@@ -1,8 +1,9 @@
+using _Project.Interactions.Scripts.UI;
 using Interactions.Scripts.Application.ViewModels;
 using TMPro;
 using UnityEngine;
 
-namespace _Project.Interactions.Scripts.UI
+namespace Interactions.Scripts.UI
 {
 	public class XRStatusUI : UIScreen
 	{
