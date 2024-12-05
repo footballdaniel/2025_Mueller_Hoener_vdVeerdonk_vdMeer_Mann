@@ -5,31 +5,27 @@ using UnityEngine;
 
 namespace _Project.PassDetection.Live
 {
-	public class PassDetectionApp : MonoBehaviour
+	public class PassDetection : MonoBehaviour
 	{
 		[Header("Dependencies"), SerializeField] XRTracker _dominantFootTracker;
 		[SerializeField] XRTracker _nonDominantFootTracker;
 		[SerializeField] ModelAssetWithMetadata _lstmModelAsset;
 		[SerializeField] AudioClip _passSound;
-		
-		InputDataQueue _inputDataQueue;
-		float _timeSinceLevelStart;
-		float _updateTimer;
-		LstmModel _lstmModel;
+		[SerializeField] PassDetectionUI _ui;
+
+		public float Prediction => _prediction;
+		public int PassCount => _passCount;
 
 		void Start()
 		{
 			_inputDataQueue = new InputDataQueue();
 			_timeSinceLevelStart = Time.time;
 			_lstmModel = new LstmModel(_lstmModelAsset);
-			
+			_ui.Bind(this);
 		}
 
 		void Update()
 		{
-			Application.targetFrameRate = 60; // or any desired value
-			
-			
 			var frameRateHz = 10f;
 			var deltaTime = 1f / frameRateHz;
 			_updateTimer += Time.fixedDeltaTime;
@@ -42,18 +38,27 @@ namespace _Project.PassDetection.Live
 				var nonDominantFootPosition = _nonDominantFootTracker.transform.position;
 
 				_inputDataQueue.EnQueue(dominantFootPosition, nonDominantFootPosition, time);
-				var prediction = _lstmModel.Evaluate(_inputDataQueue.ToInputData());
-				
-				
-				
-				if (prediction > 0.95f)
+				_prediction = _lstmModel.Evaluate(_inputDataQueue.ToInputData());
+
+				if (_prediction > 0.95f && Time.time - _lastPassTime >= 1f)
 				{
-					Debug.Log(prediction);
+					Debug.Log(_prediction);
 					AudioSource.PlayClipAtPoint(_passSound, Camera.main.transform.position);
+
+					_passCount++;
+					_lastPassTime = Time.time; // Update the last pass time
 				}
 
 				_updateTimer -= deltaTime;
 			}
 		}
+
+		InputDataQueue _inputDataQueue;
+		float _lastPassTime;
+		LstmModel _lstmModel;
+		int _passCount;
+		float _prediction;
+		float _timeSinceLevelStart;
+		float _updateTimer;
 	}
 }
