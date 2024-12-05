@@ -20,7 +20,7 @@ namespace Interactions.Application.States
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Ball = Object.Instantiate(_app.BallPrefab);
+			
 			_app.Experiment.Opponent.Set(_app.User);
 
 			// _app.User.DominantFoot.Passed += OnPassed;
@@ -72,11 +72,10 @@ namespace Interactions.Application.States
 
 		void OnPassed(Pass pass)
 		{
-			if (_hasPassed) return;
-
-			_hasPassed = true;
-			_app.Experiment.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-			_app.Experiment.Ball.Play(pass);
+			var ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
+			ball.Play(pass);
+			
+			_app.Experiment.Ball = ball;
 		}
 	}
 }
