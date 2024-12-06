@@ -3,13 +3,14 @@ using UnityEngine;
 
 namespace Interactions.Domain.Opponents
 {
-	public class Memory
+	public class DelayedPerceptionMemory
 	{
 
-		public Memory(float duration)
+		public DelayedPerceptionMemory(float duration, float delay)
 		{
 			_entries = new List<(float time, Vector2 pos)>();
 			_duration = duration;
+			_delay = delay;
 		}
 
 		public void Add(float time, Vector2 pos)
@@ -22,24 +23,30 @@ namespace Interactions.Domain.Opponents
 
 		public Vector2 Get(float time)
 		{
+			var targetTime = time - _delay;
+
 			if (_entries.Count == 0)
 				return Vector2.zero;
 
-			if (_entries[0].time > time)
+			if (targetTime <= _entries[0].time)
 				return _entries[0].pos;
+
+			if (targetTime >= _entries[^1].time)
+				return _entries[^1].pos;
 
 			for (var i = 0; i < _entries.Count - 1; i++)
 			{
 				var (t1, p1) = _entries[i];
 				var (t2, p2) = _entries[i + 1];
 
-				if (t1 <= time && t2 >= time)
-					return Vector2.Lerp(p1, p2, (time - t1) / (t2 - t1));
+				if (t1 <= targetTime && t2 >= targetTime)
+					return Vector2.Lerp(p1, p2, (targetTime - t1) / (t2 - t1));
 			}
 
 			return _entries[^1].pos;
 		}
 
+		readonly float _delay;
 		readonly float _duration;
 		readonly List<(float time, Vector2 pos)> _entries;
 	}
