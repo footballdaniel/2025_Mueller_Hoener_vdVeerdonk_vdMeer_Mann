@@ -24,6 +24,8 @@ namespace Interactions.Application.States
 		public override void Exit()
 		{
 			_hasPassed = false;
+			Object.Destroy(_app.Experiment.Ball.gameObject);
+			Object.Destroy(_app.Experiment.Opponent.gameObject);
 		}
 
 		public override void Tick()
@@ -37,6 +39,8 @@ namespace Interactions.Application.States
 
 			if (_updateTimer >= deltaTime - epsilon)
 			{
+				_app.Experiment.WebcamRecorder.Tick();
+				
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);

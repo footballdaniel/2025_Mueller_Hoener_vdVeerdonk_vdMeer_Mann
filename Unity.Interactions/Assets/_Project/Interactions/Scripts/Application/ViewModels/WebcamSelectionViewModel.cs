@@ -1,14 +1,18 @@
 using System.Collections.Generic;
+using System.Linq;
 using Interactions.Domain.VideoRecorder;
 
 namespace Interactions.Application.ViewModels
 {
 	public class WebcamSelectionViewModel
 	{
-		public WebcamSelectionViewModel( App app)
+		public WebcamSelectionViewModel(App app)
 		{
 			_app = app;
-			Webcams = app.WebCamRecorders.GetAll();
+			
+			Webcams = app.WebCamRecorders.GetAll()
+				.Prepend(new NoWebcamRecorder())
+				.ToList();
 		}
 
 		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }

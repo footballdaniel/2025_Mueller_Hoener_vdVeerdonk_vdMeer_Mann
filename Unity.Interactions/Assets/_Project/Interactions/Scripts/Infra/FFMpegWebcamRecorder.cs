@@ -10,7 +10,7 @@ namespace Interactions.Infra
 
 		public FFMpegWebcamRecorder(string deviceName, int width, int height,  IProgress<int> progress)
 		{
-			Info = new WebcamInfo(deviceName, width, height);
+			Specs = new WebcamSpecs(deviceName, width, height);
 			_progress = progress;
 			_exportFramerate = 10f;
 
@@ -41,7 +41,7 @@ namespace Interactions.Infra
 			_exportFramerate = appRecordingFrameRateHz;
 		}
 
-		public WebcamInfo Info { get; private set; }
+		public WebcamSpecs Specs { get; private set; }
 
 		public void StartRecording()
 		{
@@ -54,7 +54,7 @@ namespace Interactions.Infra
 			
 			
 			_isExportComplete = false;
-			_webcamTexture = new WebCamTexture(Info.DeviceName, Info.Width, Info.Height, (int)_exportFramerate);
+			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, (int)_exportFramerate);
 			_webcamTexture.Play();
 		}
 

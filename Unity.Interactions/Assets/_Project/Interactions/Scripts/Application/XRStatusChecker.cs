@@ -1,19 +1,12 @@
-using System;
 using UnityEngine.XR.Management;
 
 namespace Interactions.Application
 {
-	internal class XRStatus
+	internal static class XRStatusChecker
 	{
-		public static event Action XRStartupError;
-
 		public static bool HasXRErrors()
 		{
 			var initialized = XRGeneralSettings.Instance.Manager.isInitializationComplete;
-
-			if (!initialized)
-				XRStartupError?.Invoke();
-			
 			return !initialized;
 		}
 	}

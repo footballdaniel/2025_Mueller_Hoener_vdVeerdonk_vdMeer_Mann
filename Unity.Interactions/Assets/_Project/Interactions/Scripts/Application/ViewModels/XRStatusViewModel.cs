@@ -5,16 +5,21 @@ namespace Interactions.Application.ViewModels
 	public class XRStatusViewModel
 	{
 
-		public XRStatusViewModel()
+		public XRStatusViewModel(App app)
 		{
-			XRStatus.XRStartupError += OnXRStartupError;
+			_app = app;
 		}
 
 		public event Action XRStartupErrorOccurred;
 
-		void OnXRStartupError()
+		public void CheckForErrors()
 		{
-			XRStartupErrorOccurred?.Invoke();
+			if (XRStatusChecker.HasXRErrors())
+				XRStartupErrorOccurred?.Invoke();
+			else
+				_app.Transitions.SelectCondition.Execute();
 		}
+
+		readonly App _app;
 	}
 }

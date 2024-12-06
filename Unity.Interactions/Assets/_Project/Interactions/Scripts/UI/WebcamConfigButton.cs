@@ -12,7 +12,7 @@ namespace Interactions.UI
 
 		public void Set(IWebcamRecorder recorder)
 		{
-			_text.text = recorder.Info.DeviceName + " " + " " + recorder.Info.Width + "x" + recorder.Info.Height;
+			_text.text = recorder.Specs.DeviceName + " " + " " + recorder.Specs.Width + "x" + recorder.Specs.Height;
 		}
 	}
 

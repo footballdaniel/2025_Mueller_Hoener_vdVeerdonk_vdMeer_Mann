@@ -8,9 +8,10 @@ namespace Interactions.UI
 	{
 		[SerializeField] TMP_Text _errorText;
 
-		public void Bind(XRStatusViewModel xrStatusViewModel)
+		public void Bind(XRStatusViewModel viewModel)
 		{
-			xrStatusViewModel.XRStartupErrorOccurred += OnXRStartupErrorOccurred;
+			viewModel.CheckForErrors();
+			viewModel.XRStartupErrorOccurred += OnXRStartupErrorOccurred;
 		}
 
 		void OnXRStartupErrorOccurred()

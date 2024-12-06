@@ -9,6 +9,6 @@ namespace Interactions.UI
 		public WebcamSelectionUI WebcamSelectionUI;
 		public InSituUI InSituUI;
 		public XRStatusUI XRStatusUI;
-		public ConditionSelectionUI ConditionSelectionUI;
+		public ExperimentSetupUI ExperimentSetupUI;
 	}
 }

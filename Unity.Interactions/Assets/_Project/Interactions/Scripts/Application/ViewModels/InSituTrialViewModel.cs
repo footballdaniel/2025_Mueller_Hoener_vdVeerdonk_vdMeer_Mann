@@ -5,10 +5,8 @@ namespace Interactions.Application.ViewModels
 {
 	public class InSituTrialViewModel
 	{
-		readonly global::Interactions.Application.App _app;
-		readonly IWebcamRecorder _recorder;
 
-		public InSituTrialViewModel(global::Interactions.Application.App app)
+		public InSituTrialViewModel(App app)
 		{
 			_app = app;
 		}
@@ -17,15 +15,10 @@ namespace Interactions.Application.ViewModels
 
 		public void StopTrial()
 		{
-			switch (_app.RecordVideo)
-			{
-				case false:
-						_app.Transitions.EndInSituTrial.Execute();
-					break;
-				case true:
-					_app.Transitions.ExportVideoOfInSituTrial.Execute();
-					break;
-			}
+			_app.Transitions.ExportVideoOfInSituTrial.Execute();
 		}
+
+		readonly App _app;
+		readonly IWebcamRecorder _recorder;
 	}
 }

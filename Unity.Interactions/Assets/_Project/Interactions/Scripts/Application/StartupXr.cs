@@ -3,20 +3,16 @@ using Interactions.Application.ViewModels;
 
 namespace Interactions.Application
 {
-	internal class XRStartup : State
+	internal class StartupXr : State
 	{
-		public XRStartup(App app) : base(app)
+		public StartupXr(App app) : base(app)
 		{
 		}
 
 		public override void Enter()
 		{
-			var xrStatusViewModel = new XRStatusViewModel();
-			_app.UI.XRStatusUI.Bind(xrStatusViewModel);
+			_app.UI.XRStatusUI.Bind(_app.XRStatusViewModel);
 			_app.UI.XRStatusUI.Show();
-
-			if (!XRStatus.HasXRErrors())
-				_app.Transitions.SelectCondition.Execute();
 		}
 
 		public override void Exit()

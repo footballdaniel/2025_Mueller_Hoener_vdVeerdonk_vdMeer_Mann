@@ -4,7 +4,7 @@ namespace Interactions.Application.Transitions
 {
 	public class Transition
 	{
-		public Transition(global::Interactions.Application.App app, State from, State to, IPredicate predicate = null)
+		public Transition(App app, State from, State to, IPredicate predicate = null)
 		{
 			_stateMachine = app.StateMachine;
 			_from = from;
@@ -25,8 +25,8 @@ namespace Interactions.Application.Transitions
 		}
 
 		readonly State _from;
+		readonly IPredicate _predicate;
 		readonly StateMachine _stateMachine;
 		readonly State _to;
-		readonly IPredicate _predicate;
 	}
 }

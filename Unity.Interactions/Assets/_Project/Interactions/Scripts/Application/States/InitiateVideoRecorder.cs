@@ -2,7 +2,7 @@
 {
 	internal class InitiateVideoRecorder : State
 	{
-		public InitiateVideoRecorder(global::Interactions.Application.App app) : base(app)
+		public InitiateVideoRecorder(App app) : base(app)
 		{
 		}
 
@@ -13,10 +13,7 @@
 
 		public override void Tick()
 		{
-			if (_app.ExperimentalCondition == ExperimentalCondition.InSitu)
-				_app.Transitions.NextInSituTrialWithVideoRecording.Execute();
-			else
-				_app.Transitions.NextLabTrialWithVideoRecording.Execute();
+			_app.Transitions.WaitForNextTrial.Execute();
 		}
 	}
 }

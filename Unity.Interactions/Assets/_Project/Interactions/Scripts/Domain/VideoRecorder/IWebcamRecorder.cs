@@ -6,13 +6,11 @@ namespace Interactions.Domain.VideoRecorder
 	{
 		Texture2D Frame { get; }
 		bool IsExportComplete { get; }
-		public WebcamInfo Info { get; }
+		public WebcamSpecs Specs { get; }
 		void Tick();
 		void StartRecording();
 		void StopRecording();
 		void Export(int trialNumber);
 		void RecordWith(float appRecordingFrameRateHz);
 	}
-
-	public record WebcamInfo(string DeviceName, int Width, int Height);
 }

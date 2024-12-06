@@ -21,6 +21,7 @@ namespace Interactions.Application
 
 			var viewModel = new InSituTrialViewModel(_app);
 			_app.UI.InSituUI.Bind(viewModel);
+			_app.UI.InSituUI.Show();
 		}
 
 		public override void Exit()

@@ -2,7 +2,7 @@
 {
 	public class State
 	{
-		protected readonly global::Interactions.Application.App _app;
+		protected global::Interactions.Application.App _app;
 
 		protected State(global::Interactions.Application.App app)
 		{
