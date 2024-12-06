@@ -2,6 +2,7 @@ using Interactions.Application.States;
 using Interactions.Application.Transitions;
 using Interactions.Application.ViewModels;
 using Interactions.Domain;
+using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 using Interactions.UI;
 using PassDetection.Replay;

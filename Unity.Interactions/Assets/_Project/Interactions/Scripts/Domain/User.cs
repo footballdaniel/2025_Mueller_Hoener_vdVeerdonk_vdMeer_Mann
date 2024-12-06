@@ -1,8 +1,9 @@
+using Interactions.Domain.Feet;
 using UnityEngine;
 
 namespace Interactions.Domain
 {
-	public class User : MonoBehaviour, IUser
+	public class User : MonoBehaviour
 	{
 		[Header("External dependencies")] 
 		[field: SerializeReference] public DominantFoot DominantFoot { get; private set; }

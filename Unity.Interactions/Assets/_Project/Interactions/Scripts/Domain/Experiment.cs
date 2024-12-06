@@ -1,3 +1,4 @@
+using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 
 namespace Interactions.Domain
