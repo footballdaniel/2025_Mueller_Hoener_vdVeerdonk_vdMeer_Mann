@@ -15,7 +15,7 @@ namespace Interactions.Application.ViewModels
 
 		public void StopTrial()
 		{
-			_app.Transitions.ExportVideoOfInSituTrial.Execute();
+			_app.Transitions.ExportVideo.Execute();
 		}
 
 		readonly App _app;

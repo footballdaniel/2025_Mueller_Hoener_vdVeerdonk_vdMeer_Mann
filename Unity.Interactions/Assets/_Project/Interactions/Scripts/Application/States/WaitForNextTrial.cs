@@ -8,6 +8,7 @@ namespace Interactions.Application.States
 
 		public override void Enter()
 		{
+			_app.UI.ExperimentOverlay.Bind(_app.ExperimentViewModel);
 			_app.UI.ExperimentOverlay.Show();
 		}
 	}

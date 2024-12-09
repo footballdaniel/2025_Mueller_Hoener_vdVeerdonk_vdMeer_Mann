@@ -1,31 +1,34 @@
+using System;
 using Interactions.Application.States;
 
 namespace Interactions.Application.Transitions
 {
 	public class Transition
 	{
-		public Transition(App app, State from, State to, IPredicate predicate = null)
+		public Transition(App app, State from, State to)
+		{
+			_stateMachine = app.StateMachine;
+			_from = new[] { from };
+			_to = to;
+
+		}
+
+		public Transition(App app, State[] from, State to)
 		{
 			_stateMachine = app.StateMachine;
 			_from = from;
 			_to = to;
-
-			_predicate = predicate ?? new NoPredicate();
 		}
 
 		public void Execute()
 		{
-			if (_stateMachine.CurrentState != _from)
+			if (Array.IndexOf(_from, _stateMachine.CurrentState) < 0)
 				return;
-
-			if (!_predicate.IsTrue())
-				return;
-
+			
 			_stateMachine.SetState(_to);
 		}
 
-		readonly State _from;
-		readonly IPredicate _predicate;
+		readonly State[] _from;
 		readonly StateMachine _stateMachine;
 		readonly State _to;
 	}

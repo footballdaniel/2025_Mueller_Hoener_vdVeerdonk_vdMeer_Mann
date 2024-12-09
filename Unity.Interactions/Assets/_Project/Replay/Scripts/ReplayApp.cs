@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
+using _Project.Replay.Scripts;
 using Interactions.Common;
 using Interactions.Domain;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Video;
 
-namespace _Project.Replay.Scripts
+namespace Replay.Scripts
 {
 	public class ReplayApp : MonoBehaviour
 	{
@@ -110,8 +111,7 @@ namespace _Project.Replay.Scripts
 		List<FrameEvent> _frameEvents;
 		GoalController _goalController;
 		bool _isPlaying;
-
-		int _lastFrameIndex = -1;
+		
 		Trial _trial;
 		bool _videoReady;
 	}

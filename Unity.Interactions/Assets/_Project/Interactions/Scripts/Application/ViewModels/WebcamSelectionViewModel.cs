@@ -10,9 +10,9 @@ namespace Interactions.Application.ViewModels
 		{
 			_app = app;
 			
-			Webcams = app.WebCamRecorders.GetAll()
-				.Prepend(new NoWebcamRecorder())
-				.ToList();
+			app.WebCamRecorders.Add(new NoWebcamRecorder());
+
+			Webcams = app.WebCamRecorders.GetAll();
 		}
 
 		public IEnumerable<IWebcamRecorder> Webcams { get; private set; }

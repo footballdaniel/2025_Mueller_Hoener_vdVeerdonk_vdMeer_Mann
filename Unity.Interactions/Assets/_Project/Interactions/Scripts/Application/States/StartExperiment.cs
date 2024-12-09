@@ -12,13 +12,12 @@ namespace Interactions.Application.States
 		public void ConditionSelected(ExperimentalCondition condition)
 		{
 			_app.ExperimentalCondition = condition;
-			_app.Transitions.StartExperiment.Execute();
+			_app.Transitions.SelectWebcam.Execute();
 		}
 
 
 		public override void Enter()
 		{
-			_app.UI.ExperimentOverlay.Bind(_app.ExperimentViewModel);
 			_app.UI.ExperimentSetupUI.Bind(this);
 			_app.UI.ExperimentSetupUI.Show();
 		}
@@ -26,12 +25,6 @@ namespace Interactions.Application.States
 		public override void Exit()
 		{
 			_app.UI.ExperimentSetupUI.Hide();
-		}
-
-
-		public override void Tick()
-		{
-			_app.Transitions.SelectWebcam.Execute();
 		}
 
 		public void DominantFootSelected(Side side)

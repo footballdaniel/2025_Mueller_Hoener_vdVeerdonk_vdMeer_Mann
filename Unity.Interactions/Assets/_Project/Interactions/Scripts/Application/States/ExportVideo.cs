@@ -20,17 +20,8 @@ namespace Interactions.Application.States
 		{
 			if (!_app.Experiment.WebcamRecorder.IsExportComplete)
 				return;
-
-
-			switch (_app.ExperimentalCondition)
-			{
-				case ExperimentalCondition.Laboratory:
-					_app.Transitions.EndLabTrialAfterExporting.Execute();
-					break;
-				case ExperimentalCondition.InSitu:
-					_app.Transitions.WaitForNextTrialInSitu.Execute();
-					break;
-			}
+			
+			_app.Transitions.InitiateRecorder.Execute();
 		}
 	}
 }

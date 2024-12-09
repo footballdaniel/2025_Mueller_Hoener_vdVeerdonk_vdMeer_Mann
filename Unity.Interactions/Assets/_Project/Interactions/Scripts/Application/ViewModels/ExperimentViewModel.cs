@@ -28,11 +28,11 @@ namespace Interactions.Application.ViewModels
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
-			//
-			// if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
-			// 	_app.Transitions.WaitForNextTrialLab
-			// else
-			// 	_app.Transitions.NextInSituTrialWithoutRecording.Execute();
+			
+			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
+				_app.Transitions.LaboratoryTrial.Execute();
+			else
+				_app.Transitions.InSituTrial.Execute();
 		}
 
 		public void ShowData()

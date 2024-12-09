@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Interactions.Application.States;
 using Interactions.Application.Transitions;
 using Interactions.Application.ViewModels;
@@ -69,8 +70,8 @@ namespace Interactions.Application
 			var startupXr = new StartupXr(this);
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
-			var waitForNextTrial = new WaitForNextTrial(this);
 			var initiateRecorder = new InitiateVideoRecorder(this);
+			var waitForNextTrial = new WaitForNextTrial(this);
 			var export = new ExportVideo(this);
 			var labTrial = new LabTrial(this);
 			var inSituTrial = new InSituTrial(this);
@@ -78,14 +79,12 @@ namespace Interactions.Application
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.InitiateRecorder = new Transition(this, selectWebcam, initiateRecorder);
+			Transitions.InitiateRecorder = new Transition(this, new State[]{selectWebcam, export}, initiateRecorder);
 			Transitions.WaitForNextTrial = new Transition(this, initiateRecorder, waitForNextTrial);
 			Transitions.LaboratoryTrial = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
-			Transitions.ExportVideo = new Transition(this, labTrial, export);
-			Transitions.ExportLA
-			Transitions.WaitForNextTrial = new Transition(this, export, initiateRecorder);
-			
+			Transitions.ExportVideo = new Transition(this, new State[]{ labTrial, inSituTrial }, export);
+
 			// Start app
 			StateMachine.SetState(startupXr);
 		}
@@ -101,14 +100,21 @@ namespace Interactions.Application
 			if (Keyboard.current.digit1Key.wasPressedThisFrame)
 				Transitions.StartExperiment.Execute();
 
-
 			if (Keyboard.current.digit2Key.wasPressedThisFrame)
+				Transitions.SelectWebcam.Execute();
+
+			if (Keyboard.current.digit3Key.wasPressedThisFrame)
 			{
-				ExperimentalCondition = ExperimentalCondition.Laboratory;
 				var recorder = WebCamRecorders.Get(0);
 				WebcamSelectionViewModel.Select(recorder);
 				Transitions.InitiateRecorder.Execute();
 			}
+			
+			if (Keyboard.current.digit4Key.wasPressedThisFrame)
+				Transitions.LaboratoryTrial.Execute();
+			
+			if (Keyboard.current.digit5Key.wasPressedThisFrame)
+				Transitions.InSituTrial.Execute();
 		}
 	}
 

@@ -6,5 +6,6 @@ namespace Interactions.Domain.VideoRecorder
 	{
 		T Get(int id);
 		IEnumerable<T> GetAll();
+		void Add(T entity);
 	}
 }
