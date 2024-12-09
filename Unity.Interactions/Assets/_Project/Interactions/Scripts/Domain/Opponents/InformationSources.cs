@@ -11,9 +11,12 @@ namespace Interactions.Domain.Opponents
 			for (var i = 0; i < _sources.Count; i++)
 			{
 				var (src, _) = _sources[i];
-				_sources[i] = (src, src == activeSource ? 1f : 0f);
+				_sources[i] = (src, 0f);
 			}
+			_sources.RemoveAll(x => x.Item1.GetType() == activeSource.GetType());
+			_sources.Add((activeSource, 1f));
 		}
+
 
 		public void Add(IInformationSource source, float weight)
 		{

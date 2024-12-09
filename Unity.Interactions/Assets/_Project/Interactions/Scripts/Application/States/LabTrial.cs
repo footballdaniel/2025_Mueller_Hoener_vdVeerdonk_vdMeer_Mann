@@ -17,8 +17,16 @@ namespace Interactions.Application.States
 			_app.Experiment.NextTrial();
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal);
+			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
+
+			_app.Experiment.Opponent.BallIntercepted += OnBallIntercepted;
 
 			_lastPassTime = Time.time;
+		}
+
+		void OnBallIntercepted(Vector2 direction)
+		{
+			_ball.Play(new Pass(3, _ball.transform.position, new Vector3(direction.x, 0, direction.y)));
 		}
 
 		public override void Exit()
@@ -26,6 +34,8 @@ namespace Interactions.Application.States
 			_hasPassed = false;
 			Object.Destroy(_app.Experiment.Ball.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
+			
+			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
 		}
 
 		public override void Tick()
@@ -57,12 +67,11 @@ namespace Interactions.Application.States
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
 					var passDirection = new Vector3(passVelocity.normalized.x, 0, passVelocity.normalized.z);
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
-					var ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-					ball.Play(pass);
+					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
+					_ball.Play(pass);
 
-					_app.Experiment.Opponent.Intercept(ball);
-
-					_app.Experiment.Ball = ball;
+					_app.Experiment.Opponent.Intercept(_ball);
+					_app.Experiment.Ball = _ball;
 				}
 
 				_updateTimer -= deltaTime;
@@ -73,5 +82,6 @@ namespace Interactions.Application.States
 		InputDataQueue _inputDataQueue;
 		float _lastPassTime;
 		float _updateTimer;
+		Ball _ball;
 	}
 }
