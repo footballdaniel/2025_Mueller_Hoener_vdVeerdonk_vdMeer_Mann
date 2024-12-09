@@ -25,6 +25,7 @@ namespace PassDetection.Replay
 		public void Dispose()
 		{
 			_worker?.Dispose();
+			
 		}
 
 
@@ -47,6 +48,7 @@ namespace PassDetection.Replay
 			var result = cpuOutputTensor[0];
 			cpuOutputTensor.Dispose();
 			input.Dispose();
+			outputTensor.Dispose();
 
 			return result;
 		}

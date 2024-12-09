@@ -32,10 +32,12 @@ namespace Interactions.Application.States
 		public override void Exit()
 		{
 			_hasPassed = false;
-			Object.Destroy(_app.Experiment.Ball.gameObject);
+			Object.Destroy(_app.Experiment.Ball?.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 			
 			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
+			
+			_app.Experiment.CurrentTrial.Save();
 		}
 
 		public override void Tick()
