@@ -65,26 +65,17 @@ namespace Interactions.Infra
 		public void Tick()
 		{
 			// TickSynchronous();
-
-			// try
-			// {
-			// 	Task.Run(TickSynchronous);
-			// }
-			// catch (Exception e)
-			// {
-			// 	Debug.LogError(e);
-			// }
-
-
 			
 			Graphics.Blit(_webcamTexture, _renderTexture);
-
-			// AsyncGPUReadback.Request(_webcamTexture, 0, Callback);
 			AsyncGPUReadback.Request(_renderTexture, 0, GraphicsFormat.R8G8B8A8_UNorm, Callback);
 		}
 
 		void Callback(AsyncGPUReadbackRequest request)
 		{
+			if (!_texture2D)
+				return;
+			
+			
 			var rawData = request.GetData<Color32>().ToArray();
 			_texture2D.SetPixels32(rawData);
 			_texture2D.Apply();

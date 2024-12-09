@@ -11,8 +11,8 @@ namespace Interactions.Application
 
 		public override void Enter()
 		{
-			_app.UI.XRStatusUI.Bind(_app.XRStatusViewModel);
 			_app.UI.XRStatusUI.Show();
+			_app.UI.XRStatusUI.Bind(_app.XRStatusViewModel);
 		}
 
 		public override void Exit()
