@@ -25,14 +25,23 @@ namespace Interactions.Domain.Opponents
 			var targetDirection = finalPos - currentPosition;
 			targetDirection.y = 0;
 			var distanceToTarget = targetDirection.magnitude;
-			var targetSpeed = _maxSpeed;
-			if (distanceToTarget < 0.25f)
-				targetSpeed *= distanceToTarget / 0.25f;
+
+			var ratio = Mathf.Clamp01(distanceToTarget / 1f);
+			var easedRatio = ratio * ratio * ratio;
+			var targetSpeed = _maxSpeed * easedRatio;
+
 			if (distanceToTarget > 0.0001f)
 				targetDirection.Normalize();
 			else
 				targetDirection = Vector3.zero;
-			var desiredVelocity3D = Vector3.MoveTowards(_currentVelocity, targetDirection * targetSpeed, _acceleration * deltaTime);
+
+			var desiredVelocity = targetDirection * targetSpeed;
+			var desiredVelocity3D = Vector3.MoveTowards(_currentVelocity, desiredVelocity, _acceleration * deltaTime);
+			var step = desiredVelocity3D * deltaTime;
+
+			if (step.magnitude > distanceToTarget)
+				desiredVelocity3D = targetDirection * (distanceToTarget / deltaTime);
+
 			Velocity = new Vector2(desiredVelocity3D.x, desiredVelocity3D.z);			
 			var localVelocity2D = new Vector2(
 				Vector3.Dot(desiredVelocity3D, currentRotation * Vector3.right),
@@ -40,8 +49,7 @@ namespace Interactions.Domain.Opponents
 			);
 			LocalVelocity = localVelocity2D;
 			_currentVelocity = desiredVelocity3D;
-			var nextPosition = currentPosition + desiredVelocity3D * deltaTime;
-			return nextPosition;
+			return currentPosition + desiredVelocity3D * deltaTime;
 		}
 
 		public Quaternion Rotate(InformationSources sources, Vector3 currentPosition, Quaternion currentRotation, float deltaTime)
