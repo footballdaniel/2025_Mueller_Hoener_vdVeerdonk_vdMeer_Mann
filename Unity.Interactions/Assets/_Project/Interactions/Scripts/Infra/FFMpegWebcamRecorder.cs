@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Interactions.Domain.VideoRecorder;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace Interactions.Infra
 		public bool IsExportComplete => _isExportComplete;
 		public bool IsPlaying => _webcamTexture.isPlaying;
 
-		
+
 		public void StopRecording()
 		{
 			_isRecording = false;
@@ -41,7 +42,7 @@ namespace Interactions.Infra
 			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGB24, false);
 			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, Specs.FrameRate);
 			_webcamTexture.Play();
-			
+
 			if (Directory.Exists(_frameFolderPath))
 				Directory.Delete(_frameFolderPath, true);
 
@@ -58,10 +59,16 @@ namespace Interactions.Infra
 
 		public void Tick()
 		{
-			UpdateTexture();
-
-			if (_isRecording)
-				SaveFrameAsPng();
+			TickSynchronous();
+			
+			// try
+			// {
+			// 	Task.Run(TickSynchronous);
+			// }
+			// catch (Exception e)
+			// {
+			// 	Debug.LogError(e);
+			// }
 		}
 
 		void OnExportCompleted()
@@ -78,17 +85,20 @@ namespace Interactions.Infra
 			_frameIndex++;
 		}
 
+		void TickSynchronous()
+		{
+			UpdateTexture();
+
+			if (_isRecording)
+				SaveFrameAsPng();
+		}
+
 		void UpdateTexture()
 		{
-			_texture2D = new Texture2D(_webcamTexture.width, _webcamTexture.height);
 			_texture2D.SetPixels32(_webcamTexture.GetPixels32());
 			_texture2D.Apply(false);
 		}
-		
-		~FfMpegWebcamRecorder()
-		{
-			_webcamTexture.Stop();
-		}
+
 
 		readonly string _frameFolderPath;
 		readonly IProgress<int> _progress;
@@ -99,5 +109,10 @@ namespace Interactions.Infra
 		bool _isRecording;
 		Texture2D _texture2D;
 		WebCamTexture _webcamTexture;
+
+		~FfMpegWebcamRecorder()
+		{
+			_webcamTexture.Stop();
+		}
 	}
 }

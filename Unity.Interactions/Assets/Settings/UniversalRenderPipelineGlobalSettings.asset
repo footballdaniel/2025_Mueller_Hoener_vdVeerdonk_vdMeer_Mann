@@ -36,24 +36,24 @@ MonoBehaviour:
       - rid: 134415734353690624
       - rid: 134415734353690625
       - rid: 134415734353690626
-      - rid: 4437497204208304234
+      - rid: 4437497204208304272
       - rid: 134415734353690628
       - rid: 134415734353690629
-      - rid: 4437497204208304235
-      - rid: 4437497204208304236
+      - rid: 4437497204208304273
+      - rid: 4437497204208304274
       - rid: 134415734353690632
-      - rid: 4437497204208304237
+      - rid: 4437497204208304275
       - rid: 134415734353690634
-      - rid: 4437497204208304238
+      - rid: 4437497204208304276
       - rid: 134415734353690636
-      - rid: 4437497204208304239
-      - rid: 4437497204208304240
+      - rid: 4437497204208304277
+      - rid: 4437497204208304278
       - rid: 134415734353690639
       - rid: 134415734353690640
-      - rid: 4437497204208304241
-      - rid: 4437497204208304242
+      - rid: 4437497204208304279
+      - rid: 4437497204208304280
       - rid: 134415734353690643
-      - rid: 4437497204208304243
+      - rid: 4437497204208304281
     m_RuntimeSettings:
       m_List:
       - rid: 134415734353690624
@@ -183,7 +183,7 @@ MonoBehaviour:
         m_version: 0
         m_EnableCompilationCaching: 1
         m_EnableValidityChecks: 1
-    - rid: 4437497204208304234
+    - rid: 4437497204208304272
       type: {class: Renderer2DResources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         m_Version: 0
@@ -207,7 +207,7 @@ MonoBehaviour:
           type: 2}
         m_DefaultMaskMaterial: {fileID: 2100000, guid: 15d0c3709176029428a0da2f8cecf0b5,
           type: 2}
-    - rid: 4437497204208304235
+    - rid: 4437497204208304273
       type: {class: URPShaderStrippingSetting, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}
       data:
@@ -215,7 +215,7 @@ MonoBehaviour:
         m_StripUnusedPostProcessingVariants: 1
         m_StripUnusedVariants: 1
         m_StripScreenCoordOverrideVariants: 1
-    - rid: 4437497204208304236
+    - rid: 4437497204208304274
       type: {class: UniversalRenderPipelineEditorMaterials, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}
       data:
@@ -229,7 +229,7 @@ MonoBehaviour:
           type: 2}
         m_DefaultDecalMaterial: {fileID: 2100000, guid: 31d0dcc6f2dd4e4408d18036a2c93862,
           type: 2}
-    - rid: 4437497204208304237
+    - rid: 4437497204208304275
       type: {class: UniversalRenderPipelineEditorShaders, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}
       data:
@@ -251,7 +251,7 @@ MonoBehaviour:
           type: 3}
         m_DefaultSpeedTree9Shader: {fileID: -6465566751694194690, guid: cbd3e1cc4ae141c42a30e33b4d666a61,
           type: 3}
-    - rid: 4437497204208304238
+    - rid: 4437497204208304276
       type: {class: GPUResidentDrawerResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.GPUDriven.Runtime}
       data:
         m_Version: 0
@@ -273,7 +273,7 @@ MonoBehaviour:
           type: 3}
         m_DebugOccluderPS: {fileID: 4800000, guid: b3c92426a88625841ab15ca6a7917248,
           type: 3}
-    - rid: 4437497204208304239
+    - rid: 4437497204208304277
       type: {class: ProbeVolumeDebugResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_Version: 1
@@ -289,7 +289,7 @@ MonoBehaviour:
           type: 3}
         numbersDisplayTex: {fileID: 2800000, guid: 73fe53b428c5b3440b7e87ee830b608a,
           type: 3}
-    - rid: 4437497204208304240
+    - rid: 4437497204208304278
       type: {class: ProbeVolumeBakingResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_Version: 1
@@ -311,12 +311,12 @@ MonoBehaviour:
           type: 3}
         renderingLayerRT: {fileID: -5126288278712620388, guid: 94a070d33e408384bafc1dea4a565df9,
           type: 3}
-    - rid: 4437497204208304241
+    - rid: 4437497204208304279
       type: {class: ProbeVolumeGlobalSettings, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_Version: 1
         m_ProbeVolumeDisableStreamingAssets: 0
-    - rid: 4437497204208304242
+    - rid: 4437497204208304280
       type: {class: ProbeVolumeRuntimeResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_Version: 1
@@ -326,7 +326,7 @@ MonoBehaviour:
           type: 3}
         probeVolumeUploadDataL2CS: {fileID: 7200000, guid: 6196f34ed825db14b81fb3eb0ea8d931,
           type: 3}
-    - rid: 4437497204208304243
+    - rid: 4437497204208304281
       type: {class: IncludeAdditionalRPAssets, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_version: 0
