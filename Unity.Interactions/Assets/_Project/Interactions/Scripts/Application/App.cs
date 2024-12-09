@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using Interactions.Application.States;
 using Interactions.Application.Transitions;
 using Interactions.Application.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.VideoRecorder;
+using Interactions.Infra;
 using Interactions.UI;
 using PassDetection.Replay;
 using Tactive.MachineLearning.Models;
@@ -16,7 +16,6 @@ namespace Interactions.Application
 	{
 		[Header("Settings")]
 		public int RecordingFrameRateHz = 10;
-
 		public ModelAssetWithMetadata LstmModelAsset;
 		public AudioClip PassSoundClip;
 
@@ -37,6 +36,7 @@ namespace Interactions.Application
 		public RightGoal RightGoal { get; private set; }
 		public LeftGoal LeftGoal { get; private set; }
 		public ExperimentViewModel ExperimentViewModel { get; private set; }
+		public XRTrackers XRTrackers { get; set; }
 
 		void Start()
 		{
@@ -51,6 +51,7 @@ namespace Interactions.Application
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			LeftGoal = ServiceLocator.Get<LeftGoal>();
 			RightGoal = ServiceLocator.Get<RightGoal>();
+			XRTrackers = ServiceLocator.Get<XRTrackers>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
@@ -79,15 +80,16 @@ namespace Interactions.Application
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.InitiateRecorder = new Transition(this, new State[]{selectWebcam, export}, initiateRecorder);
+			Transitions.InitiateRecorder = new Transition(this, new State[] { selectWebcam, export }, initiateRecorder);
 			Transitions.WaitForNextTrial = new Transition(this, initiateRecorder, waitForNextTrial);
 			Transitions.LaboratoryTrial = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
-			Transitions.ExportVideo = new Transition(this, new State[]{ labTrial, inSituTrial }, export);
+			Transitions.ExportVideo = new Transition(this, new State[] { labTrial, inSituTrial }, export);
 
 			// Start app
 			StateMachine.SetState(startupXr);
 		}
+
 
 		void Update()
 		{
@@ -109,10 +111,10 @@ namespace Interactions.Application
 				WebcamSelectionViewModel.Select(recorder);
 				Transitions.InitiateRecorder.Execute();
 			}
-			
+
 			if (Keyboard.current.digit4Key.wasPressedThisFrame)
 				Transitions.LaboratoryTrial.Execute();
-			
+
 			if (Keyboard.current.digit5Key.wasPressedThisFrame)
 				Transitions.InSituTrial.Execute();
 		}

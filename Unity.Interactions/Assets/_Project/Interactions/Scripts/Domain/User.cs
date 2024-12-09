@@ -14,7 +14,6 @@ namespace Interactions.Domain
 		{
 			transform.parent = Head.transform;
 		}
-	
 
 		public Vector2 Position => new(transform.position.x, transform.position.z);
 	}

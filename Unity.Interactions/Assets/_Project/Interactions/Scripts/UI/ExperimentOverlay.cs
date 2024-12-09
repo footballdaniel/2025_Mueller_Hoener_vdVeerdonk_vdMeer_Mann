@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Interactions.UI
 {
-	public class ExperimentOverlay : MonoBehaviour
+	public class ExperimentOverlay : UIScreen
 	{
 		[SerializeField] TMP_Text _fpsText;
 		[SerializeField] TMP_Text _xrStatusText;
@@ -17,12 +17,9 @@ namespace Interactions.UI
 		[SerializeField] Button _exitButton;
 		[SerializeField] TMP_Text _progressText;
 		[SerializeField] Slider _progressSlider;
+		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
+		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		
-		public void Show()
-		{
-			gameObject.SetActive(true);
-		}	
-
 		void Update()
 		{
 			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
@@ -46,6 +43,14 @@ namespace Interactions.UI
 
 			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;
 			viewModel.Progress.ProgressChanged += OnProgressChanged;
+			
+			var headTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
+			var dominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
+			var nonDominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
+			
+			dominantFootTracker.Bind(viewModel.DominantFootTracker);
+			headTracker.Bind(viewModel.HeadTracker);
+			nonDominantFootTracker.Bind(viewModel.NonDominantFootTracker);
 		}
 
 		void OnCanStartNextTrialChanged(bool canStart)

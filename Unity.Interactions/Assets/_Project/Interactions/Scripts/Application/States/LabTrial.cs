@@ -36,7 +36,6 @@ namespace Interactions.Application.States
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 			
 			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
-			
 			_app.Experiment.CurrentTrial.Save();
 		}
 
@@ -46,12 +45,11 @@ namespace Interactions.Application.States
 			var deltaTime = 1f / frameRateHz;
 			_updateTimer += Time.fixedDeltaTime;
 			var epsilon = 0.0001f;
-
-			_app.Experiment.CurrentTrial.Tick(Time.deltaTime);
-
+			
 			if (_updateTimer >= deltaTime - epsilon)
 			{
 				_app.Experiment.WebcamRecorder.Tick();
+				_app.Experiment.CurrentTrial.Tick(deltaTime);
 				
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);

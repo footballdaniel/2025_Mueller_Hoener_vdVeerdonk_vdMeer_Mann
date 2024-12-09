@@ -14,6 +14,9 @@ namespace Interactions.Application.ViewModels
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
 		public Observable<bool> CanStartNextTrial { get; } = new(true);
+		public XRTracker HeadTracker => _app.XRTrackers.HeadTracker;
+		public XRTracker DominantFootTracker => _app.XRTrackers.DominantFootTracker;
+		public XRTracker NonDominantFootTracker => _app.XRTrackers.NonDominantFootTracker;
 
 		public void Exit()
 		{
