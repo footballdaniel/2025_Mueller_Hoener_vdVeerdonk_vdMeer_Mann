@@ -2,7 +2,6 @@ namespace Interactions.Application.Transitions
 {
 	public class Transitions
 	{
-		public Transition SelectCondition { get; set; }
 		public Transition SelectWebcam { get; set; }
 		public Transition StartExperiment { get; set; }
 		public Transition InitiateRecorder { get; set; }

@@ -10,14 +10,16 @@ namespace Interactions.Application.ViewModels
 			_app = app;
 		}
 
-		public event Action XRStartupErrorOccurred;
 
-		public void CheckForErrors()
+		public void Startup()
 		{
-			if (XRStatusChecker.HasXRErrors())
-				XRStartupErrorOccurred?.Invoke();
-			else
-				_app.Transitions.SelectCondition.Execute();
+			_app.Transitions.StartExperiment.Execute();
+		}
+
+		public bool HasErrors()
+		{
+			return XRStatusChecker.HasXRErrors();
+			
 		}
 
 		readonly App _app;

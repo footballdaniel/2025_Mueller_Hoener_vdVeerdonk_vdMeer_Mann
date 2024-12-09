@@ -10,13 +10,10 @@ namespace Interactions.UI
 
 		public void Bind(XRStatusViewModel viewModel)
 		{
-			viewModel.CheckForErrors();
-			viewModel.XRStartupErrorOccurred += OnXRStartupErrorOccurred;
-		}
-
-		void OnXRStartupErrorOccurred()
-		{
-			_errorText.gameObject.SetActive(true);
+			if (viewModel.HasErrors())
+				_errorText.gameObject.SetActive(true);
+			else
+				viewModel.Startup();
 		}
 	}
 }

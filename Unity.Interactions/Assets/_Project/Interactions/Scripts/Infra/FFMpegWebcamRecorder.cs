@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using Interactions.Domain.VideoRecorder;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Interactions.Infra
 {
@@ -39,7 +39,7 @@ namespace Interactions.Infra
 
 		public void Initiate()
 		{
-			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGB24, false);
+			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGB24, true);
 			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, Specs.FrameRate);
 			_webcamTexture.Play();
 
@@ -59,8 +59,8 @@ namespace Interactions.Infra
 
 		public void Tick()
 		{
-			TickSynchronous();
-			
+			// TickSynchronous();
+
 			// try
 			// {
 			// 	Task.Run(TickSynchronous);
@@ -69,7 +69,21 @@ namespace Interactions.Infra
 			// {
 			// 	Debug.LogError(e);
 			// }
+
+
+			AsyncGPUReadback.Request(_webcamTexture, 0, Callback);
 		}
+
+		void Callback(AsyncGPUReadbackRequest request)
+		{
+			var rawData = request.GetData<byte>().ToArray();
+			_texture2D.LoadRawTextureData(rawData);
+			_texture2D.Apply();
+			
+			if (_isRecording)
+				SaveFrameAsPng();
+		}
+		
 
 		void OnExportCompleted()
 		{
@@ -112,7 +126,7 @@ namespace Interactions.Infra
 
 		~FfMpegWebcamRecorder()
 		{
-			_webcamTexture.Stop();
+			_webcamTexture?.Stop();
 		}
 	}
 }
