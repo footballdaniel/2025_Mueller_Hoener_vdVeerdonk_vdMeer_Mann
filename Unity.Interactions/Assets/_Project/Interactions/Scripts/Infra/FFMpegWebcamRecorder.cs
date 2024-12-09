@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Interactions.Domain.VideoRecorder;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
 namespace Interactions.Infra
@@ -39,9 +40,13 @@ namespace Interactions.Infra
 
 		public void Initiate()
 		{
-			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGB24, true);
+			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGBA32, true);
 			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, Specs.FrameRate);
 			_webcamTexture.Play();
+			
+			_renderTexture = new RenderTexture(Specs.Width, Specs.Height, 0, RenderTextureFormat.ARGB32);
+			_renderTexture.enableRandomWrite = true;
+			_renderTexture.Create();
 
 			if (Directory.Exists(_frameFolderPath))
 				Directory.Delete(_frameFolderPath, true);
@@ -71,14 +76,19 @@ namespace Interactions.Infra
 			// }
 
 
-			AsyncGPUReadback.Request(_webcamTexture, 0, Callback);
+			
+			Graphics.Blit(_webcamTexture, _renderTexture);
+
+			// AsyncGPUReadback.Request(_webcamTexture, 0, Callback);
+			AsyncGPUReadback.Request(_renderTexture, 0, GraphicsFormat.R8G8B8A8_UNorm, Callback);
 		}
 
 		void Callback(AsyncGPUReadbackRequest request)
 		{
-			var rawData = request.GetData<byte>().ToArray();
-			_texture2D.LoadRawTextureData(rawData);
+			var rawData = request.GetData<Color32>().ToArray();
+			_texture2D.SetPixels32(rawData);
 			_texture2D.Apply();
+
 			
 			if (_isRecording)
 				SaveFrameAsPng();
@@ -123,6 +133,7 @@ namespace Interactions.Infra
 		bool _isRecording;
 		Texture2D _texture2D;
 		WebCamTexture _webcamTexture;
+		RenderTexture _renderTexture;
 
 		~FfMpegWebcamRecorder()
 		{
