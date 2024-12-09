@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Interactions.Domain.VideoRecorder;
 
 namespace Interactions.Application.ViewModels
@@ -20,8 +19,7 @@ namespace Interactions.Application.ViewModels
 		public void Select(IWebcamRecorder webcam)
 		{
 			_app.Experiment.WebcamRecorder = webcam;
-			_app.Experiment.WebcamRecorder.RecordWith(_app.RecordingFrameRateHz);
-			_app.Transitions.InitiateRecorder.Execute();
+			_app.Experiment.WebcamRecorder.Initiate();
 		}
 
 		readonly App _app;

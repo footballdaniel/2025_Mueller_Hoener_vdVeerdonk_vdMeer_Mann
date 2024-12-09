@@ -72,8 +72,8 @@ namespace Interactions.Application
 			var startupXr = new StartupXr(this);
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
-			var initiateRecorder = new InitiateVideoRecorder(this);
 			var waitForNextTrial = new WaitForNextTrial(this);
+			var initiateRecorder = new InitiateVideoRecorder(this);
 			var export = new ExportVideo(this);
 			var labTrial = new LabTrial(this);
 			var inSituTrial = new InSituTrial(this);
@@ -81,8 +81,8 @@ namespace Interactions.Application
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.InitiateRecorder = new Transition(this, new State[] { selectWebcam, export }, initiateRecorder);
-			Transitions.WaitForNextTrial = new Transition(this, initiateRecorder, waitForNextTrial);
+			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, export }, waitForNextTrial);
+			Transitions.InitiateRecorder =  new Transition(this, waitForNextTrial, initiateRecorder);
 			Transitions.LaboratoryTrial = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
 			Transitions.ExportVideo = new Transition(this, new State[] { labTrial, inSituTrial }, export);

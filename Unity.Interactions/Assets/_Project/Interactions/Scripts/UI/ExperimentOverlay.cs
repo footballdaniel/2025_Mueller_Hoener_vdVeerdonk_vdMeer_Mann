@@ -25,21 +25,18 @@ namespace Interactions.UI
 		{
 			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
 
-			if (!_shouldUpdate)
-				return;
-
 			_progressSlider.maxValue = _newProgress.MaxValue;
 			_progressText.text = $"{_newProgress.Title}: {_newProgress.Task}";
 			_progressSlider.value = _newProgress.Value;
-
-			if (_viewmodel.Frame != null)
-				_cameraFeed.texture = _viewmodel.Frame;
+			
+			_cameraFeed.texture = _viewmodel.Frame;
 		}
 
 		public void Bind(ExperimentViewModel viewModel)
 		{
 			Unbind();
 
+			_newProgress = new ProgressStatement();
 			_viewmodel = viewModel;
 			_cameraFeed.gameObject.SetActive(true);
 
@@ -73,7 +70,6 @@ namespace Interactions.UI
 
 		void OnProgressChanged(ProgressStatement progress)
 		{
-			_shouldUpdate = true;
 			_newProgress = progress;
 		}
 

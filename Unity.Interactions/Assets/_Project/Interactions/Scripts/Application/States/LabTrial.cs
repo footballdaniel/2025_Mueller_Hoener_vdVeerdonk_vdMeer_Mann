@@ -13,6 +13,8 @@ namespace Interactions.Application.States
 
 		public override void Enter()
 		{
+			_app.Experiment.WebcamRecorder.StartRecording();
+			
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
@@ -43,7 +45,7 @@ namespace Interactions.Application.States
 		{
 			var frameRateHz = 10f;
 			var deltaTime = 1f / frameRateHz;
-			_updateTimer += Time.fixedDeltaTime;
+			_updateTimer += Time.deltaTime;
 			var epsilon = 0.0001f;
 			
 			if (_updateTimer >= deltaTime - epsilon)

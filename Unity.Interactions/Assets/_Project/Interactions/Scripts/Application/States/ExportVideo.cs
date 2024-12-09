@@ -21,7 +21,7 @@ namespace Interactions.Application.States
 			if (!_app.Experiment.WebcamRecorder.IsExportComplete)
 				return;
 			
-			_app.Transitions.InitiateRecorder.Execute();
+			_app.Transitions.WaitForNextTrial.Execute();
 		}
 	}
 }

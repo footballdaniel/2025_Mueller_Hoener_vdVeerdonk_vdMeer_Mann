@@ -1,4 +1,5 @@
 using Interactions.Domain.VideoRecorder;
+using Interactions.Infra;
 
 namespace Interactions.Domain
 {
@@ -12,7 +13,7 @@ namespace Interactions.Domain
 
 		public Side DominantFoot { get; set; }
 		public int FrameRateHz { get; private set; }
-		public IWebcamRecorder WebcamRecorder { get; set; }
+		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();
 		public Opponent Opponent { get; set; }
 		public Ball Ball { get; set; }
 		public Trial CurrentTrial { get; private set; }
@@ -25,4 +26,5 @@ namespace Interactions.Domain
 
 		int _currentTrialIndex;
 	}
+
 }

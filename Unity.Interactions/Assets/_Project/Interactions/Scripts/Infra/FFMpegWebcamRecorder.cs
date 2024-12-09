@@ -5,63 +5,63 @@ using UnityEngine;
 
 namespace Interactions.Infra
 {
-	public class FFMpegWebcamRecorder : IWebcamRecorder
+	public class FfMpegWebcamRecorder : IWebcamRecorder
 	{
 
-		public FFMpegWebcamRecorder(string deviceName, int width, int height,  IProgress<int> progress)
+		public FfMpegWebcamRecorder(WebcamSpecs specs, IProgress<int> progress)
 		{
-			Specs = new WebcamSpecs(deviceName, width, height);
+			Specs = specs;
 			_progress = progress;
-			_exportFramerate = 10f;
-
 			_frameFolderPath = Path.Combine(UnityEngine.Application.persistentDataPath, "CapturedFrames");
 		}
 
 		public Texture2D Frame => _texture2D;
 		public bool IsExportComplete => _isExportComplete;
+		public bool IsPlaying => _webcamTexture.isPlaying;
 
+		
 		public void StopRecording()
 		{
-			_webcamTexture.Stop();
+			_isRecording = false;
 		}
 
 		public void Export(int trialNumber)
 		{
+			_isExportComplete = false;
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 			var fileName = $"trial_{trialNumber}_{fileNameWithDateTime}.mp4";
 			var videoOutputPath = Path.Combine(UnityEngine.Application.persistentDataPath, fileName);
 
-
 			FFMpegExporter.ExportCompleted += OnExportCompleted;
-			FFMpegExporter.Export(_frameFolderPath, videoOutputPath, _exportFramerate, _frameIndex, _progress);
+			FFMpegExporter.Export(_frameFolderPath, videoOutputPath, Specs.FrameRate, _frameIndex, _progress);
 		}
 
-		public void RecordWith(float appRecordingFrameRateHz)
+		public void Initiate()
 		{
-			_exportFramerate = appRecordingFrameRateHz;
+			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGB24, false);
+			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, Specs.FrameRate);
+			_webcamTexture.Play();
+			
+			if (Directory.Exists(_frameFolderPath))
+				Directory.Delete(_frameFolderPath, true);
+
+			Directory.CreateDirectory(_frameFolderPath);
 		}
 
 		public WebcamSpecs Specs { get; private set; }
 
 		public void StartRecording()
 		{
+			_isRecording = true;
 			_frameIndex = 0;
-			
-			if (Directory.Exists(_frameFolderPath))
-				Directory.Delete(_frameFolderPath, true);
-			
-			Directory.CreateDirectory(_frameFolderPath);
-			
-			
-			_isExportComplete = false;
-			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, (int)_exportFramerate);
-			_webcamTexture.Play();
 		}
 
 		public void Tick()
 		{
-			SaveFrameAsPng();
-			_frameIndex++;
+			UpdateTexture();
+
+			if (_isRecording)
+				SaveFrameAsPng();
 		}
 
 		void OnExportCompleted()
@@ -72,20 +72,31 @@ namespace Interactions.Infra
 
 		void SaveFrameAsPng()
 		{
-			_texture2D = new Texture2D(_webcamTexture.width, _webcamTexture.height);
-			_texture2D.SetPixels32(_webcamTexture.GetPixels32());
-			_texture2D.Apply();
-
 			var frameBytes = _texture2D.EncodeToPNG();
 			var fileName = Path.Combine(_frameFolderPath, $"frame_{_frameIndex:D6}.png");
 			File.WriteAllBytes(fileName, frameBytes);
+			_frameIndex++;
 		}
 
-		float _exportFramerate;
+		void UpdateTexture()
+		{
+			_texture2D = new Texture2D(_webcamTexture.width, _webcamTexture.height);
+			_texture2D.SetPixels32(_webcamTexture.GetPixels32());
+			_texture2D.Apply(false);
+		}
+		
+		~FfMpegWebcamRecorder()
+		{
+			_webcamTexture.Stop();
+		}
+
 		readonly string _frameFolderPath;
 		readonly IProgress<int> _progress;
+
+		float _exportFramerate;
 		int _frameIndex;
 		bool _isExportComplete;
+		bool _isRecording;
 		Texture2D _texture2D;
 		WebCamTexture _webcamTexture;
 	}

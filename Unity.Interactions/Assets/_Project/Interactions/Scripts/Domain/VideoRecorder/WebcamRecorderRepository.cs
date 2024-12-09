@@ -7,28 +7,31 @@ namespace Interactions.Domain.VideoRecorder
 {
 	public class WebcamRecorderRepository : MonoBehaviour, IRepository<IWebcamRecorder>
 	{
-
 		void Start()
 		{
 			var devices = WebCamTexture.devices;
-			var uniqueSettings = new HashSet<WebCamConfiguration>();
+			var uniqueSettings = new HashSet<WebcamSpecs>();
 
 			foreach (var device in devices)
 			foreach (var resolution in VideoCapture.SupportedResolutions)
-				uniqueSettings.Add(new WebCamConfiguration(device.name, resolution.width, resolution.height));
-
-			foreach (var setting in uniqueSettings)
 			{
-				var recorder = new FFMpegWebcamRecorder(setting.DeviceName, setting.Width, setting.Height, ProgressIndicator.Instance);
-				_recorders.Add(recorder);
+				var frameRates = VideoCapture.GetSupportedFrameRatesForResolution(resolution);
+				var minFrameRate = float.MaxValue;
+				foreach (var frameRate in frameRates)
+					if (frameRate < minFrameRate)
+						minFrameRate = frameRate;
+				
+				uniqueSettings.Add(new WebcamSpecs(device.name, resolution.width, resolution.height, (int)minFrameRate));
 			}
+
+			foreach (var specs in uniqueSettings)
+				_recorders.Add(new FfMpegWebcamRecorder(specs, ProgressIndicator.Instance));
 		}
 
 		public IWebcamRecorder Get(int id)
 		{
 			return _recorders[id];
 		}
-
 
 		public IEnumerable<IWebcamRecorder> GetAll()
 		{

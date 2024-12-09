@@ -12,6 +12,12 @@ namespace Interactions.Application.States
 			_app.UI.WebcamSelectionUI.Show();
 		}
 
+		public override void Tick()
+		{
+			if (_app.Experiment.WebcamRecorder.IsPlaying)
+				_app.Transitions.WaitForNextTrial.Execute();
+		}
+
 		public override void Exit()
 		{
 			_app.UI.WebcamSelectionUI.Hide();

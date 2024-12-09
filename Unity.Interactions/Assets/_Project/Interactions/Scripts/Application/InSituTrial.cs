@@ -1,6 +1,4 @@
 ﻿using Interactions.Application.States;
-using Interactions.Application.ViewModels;
-using Interactions.Domain;
 using Interactions.Domain.Opponents;
 using UnityEngine;
 
@@ -18,8 +16,10 @@ namespace Interactions.Application
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
+			_app.Experiment.WebcamRecorder.StartRecording();
 			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
 			_opponent.Bind(_app.Trackers.DefenderHipsTracker);
+			
 		}
 
 		public override void Exit()
@@ -32,7 +32,7 @@ namespace Interactions.Application
 		public override void Tick()
 		{
 			var deltaTime = 1f / _app.RecordingFrameRateHz;
-			_updateTimer += Time.fixedDeltaTime;
+			_updateTimer += Time.deltaTime;
 			var epsilon = 0.0001f;
 
 			if (_updateTimer >= deltaTime - epsilon)
