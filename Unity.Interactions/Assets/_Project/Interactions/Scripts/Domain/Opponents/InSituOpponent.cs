@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Interactions.Domain
+namespace Interactions.Domain.Opponents
 {
 	public class InSituOpponent : MonoBehaviour
 	{
@@ -11,6 +11,11 @@ namespace Interactions.Domain
 		void Start()
 		{
 			transform.parent = _hipsTracker.gameObject.transform;
+		}
+
+		public void Bind(XRTracker xrTrackersDefenderHipsTracker)
+		{
+			_hipsTracker = xrTrackersDefenderHipsTracker;
 		}
 	}
 }

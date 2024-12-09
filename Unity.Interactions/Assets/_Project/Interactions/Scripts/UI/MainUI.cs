@@ -7,8 +7,8 @@ namespace Interactions.UI
 	{
 		[FormerlySerializedAs("ExperimentUI")] public ExperimentOverlay ExperimentOverlay;
 		public WebcamSelectionUI WebcamSelectionUI;
-		public InSituUI InSituUI;
 		public XRStatusUI XRStatusUI;
+		public InSituUI InSituUI;
 		public ExperimentSetupUI ExperimentSetupUI;
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Interactions.Domain.VideoRecorder;
 using UnityEditor;
+using UnityEngine;
 
 namespace Interactions.Application.ViewModels
 {
@@ -14,9 +15,12 @@ namespace Interactions.Application.ViewModels
 
 		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
 		public Observable<bool> CanStartNextTrial { get; } = new(true);
-		public XRTracker HeadTracker => _app.XRTrackers.HeadTracker;
-		public XRTracker DominantFootTracker => _app.XRTrackers.DominantFootTracker;
-		public XRTracker NonDominantFootTracker => _app.XRTrackers.NonDominantFootTracker;
+		public XRTracker HeadTracker => _app.Trackers.HeadTracker;
+		public XRTracker DominantFootTracker => _app.Trackers.DominantFootTracker;
+		public XRTracker NonDominantFootTracker => _app.Trackers.NonDominantFootTracker;
+		public XRTracker DefenderHipsTracker => _app.Trackers.DefenderHipsTracker;
+
+		public Texture2D Frame => _app.Experiment.WebcamRecorder?.Frame ?? Texture2D.blackTexture;
 
 		public void Exit()
 		{
@@ -31,7 +35,7 @@ namespace Interactions.Application.ViewModels
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
-			
+
 			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
 				_app.Transitions.LaboratoryTrial.Execute();
 			else
@@ -49,7 +53,7 @@ namespace Interactions.Application.ViewModels
 		{
 			if (CanStartNextTrial.Value != false)
 				return;
-			
+
 			_app.Transitions.ExportVideo.Execute();
 
 			CanStartNextTrial.Value = true;

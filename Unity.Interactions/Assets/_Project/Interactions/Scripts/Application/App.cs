@@ -2,6 +2,7 @@ using Interactions.Application.States;
 using Interactions.Application.Transitions;
 using Interactions.Application.ViewModels;
 using Interactions.Domain;
+using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 using Interactions.Infra;
 using Interactions.UI;
@@ -36,7 +37,7 @@ namespace Interactions.Application
 		public RightGoal RightGoal { get; private set; }
 		public LeftGoal LeftGoal { get; private set; }
 		public ExperimentViewModel ExperimentViewModel { get; private set; }
-		public XRTrackers XRTrackers { get; set; }
+		public XRTrackers Trackers { get; set; }
 
 		void Start()
 		{
@@ -51,7 +52,7 @@ namespace Interactions.Application
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			LeftGoal = ServiceLocator.Get<LeftGoal>();
 			RightGoal = ServiceLocator.Get<RightGoal>();
-			XRTrackers = ServiceLocator.Get<XRTrackers>();
+			Trackers = ServiceLocator.Get<XRTrackers>();
 
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();

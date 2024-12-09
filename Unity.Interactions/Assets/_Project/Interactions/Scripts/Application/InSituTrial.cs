@@ -1,6 +1,7 @@
 ﻿using Interactions.Application.States;
 using Interactions.Application.ViewModels;
 using Interactions.Domain;
+using Interactions.Domain.Opponents;
 using UnityEngine;
 
 namespace Interactions.Application
@@ -18,10 +19,7 @@ namespace Interactions.Application
 		{
 			_app.Experiment.NextTrial();
 			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
-
-			var viewModel = new InSituTrialViewModel(_app);
-			_app.UI.InSituUI.Bind(viewModel);
-			_app.UI.InSituUI.Show();
+			_opponent.Bind(_app.Trackers.DefenderHipsTracker);
 		}
 
 		public override void Exit()

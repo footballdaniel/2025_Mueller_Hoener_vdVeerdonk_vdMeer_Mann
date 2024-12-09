@@ -13,6 +13,14 @@ namespace Interactions.Application.States
 		{
 			_app.ExperimentalCondition = condition;
 			_app.Transitions.SelectWebcam.Execute();
+
+			if (condition == ExperimentalCondition.InSitu)
+				_app.UI.InSituUI.Show();
+		}
+
+		public void DominantFootSelected(Side side)
+		{
+			_app.DominantFootSide = side;
 		}
 
 
@@ -25,11 +33,6 @@ namespace Interactions.Application.States
 		public override void Exit()
 		{
 			_app.UI.ExperimentSetupUI.Hide();
-		}
-
-		public void DominantFootSelected(Side side)
-		{
-			_app.DominantFootSide = side;
 		}
 	}
 }
