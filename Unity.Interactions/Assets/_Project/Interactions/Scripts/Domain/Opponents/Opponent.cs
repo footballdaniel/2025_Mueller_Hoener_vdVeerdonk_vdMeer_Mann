@@ -35,13 +35,13 @@ public class Opponent : MonoBehaviour
 		transform.position = _motor.Move(_sources, transform.position, transform.rotation, Time.deltaTime);
 		transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
 
+		_animations.Apply(_motor.LocalVelocity);
+		
 		if (InterceptedBall())
 		{
 			BallIntercepted?.Invoke(_motor.Velocity);
 			_sources.ActivateOnly(_attackerSource);
 		}
-
-		_animations.Apply(_motor.Velocity);
 	}
 
 	public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight)
@@ -59,7 +59,7 @@ public class Opponent : MonoBehaviour
 
 	bool InterceptedBall()
 	{
-		return Vector3.Distance(transform.position, _interceptionSource.GetDesiredPosition()) < 0.5f;
+		return Vector3.Distance(transform.position, _interceptionSource.TargetPosition()) < 0.5f;
 	}
 
 	readonly InformationSources _sources = new();

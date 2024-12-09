@@ -5,7 +5,6 @@ namespace Interactions.Domain.Opponents
 {
 	public class InformationSources
 	{
-
 		public void ActivateOnly(IInformationSource activeSource)
 		{
 			for (var i = 0; i < _sources.Count; i++)
@@ -17,25 +16,36 @@ namespace Interactions.Domain.Opponents
 			_sources.Add((activeSource, 1f));
 		}
 
-
 		public void Add(IInformationSource source, float weight)
 		{
 			source.Weight = weight;
 			_sources.Add((source, weight));
 		}
 
-		public Vector3 Combine()
+		public Vector3 CombinePositions()
 		{
 			var desiredPosition = Vector3.zero;
 			var totalWeight = 0f;
-
 			foreach (var (source, weight) in _sources)
 			{
-				desiredPosition += source.GetDesiredPosition() * weight;
+				desiredPosition += source.TargetPosition() * weight;
 				totalWeight += weight;
 			}
-
 			return desiredPosition / totalWeight;
+		}
+
+		public float CombineRotationsY()
+		{
+			var totalWeight = 0f;
+			var accumulatedRotation = 0f;
+			foreach (var (source, weight) in _sources)
+			{
+				accumulatedRotation += source.TargetRotationY() * weight;
+				totalWeight += weight;
+			}
+			if (totalWeight > 0f)
+				return accumulatedRotation / totalWeight;
+			return 0f;
 		}
 
 		public void SetWeight(IInformationSource source, float weight)

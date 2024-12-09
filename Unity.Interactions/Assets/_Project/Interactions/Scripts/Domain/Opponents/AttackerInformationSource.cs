@@ -4,10 +4,6 @@ namespace Interactions.Domain.Opponents
 {
 	public class AttackerInformationSource : IInformationSource
 	{
-		Transform _goalLeft;
-		Transform _goalRight;
-		DelayedPerceptionMemory _memory;
-		float _distanceFromAttacker;
 
 		public AttackerInformationSource(Transform goalLeft, Transform goalRight, DelayedPerceptionMemory memory, float distanceFromAttacker)
 		{
@@ -17,7 +13,7 @@ namespace Interactions.Domain.Opponents
 			_distanceFromAttacker = distanceFromAttacker;
 		}
 
-		public Vector3 GetDesiredPosition()
+		public Vector3 TargetPosition()
 		{
 			var positionBetweenGoals = (_goalLeft.position + _goalRight.position) / 2;
 			var pos = _memory.Get(Time.time);
@@ -26,6 +22,19 @@ namespace Interactions.Domain.Opponents
 			return userPosition - dir * _distanceFromAttacker;
 		}
 
+		public float TargetRotationY()
+		{
+			var positionBetweenGoals = (_goalLeft.position + _goalRight.position) / 2;
+			var pos = _memory.Get(Time.time);
+			var userPosition = new Vector3(pos.x, 0, pos.y);
+			var dir = (userPosition - positionBetweenGoals).normalized;
+			return Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+		}
+
 		public float Weight { get; set; }
+		float _distanceFromAttacker;
+		Transform _goalLeft;
+		Transform _goalRight;
+		DelayedPerceptionMemory _memory;
 	}
 }
