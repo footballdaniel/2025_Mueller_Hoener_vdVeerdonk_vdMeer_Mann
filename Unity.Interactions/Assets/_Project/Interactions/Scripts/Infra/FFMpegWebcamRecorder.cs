@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Interactions.Domain.VideoRecorder;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -70,8 +71,8 @@ namespace Interactions.Infra
 		{
 			// TickSynchronous();
 
-			Graphics.Blit(_webcamTexture, _renderTexture);
-			AsyncGPUReadback.Request(_renderTexture, 0, GraphicsFormat.R8G8B8A8_UNorm, Callback);
+			// Graphics.Blit(_webcamTexture, _renderTexture);
+			AsyncGPUReadback.Request(_webcamTexture, 0, GraphicsFormat.R8G8B8A8_UNorm, Callback);
 		}
 
 		void Callback(AsyncGPUReadbackRequest request)
@@ -88,13 +89,8 @@ namespace Interactions.Infra
 			_texture2D.SetPixels32(rawData.ToArray());
 			_texture2D.Apply();
 
-			
-			Debug.Log("rawData.Length: " + rawData.Length);
-			
-			// append to memory!
-			
-			
-			// show size of array in memory in GB
+			if (_isRecording)
+				SaveFrameAsPng(rawData);
 		}
 
 
@@ -106,8 +102,7 @@ namespace Interactions.Infra
 		// // _texture2D.Apply();
 		//
 		//
-		// if (_isRecording)
-		// 	SaveFrameAsPng();
+
 
 
 		void OnExportCompleted()
@@ -116,9 +111,11 @@ namespace Interactions.Infra
 			FFMpegExporter.ExportCompleted -= OnExportCompleted;
 		}
 
-		void SaveFrameAsPng()
+		void SaveFrameAsPng(NativeArray<Color32> nativeArray)
 		{
-			var frameBytes = _texture2D.EncodeToPNG();
+			// save to disk as byte array
+			
+			
 			var fileName = Path.Combine(_frameFolderPath, $"frame_{_frameIndex:D6}.png");
 			File.WriteAllBytes(fileName, frameBytes);
 			_frameIndex++;
