@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Interactions.Domain.VideoRecorder;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -43,7 +47,7 @@ namespace Interactions.Infra
 			_texture2D = new Texture2D(Specs.Width, Specs.Height, TextureFormat.RGBA32, true);
 			_webcamTexture = new WebCamTexture(Specs.DeviceName, Specs.Width, Specs.Height, Specs.FrameRate);
 			_webcamTexture.Play();
-			
+
 			_renderTexture = new RenderTexture(Specs.Width, Specs.Height, 0, RenderTextureFormat.ARGB32);
 			_renderTexture.enableRandomWrite = true;
 			_renderTexture.Create();
@@ -65,26 +69,46 @@ namespace Interactions.Infra
 		public void Tick()
 		{
 			// TickSynchronous();
-			
+
 			Graphics.Blit(_webcamTexture, _renderTexture);
 			AsyncGPUReadback.Request(_renderTexture, 0, GraphicsFormat.R8G8B8A8_UNorm, Callback);
 		}
 
 		void Callback(AsyncGPUReadbackRequest request)
 		{
-			if (!_texture2D)
+
+			if (request.hasError)
+			{
+				Debug.LogError("GPU readback failed.");
 				return;
+			}
+
+			var rawData = request.GetData<Color32>();
 			
-			
-			var rawData = request.GetData<Color32>().ToArray();
-			_texture2D.SetPixels32(rawData);
+			_texture2D.SetPixels32(rawData.ToArray());
 			_texture2D.Apply();
 
 			
-			if (_isRecording)
-				SaveFrameAsPng();
+			Debug.Log("rawData.Length: " + rawData.Length);
+			
+			// append to memory!
+			
+			
+			// show size of array in memory in GB
 		}
-		
+
+
+		// if (!_texture2D)
+		// 	return;
+		//
+		// var rawData = request.GetData<Color32>().ToArray();
+		// // _texture2D.SetPixels32(rawData);
+		// // _texture2D.Apply();
+		//
+		//
+		// if (_isRecording)
+		// 	SaveFrameAsPng();
+
 
 		void OnExportCompleted()
 		{
@@ -122,9 +146,10 @@ namespace Interactions.Infra
 		int _frameIndex;
 		bool _isExportComplete;
 		bool _isRecording;
+		RenderTexture _renderTexture;
+		string _tempDataPath;
 		Texture2D _texture2D;
 		WebCamTexture _webcamTexture;
-		RenderTexture _renderTexture;
 
 		~FfMpegWebcamRecorder()
 		{
