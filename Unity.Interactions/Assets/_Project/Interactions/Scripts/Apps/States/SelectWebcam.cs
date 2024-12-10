@@ -1,4 +1,4 @@
-namespace Interactions.Application.States
+namespace Interactions.Apps.States
 {
 	internal class SelectWebcam : State
 	{

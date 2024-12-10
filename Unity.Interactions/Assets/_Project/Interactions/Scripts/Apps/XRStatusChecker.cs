@@ -1,6 +1,6 @@
 using UnityEngine.XR.Management;
 
-namespace Interactions.Application
+namespace Interactions.Apps
 {
 	internal static class XRStatusChecker
 	{

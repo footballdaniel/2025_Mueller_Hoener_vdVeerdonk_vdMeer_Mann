@@ -10,7 +10,7 @@ namespace Interactions.Infra
 
 		static FFMpegExporter()
 		{
-			UnityEngine.Application.quitting += StopFFmpegOnQuit;
+			UnityEngine.Application.quitting += EndExport;
 		}
 
 		public static event Action ExportCompleted;
@@ -70,8 +70,8 @@ namespace Interactions.Infra
 				}
 			};
 
-			_ffmpegProcess.OutputDataReceived += (sender, args) => Debug.Log(args.Data);
-			_ffmpegProcess.ErrorDataReceived += (sender, args) => Debug.LogError(args.Data);
+			// _ffmpegProcess.OutputDataReceived += (sender, args) => Debug.Log(args.Data);
+			// _ffmpegProcess.ErrorDataReceived += (sender, args) => Debug.LogError(args.Data);
 
 			_ffmpegProcess.Start();
 			_ffmpegInputStream = _ffmpegProcess.StandardInput.BaseStream;
@@ -88,14 +88,8 @@ namespace Interactions.Infra
 			_ffmpegInputStream.Write(frameData, 0, frameData.Length);
 		}
 
-		static void StopFFmpegOnQuit()
-		{
-			Debug.Log("Application is quitting. Stopping FFmpeg process...");
-			EndExport();
-		}
 
 		static Stream _ffmpegInputStream;
-
 		static Process _ffmpegProcess;
 		static bool _isStopping;
 	}

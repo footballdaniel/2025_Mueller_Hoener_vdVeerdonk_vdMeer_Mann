@@ -1,5 +1,5 @@
 using System;
-using Interactions.Application.ViewModels;
+using Interactions.Apps.ViewModels;
 using Interactions.Domain.VideoRecorder;
 using TMPro;
 using UnityEngine;

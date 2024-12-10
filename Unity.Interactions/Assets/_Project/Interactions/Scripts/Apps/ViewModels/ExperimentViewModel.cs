@@ -3,7 +3,7 @@ using Interactions.Domain.VideoRecorder;
 using UnityEditor;
 using UnityEngine;
 
-namespace Interactions.Application.ViewModels
+namespace Interactions.Apps.ViewModels
 {
 	public class ExperimentViewModel
 	{
@@ -20,7 +20,7 @@ namespace Interactions.Application.ViewModels
 		public XRTracker NonDominantFootTracker => _app.Trackers.NonDominantFootTracker;
 		public XRTracker DefenderHipsTracker => _app.Trackers.DefenderHipsTracker;
 
-		public Texture2D Frame => _app.Experiment.WebcamRecorder?.Frame ?? Texture2D.blackTexture;
+		public RenderTexture Frame => _app.Experiment.WebcamRecorder?.Frame ?? new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32);
 
 		public void Exit()
 		{
@@ -54,7 +54,7 @@ namespace Interactions.Application.ViewModels
 			if (CanStartNextTrial.Value != false)
 				return;
 
-			_app.Transitions.ExportVideo.Execute();
+			_app.Transitions.WaitForNextTrial.Execute();
 
 			CanStartNextTrial.Value = true;
 		}

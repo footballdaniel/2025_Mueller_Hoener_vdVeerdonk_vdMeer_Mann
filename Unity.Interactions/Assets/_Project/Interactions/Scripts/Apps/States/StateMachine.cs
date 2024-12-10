@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Interactions.Application.States
+namespace Interactions.Apps.States
 {
 	public class StateMachine
 	{

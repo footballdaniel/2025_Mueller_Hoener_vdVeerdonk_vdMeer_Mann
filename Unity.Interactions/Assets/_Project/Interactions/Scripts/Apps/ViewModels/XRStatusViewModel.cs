@@ -1,6 +1,4 @@
-using System;
-
-namespace Interactions.Application.ViewModels
+namespace Interactions.Apps.ViewModels
 {
 	public class XRStatusViewModel
 	{

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Interactions.Application.States
+namespace Interactions.Apps.States
 {
 	internal class WaitForNextTrial : State
 	{

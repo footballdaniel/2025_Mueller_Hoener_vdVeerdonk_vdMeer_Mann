@@ -4,14 +4,12 @@ namespace Interactions.Domain.VideoRecorder
 {
 	public interface IWebcamRecorder
 	{
-		Texture2D Frame { get; }
-		bool IsExportComplete { get; }
+		RenderTexture Frame { get; }
 		public WebcamSpecs Specs { get; }
 		bool IsPlaying { get;  }
 		void Tick();
-		void StartRecording();
+		void StartRecording(int currentTrialTrialNumber);
 		void StopRecording();
-		void Export(int trialNumber);
 		void Initiate();
 	}
 }

@@ -2,7 +2,7 @@
 using Interactions.Infra;
 using UnityEngine;
 
-namespace Interactions.Application.States
+namespace Interactions.Apps.States
 {
 	internal class LabTrial : State
 	{
@@ -13,7 +13,7 @@ namespace Interactions.Application.States
 
 		public override void Enter()
 		{
-			_app.Experiment.WebcamRecorder.StartRecording();
+			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
@@ -39,6 +39,8 @@ namespace Interactions.Application.States
 			
 			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
 			_app.Experiment.CurrentTrial.Save();
+			
+			_app.Experiment.WebcamRecorder.StopRecording();
 		}
 
 		public override void Tick()

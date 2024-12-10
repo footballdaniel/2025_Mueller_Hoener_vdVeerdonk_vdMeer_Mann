@@ -5,7 +5,7 @@ namespace Interactions.Infra
 {
 	public class NotInitiatedRecorder : IWebcamRecorder
 	{
-		public Texture2D Frame { get; } = null;
+		public RenderTexture Frame { get; } = null;
 		public bool IsExportComplete { get; } = true;
 		public WebcamSpecs Specs { get; } = new("Not initiated recorder", 0, 0, 0);
 		public bool IsPlaying { get; } = false;
@@ -14,15 +14,16 @@ namespace Interactions.Infra
 			
 		}
 
-		public void StartRecording()
+		public void StartRecording(int currentTrialTrialNumber)
 		{
 			
 		}
 
 		public void StopRecording()
 		{
-			
+			throw new System.NotImplementedException();
 		}
+
 
 		public void Export(int trialNumber)
 		{

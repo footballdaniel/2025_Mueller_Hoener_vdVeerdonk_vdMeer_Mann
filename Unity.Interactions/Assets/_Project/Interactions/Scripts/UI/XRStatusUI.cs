@@ -1,4 +1,4 @@
-using Interactions.Application.ViewModels;
+using Interactions.Apps.ViewModels;
 using TMPro;
 using UnityEngine;
 

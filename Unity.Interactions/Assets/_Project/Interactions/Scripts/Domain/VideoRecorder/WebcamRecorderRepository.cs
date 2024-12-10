@@ -25,7 +25,7 @@ namespace Interactions.Domain.VideoRecorder
 			}
 
 			foreach (var specs in uniqueSettings)
-				_recorders.Add(new FfMpegWebcamRecorder(specs, ProgressIndicator.Instance));
+				_recorders.Add(new FfMpegWebcamRecorder(specs));
 		}
 
 		public IWebcamRecorder Get(int id)

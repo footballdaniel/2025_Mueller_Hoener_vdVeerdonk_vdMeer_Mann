@@ -1,7 +1,6 @@
-using Interactions.Application.States;
-using Interactions.Application.ViewModels;
+using Interactions.Apps.States;
 
-namespace Interactions.Application
+namespace Interactions.Apps
 {
 	internal class StartupXr : State
 	{

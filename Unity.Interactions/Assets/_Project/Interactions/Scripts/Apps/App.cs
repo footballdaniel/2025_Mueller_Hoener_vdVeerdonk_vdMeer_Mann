@@ -1,6 +1,6 @@
-using Interactions.Application.States;
-using Interactions.Application.Transitions;
-using Interactions.Application.ViewModels;
+using Interactions.Apps.States;
+using Interactions.Apps.Transitions;
+using Interactions.Apps.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
@@ -11,7 +11,7 @@ using Tactive.MachineLearning.Models;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Interactions.Application
+namespace Interactions.Apps
 {
 	public class App : MonoBehaviour
 	{
@@ -73,19 +73,15 @@ namespace Interactions.Application
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
 			var waitForNextTrial = new WaitForNextTrial(this);
-			var initiateRecorder = new InitiateVideoRecorder(this);
-			var export = new ExportVideo(this);
 			var labTrial = new LabTrial(this);
 			var inSituTrial = new InSituTrial(this);
 
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, export }, waitForNextTrial);
-			Transitions.InitiateRecorder =  new Transition(this, waitForNextTrial, initiateRecorder);
+			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrial, inSituTrial }, waitForNextTrial);
 			Transitions.LaboratoryTrial = new Transition(this, waitForNextTrial, labTrial);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
-			Transitions.ExportVideo = new Transition(this, new State[] { labTrial, inSituTrial }, export);
 
 			// Start app
 			StateMachine.SetState(startupXr);
@@ -110,7 +106,7 @@ namespace Interactions.Application
 			{
 				var recorder = WebCamRecorders.Get(0);
 				WebcamSelectionViewModel.Select(recorder);
-				Transitions.InitiateRecorder.Execute();
+				Transitions.LaboratoryTrial.Execute();
 			}
 
 			if (Keyboard.current.digit4Key.wasPressedThisFrame)

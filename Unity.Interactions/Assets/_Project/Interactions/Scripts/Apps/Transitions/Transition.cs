@@ -1,7 +1,7 @@
 using System;
-using Interactions.Application.States;
+using Interactions.Apps.States;
 
-namespace Interactions.Application.Transitions
+namespace Interactions.Apps.Transitions
 {
 	public class Transition
 	{

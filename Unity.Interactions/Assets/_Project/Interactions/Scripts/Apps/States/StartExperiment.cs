@@ -1,6 +1,6 @@
 ﻿using Interactions.Domain;
 
-namespace Interactions.Application.States
+namespace Interactions.Apps.States
 {
 	public class StartExperiment : State
 	{

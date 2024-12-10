@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Interactions.Domain;
 using UnityEngine;
 
-namespace Interactions.Application
+namespace Interactions.Apps
 {
 	[Serializable]
 	public class ServiceTypeReference

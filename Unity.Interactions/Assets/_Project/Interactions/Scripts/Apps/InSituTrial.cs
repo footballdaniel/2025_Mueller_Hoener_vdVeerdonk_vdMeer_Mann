@@ -1,8 +1,8 @@
-﻿using Interactions.Application.States;
+﻿using Interactions.Apps.States;
 using Interactions.Domain.Opponents;
 using UnityEngine;
 
-namespace Interactions.Application
+namespace Interactions.Apps
 {
 	internal class InSituTrial : State
 	{
@@ -16,7 +16,7 @@ namespace Interactions.Application
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
-			_app.Experiment.WebcamRecorder.StartRecording();
+			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
 			_opponent.Bind(_app.Trackers.DefenderHipsTracker);
 			
@@ -27,6 +27,7 @@ namespace Interactions.Application
 			Object.Destroy(_opponent.gameObject);
 			_app.Experiment.WebcamRecorder.StopRecording();
 			_app.Experiment.CurrentTrial.Save();
+			
 		}
 
 		public override void Tick()

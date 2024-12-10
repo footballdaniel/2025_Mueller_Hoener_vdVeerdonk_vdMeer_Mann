@@ -1,10 +1,10 @@
-﻿namespace Interactions.Application.States
+﻿namespace Interactions.Apps.States
 {
 	public class State
 	{
-		protected global::Interactions.Application.App _app;
+		protected global::Interactions.Apps.App _app;
 
-		protected State(global::Interactions.Application.App app)
+		protected State(global::Interactions.Apps.App app)
 		{
 			_app = app;
 		}

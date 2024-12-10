@@ -1,4 +1,4 @@
-using Interactions.Application;
+using Interactions.Apps;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

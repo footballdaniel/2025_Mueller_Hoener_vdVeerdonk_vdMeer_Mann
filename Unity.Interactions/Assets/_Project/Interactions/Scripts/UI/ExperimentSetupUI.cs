@@ -1,6 +1,6 @@
 using System;
-using Interactions.Application;
-using Interactions.Application.States;
+using Interactions.Apps;
+using Interactions.Apps.States;
 using Interactions.Domain;
 using UnityEngine;
 using UnityEngine.UI;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Interactions.Domain.VideoRecorder;
 
-namespace Interactions.Application.ViewModels
+namespace Interactions.Apps.ViewModels
 {
 	public class WebcamSelectionViewModel
 	{
