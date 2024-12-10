@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Debug = UnityEngine.Debug;
+
 
 namespace Interactions.Infra
 {
@@ -8,56 +10,68 @@ namespace Interactions.Infra
 	{
 		public static event Action ExportCompleted;
 
-		public static void Export(string inputFramePath, string videoOutputPath, float frameRate, int totalFrames, IProgress<int> progress, string ffmpegPath = null)
+		public static void EndExport()
+		{
+			if (_ffmpegProcess == null) return;
+
+			try
+			{
+				_ffmpegInputStream.Close();
+				_ffmpegProcess.WaitForExit();
+				_ffmpegProcess.Close();
+				ExportCompleted?.Invoke();
+			}
+			catch (Exception e)
+			{
+				Debug.LogError($"Error while closing FFmpeg process: {e.Message}");
+			}
+			finally
+			{
+				_ffmpegProcess = null;
+				_ffmpegInputStream = null;
+			}
+		}
+
+		public static void StartExport(string videoOutputPath, int width, int height, float frameRate, string ffmpegPath = null)
 		{
 			ffmpegPath ??= Path.Combine(UnityEngine.Application.streamingAssetsPath, "ffmpeg", "ffmpeg.exe");
 
-			var arguments = $"-r {frameRate} -i \"{inputFramePath}/frame_%06d.png\" -vf \"drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
+			var arguments = $"-f rawvideo -pix_fmt rgba -s {width}x{height} -r {frameRate} -i - -vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
 
-			var process = new Process
+			_ffmpegProcess = new Process
 			{
 				StartInfo =
 				{
 					FileName = ffmpegPath,
 					Arguments = arguments,
 					UseShellExecute = false,
+					RedirectStandardInput = true,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
 					CreateNoWindow = true
 				}
 			};
 
-			process.OutputDataReceived += (sender, args) => ProcessFfmpegOutput(args.Data, totalFrames, progress);
-			process.ErrorDataReceived += (sender, args) => ProcessFfmpegOutput(args.Data, totalFrames, progress);
-			process.Start();
+			_ffmpegProcess.OutputDataReceived += (sender, args) => Debug.Log(args.Data);
+			_ffmpegProcess.ErrorDataReceived += (sender, args) => Debug.LogError(args.Data);
 
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
+			_ffmpegProcess.Start();
+			_ffmpegInputStream = _ffmpegProcess.StandardInput.BaseStream;
 
-			process.EnableRaisingEvents = true;
-			process.Exited += (sender, args) =>
-			{
-				progress?.Report(0);
-				process.WaitForExit();
-				process.Close();
-				ExportCompleted?.Invoke();
-			};
+			_ffmpegProcess.BeginOutputReadLine();
+			_ffmpegProcess.BeginErrorReadLine();
 		}
 
-		static void ProcessFfmpegOutput(string output, int totalFrames, IProgress<int> progress)
+		public static void WriteFrame(byte[] frameData)
 		{
-			if (string.IsNullOrEmpty(output)) return;
+			if (_ffmpegInputStream == null)
+				throw new InvalidOperationException("FFmpeg process is not running. Call StartExport() first.");
 
-			if (output.Contains("frame="))
-			{
-				var frameStr = output.Split('=')[1].Trim().Split(' ')[0];
-
-				if (int.TryParse(frameStr, out var currentFrame))
-				{
-					var progressPercentage = (int)((float)currentFrame / totalFrames * 100);
-					progress?.Report(progressPercentage);
-				}
-			}
+			_ffmpegInputStream.Write(frameData, 0, frameData.Length);
 		}
+
+		static Stream _ffmpegInputStream;
+
+		static Process _ffmpegProcess;
 	}
 }

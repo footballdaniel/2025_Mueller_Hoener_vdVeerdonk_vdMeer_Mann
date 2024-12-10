@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+
 using Interactions.Domain.VideoRecorder;
 using Unity.Collections;
 using UnityEngine;
@@ -30,6 +28,7 @@ namespace Interactions.Infra
 		public void StopRecording()
 		{
 			_isRecording = false;
+			FFMpegExporter.EndExport();
 		}
 
 		public void Export(int trialNumber)
@@ -39,8 +38,8 @@ namespace Interactions.Infra
 			var fileName = $"trial_{trialNumber}_{fileNameWithDateTime}.mp4";
 			var videoOutputPath = Path.Combine(UnityEngine.Application.persistentDataPath, fileName);
 
-			FFMpegExporter.ExportCompleted += OnExportCompleted;
-			FFMpegExporter.Export(_frameFolderPath, videoOutputPath, Specs.FrameRate, _frameIndex, _progress);
+			// FFMpegExporter.ExportCompleted += OnExportCompleted;
+			// FFMpegExporter.Export(_frameFolderPath, videoOutputPath, Specs.FrameRate, _frameIndex, _progress);
 		}
 
 		public void Initiate()
@@ -65,6 +64,9 @@ namespace Interactions.Infra
 		{
 			_isRecording = true;
 			_frameIndex = 0;
+			
+			var videoPath = Path.Combine(UnityEngine.Application.persistentDataPath, "output.avi");
+			FFMpegExporter.StartExport(videoPath, Specs.Width, Specs.Height, Specs.FrameRate);
 		}
 
 		public void Tick()
@@ -89,51 +91,27 @@ namespace Interactions.Infra
 			_texture2D.SetPixels32(rawData.ToArray());
 			_texture2D.Apply();
 
+			var rawDataBytes = request.GetData<Color32>().Reinterpret<byte>(4).ToArray();
 			if (_isRecording)
-				SaveFrameAsPng(rawData);
+				FFMpegExporter.WriteFrame(rawDataBytes);
 		}
 
 
-		// if (!_texture2D)
-		// 	return;
+		// void OnExportCompleted()
+		// {
+		// 	_isExportComplete = true;
+		// 	FFMpegExporter.ExportCompleted -= OnExportCompleted;
+		// }
 		//
-		// var rawData = request.GetData<Color32>().ToArray();
-		// // _texture2D.SetPixels32(rawData);
-		// // _texture2D.Apply();
+		// void TickSynchronous()
+		// {
+		// 	UpdateTexture();
 		//
-		//
+		// 	if (_isRecording)
+		// 		SaveFrameAsPng();
+		// }
 
 
-
-		void OnExportCompleted()
-		{
-			_isExportComplete = true;
-			FFMpegExporter.ExportCompleted -= OnExportCompleted;
-		}
-
-		void SaveFrameAsPng(NativeArray<Color32> nativeArray)
-		{
-			// save to disk as byte array
-			
-			
-			var fileName = Path.Combine(_frameFolderPath, $"frame_{_frameIndex:D6}.png");
-			File.WriteAllBytes(fileName, frameBytes);
-			_frameIndex++;
-		}
-
-		void TickSynchronous()
-		{
-			UpdateTexture();
-
-			if (_isRecording)
-				SaveFrameAsPng();
-		}
-
-		void UpdateTexture()
-		{
-			_texture2D.SetPixels32(_webcamTexture.GetPixels32());
-			_texture2D.Apply(false);
-		}
 
 
 		readonly string _frameFolderPath;
