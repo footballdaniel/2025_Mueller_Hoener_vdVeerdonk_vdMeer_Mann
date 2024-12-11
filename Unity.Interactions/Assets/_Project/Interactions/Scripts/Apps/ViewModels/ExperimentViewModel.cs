@@ -25,11 +25,11 @@ namespace Interactions.Apps.ViewModels
 		public void Exit()
 		{
 #if UNITY_EDITOR
-			if (UnityEngine.Application.isEditor)
+			if (Application.isEditor)
 				EditorApplication.isPlaying = false;
 			else
 #endif
-				UnityEngine.Application.Quit();
+				Application.Quit();
 		}
 
 		public void NextTrial()
@@ -44,9 +44,9 @@ namespace Interactions.Apps.ViewModels
 
 		public void ShowData()
 		{
-			var path = UnityEngine.Application.persistentDataPath;
+			var path = Application.persistentDataPath;
 			var uri = new Uri(path);
-			UnityEngine.Application.OpenURL(uri.AbsoluteUri);
+			Application.OpenURL(uri.AbsoluteUri);
 		}
 
 		public void StopTrial()

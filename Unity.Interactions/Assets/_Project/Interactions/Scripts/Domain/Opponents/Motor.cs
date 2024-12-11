@@ -4,7 +4,7 @@ namespace Interactions.Domain.Opponents
 {
 	public class Motor
 	{
-		readonly float _acceleration;
+		float _acceleration;
 		Vector3 _currentVelocity = Vector3.zero;
 		readonly float _maxRotationSpeedDegreesY;
 		readonly float _maxSpeed;
@@ -77,5 +77,9 @@ namespace Interactions.Domain.Opponents
 			}
 		}
 
+		public void ChangeAcceleration(float newAcceleration)
+		{
+			_acceleration = newAcceleration;
+		}
 	}
 }

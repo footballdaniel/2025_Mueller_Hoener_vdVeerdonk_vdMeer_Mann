@@ -12,6 +12,11 @@ namespace Interactions.Domain.Opponents
 			_memory = memory;
 			_distanceFromAttacker = distanceFromAttacker;
 		}
+		
+		public void ChangeInterpersonalDistance(float distance)
+		{
+			_distanceFromAttacker = distance;
+		}
 
 		public Vector3 TargetPosition()
 		{

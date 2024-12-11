@@ -21,6 +21,11 @@ namespace Interactions.Domain.Opponents
 				_entries.RemoveAt(0);
 		}
 
+		public void ChangeReactionTime(float newReactionTime)
+		{
+			_delay = newReactionTime;
+		}
+
 		public Vector2 Get(float time)
 		{
 			var targetTime = time - _delay;
@@ -46,8 +51,9 @@ namespace Interactions.Domain.Opponents
 			return _entries[^1].pos;
 		}
 
-		readonly float _delay;
 		readonly float _duration;
 		readonly List<(float time, Vector2 pos)> _entries;
+
+		float _delay;
 	}
 }

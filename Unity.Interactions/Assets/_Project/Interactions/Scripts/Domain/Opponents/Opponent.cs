@@ -5,28 +5,17 @@ using UnityEngine;
 
 public class Opponent : MonoBehaviour
 {
-	public event Action<Vector2> BallIntercepted;
-	
+
 	[SerializeField] Animator _animator;
 	[SerializeField] float distanceFromAttacker = 3f;
 	[SerializeField] float maxSpeed = 5f;
-	[SerializeField] float acceleration = 5f;
+	[SerializeField] float maxAcceleration = 5f;
 	[SerializeField] float maxRotationSpeedDegreesY = 90f;
 	[SerializeField] float memoryDuration = 1f;
 	[SerializeField] float reactionDelay = 0.3f;
+	public event Action<Vector2> BallIntercepted;
 
 	public Vector3 Position => transform.position;
-
-	void Start()
-	{
-		_memory = new DelayedPerceptionMemory(memoryDuration, reactionDelay);
-		_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _memory, distanceFromAttacker);
-		_motor = new Motor(maxSpeed, acceleration, maxRotationSpeedDegreesY);
-		_animations = new Animations(_animator);
-		_interceptionSource = new NoInterceptionInformationSource();
-
-		_sources.Add(_attackerSource, 1f);
-	}
 
 	void Update()
 	{
@@ -36,7 +25,7 @@ public class Opponent : MonoBehaviour
 		transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
 
 		_animations.Apply(_motor.LocalVelocity);
-		
+
 		if (InterceptedBall())
 		{
 			BallIntercepted?.Invoke(_motor.Velocity);
@@ -49,6 +38,24 @@ public class Opponent : MonoBehaviour
 		_user = user;
 		_goalLeft = goalLeft;
 		_goalRight = goalRight;
+
+		_memory = new DelayedPerceptionMemory(memoryDuration, reactionDelay);
+		_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _memory, distanceFromAttacker);
+		_motor = new Motor(maxSpeed, maxAcceleration, maxRotationSpeedDegreesY);
+		_animations = new Animations(_animator);
+		_interceptionSource = new NoInterceptionInformationSource();
+
+		_sources.Add(_attackerSource, 1f);
+	}
+
+	public void ChangeAcceleration(float newAcceleration)
+	{
+		_motor.ChangeAcceleration(newAcceleration);
+	}
+
+	public void ChangeInterpersonalDistance(float newInterpersonalDistance)
+	{
+		_attackerSource.ChangeInterpersonalDistance(newInterpersonalDistance);
 	}
 
 	public void Intercept(Ball ball)
@@ -64,11 +71,16 @@ public class Opponent : MonoBehaviour
 
 	readonly InformationSources _sources = new();
 	Animations _animations;
-	IInformationSource _attackerSource;
+	AttackerInformationSource _attackerSource;
 	LeftGoal _goalLeft;
 	RightGoal _goalRight;
 	IInformationSource _interceptionSource;
 	DelayedPerceptionMemory _memory;
 	Motor _motor;
 	User _user;
+
+	public void ChangeReactionTime(float newReactionTime)
+	{
+		_memory.ChangeReactionTime(newReactionTime);
+	}
 }

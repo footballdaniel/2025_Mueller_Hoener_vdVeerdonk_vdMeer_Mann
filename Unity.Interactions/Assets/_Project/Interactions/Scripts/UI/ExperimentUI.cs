@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Interactions.UI
 {
-	public class ExperimentOverlay : UIScreen
+	public class ExperimentUI : UIScreen
 	{
 		[SerializeField] RawImage _cameraFeed;
 		[SerializeField] TMP_Text _fpsText;
