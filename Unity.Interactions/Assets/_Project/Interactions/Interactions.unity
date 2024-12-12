@@ -4393,7 +4393,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377fa89f691989d4183cd591b2b6c927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _nonDominantFootTracker: {fileID: 1932555423}
+  _dominantFootTracker: {fileID: 1932555423}
+  <Speed>k__BackingField: 0
+  <Velocity>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!1 &964968367
 GameObject:
   m_ObjectHideFlags: 0
@@ -6542,9 +6544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dominantFootTracker: {fileID: 6432888728729848986}
-  _targetLocation: {fileID: 0}
   <Speed>k__BackingField: 0
-  <VelocityTowardsTarget>k__BackingField: 0
   <Velocity>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!1001 &1557037604
 PrefabInstance:

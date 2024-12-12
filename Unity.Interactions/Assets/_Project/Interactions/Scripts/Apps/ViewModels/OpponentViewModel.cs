@@ -1,3 +1,5 @@
+using Interactions.Domain.Opponents;
+
 namespace Interactions.Apps.ViewModels
 {
 	public class OpponentViewModel

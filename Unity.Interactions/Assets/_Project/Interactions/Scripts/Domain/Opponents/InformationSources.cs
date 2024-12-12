@@ -12,6 +12,7 @@ namespace Interactions.Domain.Opponents
 				var (src, _) = _sources[i];
 				_sources[i] = (src, 0f);
 			}
+
 			_sources.RemoveAll(x => x.Item1.GetType() == activeSource.GetType());
 			_sources.Add((activeSource, 1f));
 		}
@@ -26,11 +27,23 @@ namespace Interactions.Domain.Opponents
 		{
 			var desiredPosition = Vector3.zero;
 			var totalWeight = 0f;
+
 			foreach (var (source, weight) in _sources)
 			{
-				desiredPosition += source.TargetPosition() * weight;
+				var sourceTargetPosition = source.TargetPosition();
+
+				if (sourceTargetPosition.x != 0)
+					desiredPosition.x += sourceTargetPosition.x * weight;
+				
+				if (sourceTargetPosition.y != 0)
+					desiredPosition.y += sourceTargetPosition.y * weight;
+				
+				if (sourceTargetPosition.z != 0)
+					desiredPosition.z += sourceTargetPosition.z * weight;
+
 				totalWeight += weight;
 			}
+
 			return desiredPosition / totalWeight;
 		}
 
@@ -38,21 +51,22 @@ namespace Interactions.Domain.Opponents
 		{
 			var totalWeight = 0f;
 			var accumulatedRotation = 0f;
+
 			foreach (var (source, weight) in _sources)
 			{
-				accumulatedRotation += source.TargetRotationY() * weight;
-				totalWeight += weight;
+				var targetRotationY = source.TargetRotationY();
+
+				if (targetRotationY != 0)
+				{
+					accumulatedRotation += source.TargetRotationY() * weight;
+					totalWeight += weight;
+				}
+				
 			}
+
 			if (totalWeight > 0f)
 				return accumulatedRotation / totalWeight;
 			return 0f;
-		}
-
-		public void SetWeight(IInformationSource source, float weight)
-		{
-			for (var i = 0; i < _sources.Count; i++)
-				if (_sources[i].source == source)
-					_sources[i] = (source, weight);
 		}
 
 		List<(IInformationSource source, float weight)> _sources = new();

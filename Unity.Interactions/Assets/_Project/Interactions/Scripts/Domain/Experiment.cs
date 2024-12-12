@@ -1,4 +1,5 @@
 using Interactions.Domain.Goals;
+using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 using Interactions.Infra;
 
@@ -6,10 +7,12 @@ namespace Interactions.Domain
 {
 	public class Experiment
 	{
-		public Experiment(int frameRateHz, Side dominantFoot)
+		public Experiment(int frameRateHz, Side dominantFoot, LeftGoal leftGoal, RightGoal rightGoal)
 		{
 			FrameRateHz = frameRateHz;
 			DominantFoot = dominantFoot;
+			LeftGoal = leftGoal;
+			RightGoal = rightGoal;
 		}
 
 		public float InterPersonalDistance { get; set; } = 4f;

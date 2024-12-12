@@ -38,8 +38,8 @@ namespace Interactions.Domain.Opponents
 
 		public float Weight { get; set; }
 		float _distanceFromAttacker;
-		Transform _goalLeft;
-		Transform _goalRight;
-		DelayedPerceptionMemory _memory;
+		readonly Transform _goalLeft;
+		readonly Transform _goalRight;
+		readonly DelayedPerceptionMemory _memory;
 	}
 }

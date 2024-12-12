@@ -6,16 +6,17 @@ namespace Interactions.Domain.Opponents
 	public class DelayedPerceptionMemory
 	{
 
-		public DelayedPerceptionMemory(float duration, float delay)
+		public DelayedPerceptionMemory(float duration, float delay, User user)
 		{
 			_entries = new List<(float time, Vector2 pos)>();
 			_duration = duration;
 			_delay = delay;
+			_user = user;
 		}
 
-		public void Add(float time, Vector2 pos)
+		public void Tick(float time)
 		{
-			_entries.Add((time, pos));
+			_entries.Add((time, _user.Position));
 
 			while (_entries.Count > 0 && _entries[0].time < time - _duration)
 				_entries.RemoveAt(0);
@@ -55,5 +56,6 @@ namespace Interactions.Domain.Opponents
 		readonly List<(float time, Vector2 pos)> _entries;
 
 		float _delay;
+		readonly User _user;
 	}
 }

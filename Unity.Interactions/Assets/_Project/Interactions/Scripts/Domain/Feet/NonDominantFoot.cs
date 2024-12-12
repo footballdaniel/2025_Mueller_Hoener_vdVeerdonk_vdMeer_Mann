@@ -1,27 +1,42 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Interactions.Domain
+namespace Interactions.Domain.Feet
 {
 	public class NonDominantFoot : MonoBehaviour
 	{
-		[SerializeField] XRTracker _nonDominantFootTracker;
-
-		public Vector3 Velocity => _velocity;
+		const int FrameWindow = 5;
+		[Header("Dependencies"), SerializeField] XRTracker _dominantFootTracker;
+		[field: SerializeReference] public float Speed { get; private set; }
+		[field: SerializeReference] public Vector3 Velocity { get; private set; }
 
 		void Start()
 		{
-			transform.parent = _nonDominantFootTracker.gameObject.transform;
-			_previousPosition = transform.position;
+			transform.parent = _dominantFootTracker.gameObject.transform;
+			_positionLastFrame = transform.position;
 		}
 
 		void Update()
 		{
-			var currentPosition = transform.position;
-			_velocity = (currentPosition - _previousPosition) / Time.deltaTime;
-			_previousPosition = currentPosition;
+			var currentVelocity = (transform.position - _positionLastFrame) / Time.deltaTime;
+
+			_velocityHistory.Enqueue(currentVelocity);
+			if (_velocityHistory.Count > FrameWindow)
+				_velocityHistory.Dequeue();
+			
+			var averagedVelocity = Vector3.zero;
+			foreach (var velocity in _velocityHistory)
+				averagedVelocity += velocity;
+			averagedVelocity /= _velocityHistory.Count;
+
+			Velocity = averagedVelocity;
+			Speed = Velocity.magnitude;
+
+			_positionLastFrame = transform.position;
 		}
 
-		Vector3 _previousPosition;
-		Vector3 _velocity;
+		Vector3 _positionLastFrame;
+
+		readonly Queue<Vector3> _velocityHistory = new();
 	}
 }

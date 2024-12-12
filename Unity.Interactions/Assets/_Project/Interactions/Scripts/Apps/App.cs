@@ -44,10 +44,6 @@ namespace Interactions.Apps
 
 		void Start()
 		{
-			// Dependencies
-			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide);
-			LstmModel = new LstmModel(LstmModelAsset);
-
 			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
@@ -56,11 +52,15 @@ namespace Interactions.Apps
 			LeftGoal = ServiceLocator.Get<LeftGoal>();
 			RightGoal = ServiceLocator.Get<RightGoal>();
 			Trackers = ServiceLocator.Get<XRTrackers>();
-
+			
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			BallPrefab = ServiceLocator.Get<Ball>();
+			
+			// Other Dependencies
+			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide, LeftGoal, RightGoal);
+			LstmModel = new LstmModel(LstmModelAsset);
 
 			// View models for showing data on the UI
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
