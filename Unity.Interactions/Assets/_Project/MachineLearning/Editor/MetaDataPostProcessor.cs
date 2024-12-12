@@ -45,9 +45,6 @@ namespace Tactive.MachineLearning.Models
 					if (metadata.MetadataProps.TryGetValue("sample_output", out var sampleOutputJson))
 						sampleOutput = JsonConvert.DeserializeObject<float>(sampleOutputJson);
 					
-					
-					
-					
 					assetWithMetadata.Initialize(featureNames, inputShape, sampleInput, sampleOutput, stem);
 
 					// add as asset

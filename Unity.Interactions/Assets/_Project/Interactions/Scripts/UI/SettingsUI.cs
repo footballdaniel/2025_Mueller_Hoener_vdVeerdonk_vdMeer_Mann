@@ -2,12 +2,12 @@ using Interactions.Apps.ViewModels;
 using Interactions.UI;
 using UnityEngine;
 
-public class OpponentUI : UIScreen
+public class SettingsUI : UIScreen
 {
-	[SerializeField] OpponentSlider _interPersonalDistanceSlider;
-	[SerializeField] OpponentSlider _reactionTimeSlider;
-	[SerializeField] OpponentSlider _accelerationSlider;
-	[SerializeField] OpponentSlider _ballSpeedSlider;
+	[SerializeField] SettingSlider _interPersonalDistanceSlider;
+	[SerializeField] SettingSlider _reactionTimeSlider;
+	[SerializeField] SettingSlider _accelerationSlider;
+	[SerializeField] SettingSlider _goalDistanceSlider;
 	
 	public void Bind(OpponentViewModel viewModel)
 	{
@@ -20,6 +20,7 @@ public class OpponentUI : UIScreen
 		_accelerationSlider.Slider.onValueChanged.AddListener(viewModel.ChangeAcceleration);
 		_accelerationSlider.Bind("Acceleration", viewModel.Acceleration, 0f, 20f);
 		
-		// todo
+		_goalDistanceSlider.Slider.onValueChanged.AddListener(viewModel.ChangeGoalDistance);
+		_goalDistanceSlider.Bind("Goal Distance", viewModel.GoalDistance, 0, 5);
 	}
 }

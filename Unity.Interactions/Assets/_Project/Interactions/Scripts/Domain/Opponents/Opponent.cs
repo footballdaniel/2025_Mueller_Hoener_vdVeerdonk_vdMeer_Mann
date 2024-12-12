@@ -1,5 +1,6 @@
 using System;
 using Interactions.Domain;
+using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
 using UnityEngine;
 

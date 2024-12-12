@@ -26,10 +26,22 @@ namespace Interactions.Apps.ViewModels
 			set => ChangeAcceleration(value);
 		}
 
+		public float GoalDistance
+		{
+			get => _app.Experiment.DistanceBetweenGoals;
+			set => ChangeGoalDistance(value);
+		}
+
 		public void ChangeAcceleration(float newAcceleration)
 		{
 			_app.Experiment.OpponentAcceleration = newAcceleration;
 			_app.Experiment.Opponent.ChangeAcceleration(newAcceleration);
+		}
+
+		public void ChangeGoalDistance(float newDistance)
+		{
+			_app.Experiment.LeftGoal.PlaceWithDistance(newDistance / 2f);
+			_app.Experiment.RightGoal.PlaceWithDistance(newDistance / 2f);
 		}
 
 		public void ChangeInterpersonalDistance(float newDistance)

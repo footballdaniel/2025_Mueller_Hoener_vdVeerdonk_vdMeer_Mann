@@ -2,6 +2,7 @@ using Interactions.Apps.States;
 using Interactions.Apps.Transitions;
 using Interactions.Apps.ViewModels;
 using Interactions.Domain;
+using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 using Interactions.Infra;

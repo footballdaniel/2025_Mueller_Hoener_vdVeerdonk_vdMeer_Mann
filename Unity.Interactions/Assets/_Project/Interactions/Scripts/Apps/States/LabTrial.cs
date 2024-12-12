@@ -21,8 +21,8 @@ namespace Interactions.Apps.States
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 			
-			_app.UI.OpponentUI.Bind(_app.OpponentViewModel);
-			_app.UI.OpponentUI.Show();
+			_app.UI._settingsUI.Bind(_app.OpponentViewModel);
+			_app.UI._settingsUI.Show();
 
 			_app.Experiment.Opponent.BallIntercepted += OnBallIntercepted;
 
@@ -45,7 +45,7 @@ namespace Interactions.Apps.States
 			
 			_app.Experiment.WebcamRecorder.StopRecording();
 			
-			_app.UI.OpponentUI.Hide();
+			_app.UI._settingsUI.Hide();
 		}
 
 		public override void Tick()
@@ -74,7 +74,7 @@ namespace Interactions.Apps.States
 					_lastPassTime = Time.time; // Update the last pass time
 
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
-					var passDirection = new Vector3(passVelocity.normalized.x, 0, passVelocity.normalized.z);
+					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);

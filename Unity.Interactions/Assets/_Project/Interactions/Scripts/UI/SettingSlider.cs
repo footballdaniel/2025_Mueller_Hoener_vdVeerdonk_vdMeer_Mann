@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OpponentSlider : MonoBehaviour
+public class SettingSlider : MonoBehaviour
 {
 
 	[SerializeField] TMP_Text _title;
