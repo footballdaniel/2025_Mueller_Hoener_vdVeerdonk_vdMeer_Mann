@@ -27,6 +27,8 @@ namespace Interactions.Domain
 		public float DistanceBetweenGoals { get; set; } = 2f;
 		public LeftGoal LeftGoal { get; set; }
 		public RightGoal RightGoal { get; set; }
+		public float BodyInformationWeight { get; set; } = 1f;
+		public float FootInformationWeight { get; set; } = 0.33f;
 
 		public void NextTrial()
 		{

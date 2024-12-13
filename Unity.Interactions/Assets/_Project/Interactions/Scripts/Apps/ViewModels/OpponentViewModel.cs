@@ -34,10 +34,32 @@ namespace Interactions.Apps.ViewModels
 			set => ChangeGoalDistance(value);
 		}
 
+		public float BodyInformation
+		{
+			get => _app.Experiment.BodyInformationWeight;
+			set => ChangeBodyInformationWeight(value);
+		}
+
+		public float FootInformation
+		{
+			get => _app.Experiment.FootInformationWeight;
+			set => _app.Experiment.Opponent.ChangeFootInformation(value);
+		}
+
 		public void ChangeAcceleration(float newAcceleration)
 		{
 			_app.Experiment.OpponentAcceleration = newAcceleration;
 			_app.Experiment.Opponent.ChangeAcceleration(newAcceleration);
+		}
+
+		public void ChangeBodyInformationWeight(float arg0)
+		{
+			_app.Experiment.Opponent.ChangeBodyInformationWeight(arg0);
+		}
+
+		public void ChangeFootInformation(float arg0)
+		{
+			_app.Experiment.Opponent.ChangeFootInformation(arg0);
 		}
 
 		public void ChangeGoalDistance(float newDistance)
@@ -59,6 +81,5 @@ namespace Interactions.Apps.ViewModels
 		}
 
 		readonly App _app;
-		Opponent _opponent;
 	}
 }

@@ -47,13 +47,23 @@ namespace Interactions.Domain.Opponents
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 
-			_sources.Add(_attackerSource, 1f);
-			_sources.Add(_footSource, 0.33f);
+			_sources.Update(_attackerSource, 1f);
+			_sources.Update(_footSource, 0.33f);
 		}
 
 		public void ChangeAcceleration(float newAcceleration)
 		{
 			_motor.ChangeAcceleration(newAcceleration);
+		}
+
+		public void ChangeBodyInformationWeight(float newWeight)
+		{
+			_sources.Update(_attackerSource, newWeight);
+		}
+
+		public void ChangeFootInformation(float newWeight)
+		{
+			_sources.Update(_footSource, newWeight);
 		}
 
 		public void ChangeInterpersonalDistance(float newInterpersonalDistance)
