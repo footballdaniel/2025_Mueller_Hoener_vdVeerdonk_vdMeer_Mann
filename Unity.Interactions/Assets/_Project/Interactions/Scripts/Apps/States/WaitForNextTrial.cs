@@ -18,7 +18,7 @@ namespace Interactions.Apps.States
 
 		public override void Tick()
 		{
-			var deltaTime = 1f / _app.RecordingFrameRateHz;
+			var deltaTime = 1f / _app.Experiment.FrameRateHz;
 			_updateTimer += Time.deltaTime;
 			var epsilon = 0.0001f;
 

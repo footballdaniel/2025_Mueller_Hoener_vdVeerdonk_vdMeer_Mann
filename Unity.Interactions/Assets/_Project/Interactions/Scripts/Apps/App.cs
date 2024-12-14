@@ -17,8 +17,7 @@ namespace Interactions.Apps
 	public class App : MonoBehaviour
 	{
 		[Header("Settings")]
-		public int RecordingFrameRateHz = 10;
-
+		public Experiment Experiment;
 		public ModelAssetWithMetadata LstmModelAsset;
 		public AudioClip PassSoundClip;
 
@@ -31,7 +30,7 @@ namespace Interactions.Apps
 		public InSituOpponent InSituOpponentPrefab { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
-		[Header("State")] public Experiment Experiment { get; set; }
+		[Header("State")] 
 		public Transitions.Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
@@ -59,7 +58,7 @@ namespace Interactions.Apps
 			BallPrefab = ServiceLocator.Get<Ball>();
 			
 			// Other Dependencies
-			Experiment = new Experiment(RecordingFrameRateHz, DominantFootSide, LeftGoal, RightGoal);
+			Experiment.Bind(DominantFootSide, LeftGoal, RightGoal);
 			LstmModel = new LstmModel(LstmModelAsset);
 
 			// View models for showing data on the UI

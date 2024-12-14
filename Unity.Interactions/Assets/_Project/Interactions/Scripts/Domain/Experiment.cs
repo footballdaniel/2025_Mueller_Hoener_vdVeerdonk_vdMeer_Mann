@@ -1,34 +1,38 @@
+using System;
 using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
 using Interactions.Infra;
+using UnityEngine;
 
 namespace Interactions.Domain
 {
+	[Serializable]
 	public class Experiment
 	{
-		public Experiment(int frameRateHz, Side dominantFoot, LeftGoal leftGoal, RightGoal rightGoal)
+		public int Test;
+		[field: SerializeReference] public float InterPersonalDistance { get; set; } = 4f;
+		[field: SerializeReference] public int FrameRateHz { get; private set; }
+		[field: SerializeReference] public float BodyInformationWeight { get; set; } = 1f;
+		[field: SerializeReference] public float FootInformationWeight { get; set; } = 0.33f;
+		[field: SerializeReference] public float OpponentAcceleration { get; set; } = 10f;
+		[field: SerializeReference] public float OpponentReactionTime { get; set; } = 0.2f;
+		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2f;
+		public Side DominantFoot { get; set; }
+		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();
+		public Opponent Opponent { get; set; }
+		public Ball Ball { get; set; }
+		public Trial CurrentTrial { get; private set; }
+		public LeftGoal LeftGoal { get; set; }
+		public RightGoal RightGoal { get; set; }
+
+		public void Bind(Side dominantFoot, LeftGoal leftGoal, RightGoal rightGoal)
 		{
-			FrameRateHz = frameRateHz;
 			DominantFoot = dominantFoot;
 			LeftGoal = leftGoal;
 			RightGoal = rightGoal;
 		}
 
-		public float InterPersonalDistance { get; set; } = 4f;
-		public Side DominantFoot { get; set; }
-		public int FrameRateHz { get; private set; }
-		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();
-		public Opponent Opponent { get; set; }
-		public Ball Ball { get; set; }
-		public Trial CurrentTrial { get; private set; }
-		public float OpponentAcceleration { get; set; } = 10f;
-		public float OpponentReactionTime { get; set; } = 0.2f;
-		public float DistanceBetweenGoals { get; set; } = 2f;
-		public LeftGoal LeftGoal { get; set; }
-		public RightGoal RightGoal { get; set; }
-		public float BodyInformationWeight { get; set; } = 1f;
-		public float FootInformationWeight { get; set; } = 0.33f;
 
 		public void NextTrial()
 		{

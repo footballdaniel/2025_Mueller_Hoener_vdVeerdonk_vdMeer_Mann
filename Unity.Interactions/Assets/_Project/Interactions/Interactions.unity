@@ -4099,7 +4099,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 967266048}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &797247219
 MonoBehaviour:
@@ -4616,9 +4616,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 797247218}
-  - {fileID: 1520380777}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &967266049
@@ -4645,6 +4643,8 @@ MonoBehaviour:
   - {fileID: 1285315417}
   - {fileID: 286015695}
   - {fileID: 370643114}
+  - {fileID: 797247216}
+  - {fileID: 1520380776}
   _nonMonoBehaviours: []
 --- !u!1 &1015579754
 GameObject:
@@ -6459,12 +6459,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1520380776}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 967266048}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1520380778
 MonoBehaviour:
@@ -7593,7 +7593,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bef2547dbd828847bff4e6c5f781ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RecordingFrameRateHz: 10
+  Experiment:
+    Test: 0
+    <InterPersonalDistance>k__BackingField: 4
+    <FrameRateHz>k__BackingField: 0
+    <BodyInformationWeight>k__BackingField: 1
+    <FootInformationWeight>k__BackingField: 0.33
+    <OpponentAcceleration>k__BackingField: 10
+    <OpponentReactionTime>k__BackingField: 0.2
+    <DistanceBetweenGoals>k__BackingField: 2
   LstmModelAsset: {fileID: 11400000, guid: a0277abb140ae2c498c3bcc052e47bd2, type: 2}
   PassSoundClip: {fileID: 8300000, guid: 16f8e268a70602f4ebd9d9789d950d86, type: 3}
 --- !u!1001 &1784216646
@@ -8709,7 +8717,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 1770768574}
   - {fileID: 967266048}
-  - {fileID: 1353127920}
+  - {fileID: 797247218}
+  - {fileID: 1520380777}
   - {fileID: 1557037604}
   - {fileID: 128303749}
   - {fileID: 101493840}
@@ -8717,3 +8726,4 @@ SceneRoots:
   - {fileID: 370643115}
   - {fileID: 1285315416}
   - {fileID: 286015694}
+  - {fileID: 1353127920}
