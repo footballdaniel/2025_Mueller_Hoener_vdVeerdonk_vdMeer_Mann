@@ -1958,6 +1958,7 @@ Transform:
   - {fileID: 6364217007249889605}
   - {fileID: 6364217008209439675}
   - {fileID: 1932555424}
+  - {fileID: 773336707}
   - {fileID: 1689288789}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1976,6 +1977,7 @@ MonoBehaviour:
   <HeadTracker>k__BackingField: {fileID: 6432888728586108516}
   <DominantFootTracker>k__BackingField: {fileID: 6432888728729848986}
   <NonDominantFootTracker>k__BackingField: {fileID: 1932555423}
+  <UserHipsTracker>k__BackingField: {fileID: 773336708}
   <DefenderHipsTracker>k__BackingField: {fileID: 1689288788}
 --- !u!1 &395314954
 GameObject:
@@ -3893,6 +3895,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771072529}
   m_CullTransparentMesh: 1
+--- !u!1 &773336706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 773336707}
+  - component: {fileID: 773336708}
+  m_Layer: 0
+  m_Name: UserHips
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &773336707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773336706}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 370643115}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &773336708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773336706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9390a5ab238d474883731f758db70bfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _positionAction: {fileID: -5922019433432456627, guid: 53a08a6060541574788d1f5191c83ae0,
+    type: 3}
+  _isXForward: 1
+  <TrackerMappingName>k__BackingField: Chest
 --- !u!1 &793940995
 GameObject:
   m_ObjectHideFlags: 0

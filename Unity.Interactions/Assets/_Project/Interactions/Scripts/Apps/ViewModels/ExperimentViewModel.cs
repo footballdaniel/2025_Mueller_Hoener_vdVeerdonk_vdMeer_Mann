@@ -19,6 +19,7 @@ namespace Interactions.Apps.ViewModels
 		public XRTracker DominantFootTracker => _app.Trackers.DominantFootTracker;
 		public XRTracker NonDominantFootTracker => _app.Trackers.NonDominantFootTracker;
 		public XRTracker DefenderHipsTracker => _app.Trackers.DefenderHipsTracker;
+		public XRTracker UserHipsTracker => _app.Trackers.UserHipsTracker;
 
 		public RenderTexture Frame => _app.Experiment.WebcamRecorder?.Frame ?? new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32);
 

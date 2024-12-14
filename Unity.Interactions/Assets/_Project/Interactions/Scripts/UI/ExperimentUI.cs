@@ -53,12 +53,14 @@ namespace Interactions.UI
 			var headTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
 			var dominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
 			var nonDominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
-			var hipsTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
+			var userHipsTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
+			var defenderHipsTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
 
 			dominantFootTracker.Bind(viewModel.DominantFootTracker);
 			headTracker.Bind(viewModel.HeadTracker);
 			nonDominantFootTracker.Bind(viewModel.NonDominantFootTracker);
-			hipsTracker.Bind(viewModel.DefenderHipsTracker);
+			userHipsTracker.Bind(viewModel.UserHipsTracker);
+			defenderHipsTracker.Bind(viewModel.DefenderHipsTracker);
 		}
 
 		void OnCanStartNextTrialChanged(bool canStart)
