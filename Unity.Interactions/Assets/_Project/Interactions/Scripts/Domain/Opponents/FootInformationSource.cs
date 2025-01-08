@@ -6,19 +6,15 @@ namespace Interactions.Domain.Opponents
 	public class FootInformationSource : IInformationSource
 	{
 
-		public FootInformationSource(DominantFoot userDominantFoot, NonDominantFoot userNonDominantFoot)
+		public FootInformationSource(IPercept footPercept)
 		{
-			_userDominantFoot = userDominantFoot;
-			_userNonDominantFoot = userNonDominantFoot;
+			_footPercept = footPercept;
 		}
 
 		public Vector3 TargetPosition()
 		{
-			var dominantFootVelocityZ = _userDominantFoot.Velocity.z;
-			var nonDominantFootVelocityZ = _userNonDominantFoot.Velocity.z;
-			var combinedVelocityZ = dominantFootVelocityZ + nonDominantFootVelocityZ;
-
-			return new Vector3(0, 0, combinedVelocityZ);
+			var pos = _footPercept.Perceive();
+			return new Vector3(pos.x, 0, pos.y);
 		}
 
 		public float TargetRotationY()
@@ -30,5 +26,6 @@ namespace Interactions.Domain.Opponents
 
 		readonly DominantFoot _userDominantFoot;
 		readonly NonDominantFoot _userNonDominantFoot;
+		readonly IPercept _footPercept;
 	}
 }

@@ -9,20 +9,35 @@ namespace Interactions.Domain.Opponents
 		{
 			for (var i = 0; i < _sources.Count; i++)
 			{
-				var (src, _) = _sources[i];
-				_sources[i] = (src, 0f);
+				var (src, weight, _) = _sources[i];
+				_sources[i] = (src, weight, false);
 			}
 
 			_sources.RemoveAll(x => x.Item1.GetType() == activeSource.GetType());
-			_sources.Add((activeSource, 1f));
+			_sources.Add((activeSource, 1f, true));
+		}
+		
+		public void Remove(IInformationSource source)
+		{
+			_sources.RemoveAll(x => x.Item1.GetType() == source.GetType());
+		}
+
+		public void ActivateAll()
+		{
+			for (var i = 0; i < _sources.Count; i++)
+			{
+				var (src, weight, _) = _sources[i];
+				_sources[i] = (src, weight, true);
+			}
 		}
 
 		public void Update(IInformationSource source, float weight)
 		{
+			var (_, _, isActive) = _sources.Find(x => x.Item1.GetType() == source.GetType());
 			_sources.RemoveAll(x => x.Item1.GetType() == source.GetType());
 			
 			source.Weight = weight;
-			_sources.Add((source, weight));
+			_sources.Add((source, weight, isActive));
 		}
 
 		public Vector3 CombinePositions()
@@ -32,9 +47,7 @@ namespace Interactions.Domain.Opponents
 			var totalWeightY = 0f;
 			var totalWeightZ = 0f;
 			
-			
-
-			foreach (var (source, weight) in _sources)
+			foreach (var (source, weight, isActive) in _sources)
 			{
 				var sourceTargetPosition = source.TargetPosition();
 
@@ -69,7 +82,7 @@ namespace Interactions.Domain.Opponents
 			var totalWeight = 0f;
 			var accumulatedRotation = 0f;
 
-			foreach (var (source, weight) in _sources)
+			foreach (var (source, weight, _) in _sources)
 			{
 				var targetRotationY = source.TargetRotationY();
 
@@ -86,6 +99,6 @@ namespace Interactions.Domain.Opponents
 			return 0f;
 		}
 
-		List<(IInformationSource source, float weight)> _sources = new();
+		List<(IInformationSource source, float weight, bool isActive)> _sources = new();
 	}
 }

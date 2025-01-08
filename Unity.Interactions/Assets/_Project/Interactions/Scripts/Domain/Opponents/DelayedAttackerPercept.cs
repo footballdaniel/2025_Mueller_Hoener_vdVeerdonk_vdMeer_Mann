@@ -4,10 +4,10 @@ using UnityEngine;
 namespace Interactions.Domain.Opponents
 {
 
-	public class DelayedAttackerPerception : IAttackerPerception
+	public class DelayedAttackerPercept : IPercept
 	{
 
-		public DelayedAttackerPerception(float duration, float delay, User user)
+		public DelayedAttackerPercept(float duration, float delay, User user)
 		{
 			_entries = new List<(float time, Vector2 pos)>();
 			_duration = duration;

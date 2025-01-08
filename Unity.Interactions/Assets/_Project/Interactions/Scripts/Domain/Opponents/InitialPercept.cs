@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace Interactions.Domain.Opponents
 {
-	public class InitialAttackerPerception : IAttackerPerception
+	public class InitialPercept : IPercept
 	{
 		readonly Vector2 _perceivedPosition;
 
-		public InitialAttackerPerception(User user)
+		public InitialPercept(User user)
 		{
 			_perceivedPosition = user.Position;
 		}

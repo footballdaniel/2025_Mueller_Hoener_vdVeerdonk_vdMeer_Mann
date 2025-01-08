@@ -20,7 +20,8 @@ namespace Interactions.Domain.Opponents
 
 		void Update()
 		{
-			_perception.Tick(Time.time);
+			_attackerPerception.Tick(Time.time);
+			_footPerception.Tick(Time.time);
 
 			transform.position = _motor.Move(_sources, transform.position, transform.rotation, Time.deltaTime);
 			transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
@@ -30,7 +31,8 @@ namespace Interactions.Domain.Opponents
 			if (InterceptedBall())
 			{
 				BallIntercepted?.Invoke(_motor.Velocity);
-				_sources.ActivateOnly(_attackerSource);
+				_sources.Remove(_interceptionSource);
+				_sources.ActivateAll();
 			}
 		}
 
@@ -43,22 +45,24 @@ namespace Interactions.Domain.Opponents
 			
 			if (isInteractive)
 			{
-				_perception = new DelayedAttackerPerception(_memoryDuration, _reactionDelay, _user);
-				_footSource = new FootInformationSource(_user.DominantFoot, user.NonDominantFoot);
-				_sources.Update(_footSource, 0.33f);
+				_attackerPerception = new DelayedAttackerPercept(_memoryDuration, _reactionDelay, _user);
+				_footPerception = new DelayedFootPerception(_memoryDuration, _reactionDelay,  0.4f,  _user.DominantFoot, user.NonDominantFoot);
+
 			}
 			else
 			{
-				_perception = new InitialAttackerPerception(_user);
-				_footSource = new NoFootInfomationSource();
+				_attackerPerception = new InitialPercept(_user);
+				_footPerception = new NoFootPerception();
 			}
 			
-			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _perception, _distanceFromAttacker);
+			_footSource = new FootInformationSource(_footPerception);
+			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
 			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 			
 			_sources.Update(_attackerSource, 1f);
+			_sources.Update(_footSource, 0.33f);
 		}
 
 		public void ChangeAcceleration(float newAcceleration)
@@ -83,7 +87,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
-			_perception.ChangeReactionTime(newReactionTime);
+			_attackerPerception.ChangeReactionTime(newReactionTime);
 		}
 
 		public void Intercept(Ball ball)
@@ -107,10 +111,11 @@ namespace Interactions.Domain.Opponents
 		LeftGoal _goalLeft;
 		RightGoal _goalRight;
 		IInformationSource _interceptionSource;
-		IAttackerPerception _perception;
+		IPercept _attackerPerception;
 		Motor _motor;
 		User _user;
 		bool _isInteractive;
+		IPercept _footPerception;
 	}
 
 }

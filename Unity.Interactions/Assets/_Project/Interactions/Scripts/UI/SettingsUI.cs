@@ -17,7 +17,7 @@ public class SettingsUI : UIScreen
 		_interPersonalDistanceSlider.Bind("Weight IPD", viewModel.InterpersonalDistance, 2, 10);
 		
 		_bodyInformationSlider.Slider.onValueChanged.AddListener(viewModel.ChangeBodyInformationWeight);
-		_bodyInformationSlider.Bind("Weight Body Info", viewModel.BodyInformation, 0, 1);
+		_bodyInformationSlider.Bind("Weight Body Info", viewModel.BodyInformation, 0.01f, 1);
 		
 		_footInformationSlider.Slider.onValueChanged.AddListener(viewModel.ChangeFootInformation);
 		_footInformationSlider.Bind("Weight Foot Info", viewModel.FootInformation, 0, 1);
