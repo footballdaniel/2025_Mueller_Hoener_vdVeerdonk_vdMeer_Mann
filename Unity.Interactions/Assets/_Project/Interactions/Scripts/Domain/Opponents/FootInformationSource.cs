@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Interactions.Domain.Opponents
 {
-	internal class FootInformationSource : IInformationSource
+	public class FootInformationSource : IInformationSource
 	{
 
 		public FootInformationSource(DominantFoot userDominantFoot, NonDominantFoot userNonDominantFoot)

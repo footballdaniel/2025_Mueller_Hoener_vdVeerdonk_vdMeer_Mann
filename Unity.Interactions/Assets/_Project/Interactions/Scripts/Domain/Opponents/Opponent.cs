@@ -50,6 +50,7 @@ namespace Interactions.Domain.Opponents
 			else
 			{
 				_perception = new InitialAttackerPerception(_user);
+				_footSource = new NoFootInfomationSource();
 			}
 			
 			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _perception, _distanceFromAttacker);
@@ -102,7 +103,7 @@ namespace Interactions.Domain.Opponents
 		readonly InformationSources _sources = new();
 		Animations _animations;
 		AttackerInformationSource _attackerSource;
-		FootInformationSource _footSource;
+		IInformationSource _footSource;
 		LeftGoal _goalLeft;
 		RightGoal _goalRight;
 		IInformationSource _interceptionSource;
