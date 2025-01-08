@@ -1,5 +1,3 @@
-using Interactions.Domain.Opponents;
-
 namespace Interactions.Apps.ViewModels
 {
 	public class OpponentViewModel
@@ -18,7 +16,7 @@ namespace Interactions.Apps.ViewModels
 
 		public float ReactionTime
 		{
-			get => _app.Experiment.OpponentReactionTime;
+			get => _app.Experiment.OpponentReactionTimeBody;
 			set => ChangeReactionTime(value);
 		}
 
@@ -44,6 +42,12 @@ namespace Interactions.Apps.ViewModels
 		{
 			get => _app.Experiment.FootInformationWeight;
 			set => _app.Experiment.Opponent.ChangeFootInformation(value);
+		}
+
+		public float ReactionTimeFoot
+		{
+			get => _app.Experiment.OpponentReactionTimeFoot;
+			set => _app.Experiment.Opponent.ChangeReactionTimeBody(value);
 		}
 
 		public void ChangeAcceleration(float newAcceleration)
@@ -76,10 +80,16 @@ namespace Interactions.Apps.ViewModels
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
-			_app.Experiment.OpponentReactionTime = newReactionTime;
-			_app.Experiment.Opponent.ChangeReactionTime(newReactionTime);
+			_app.Experiment.OpponentReactionTimeBody = newReactionTime;
+			_app.Experiment.Opponent.ChangeReactionTimeBody(newReactionTime);
 		}
 
 		readonly App _app;
+
+		public void ChangeReactionTimeFoot(float arg0)
+		{
+			_app.Experiment.OpponentReactionTimeFoot = arg0;
+			_app.Experiment.Opponent.ChangeReactionTimeFoot(arg0);
+		}
 	}
 }

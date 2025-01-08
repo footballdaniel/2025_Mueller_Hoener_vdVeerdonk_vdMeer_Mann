@@ -11,11 +11,12 @@ namespace Interactions.Domain
 	public class Experiment
 	{
 		[field: SerializeReference] public float InterPersonalDistance { get; set; } = 4f;
-		[field: SerializeReference] public int FrameRateHz { get; private set; }
-		[field: SerializeReference] public float BodyInformationWeight { get; set; } = 1f;
+		[field: SerializeReference] public int FrameRateHz { get; private set; } = 10;
+		[field: SerializeReference] public float BodyInformationWeight { get; set; } = 0.5f;
 		[field: SerializeReference] public float FootInformationWeight { get; set; } = 0.33f;
 		[field: SerializeReference] public float OpponentAcceleration { get; set; } = 10f;
-		[field: SerializeReference] public float OpponentReactionTime { get; set; } = 0.2f;
+		[field: SerializeReference] public float OpponentReactionTimeBody { get; set; } = 1f;
+		[field: SerializeReference] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
 		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2f;
 		public Side DominantFoot { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();

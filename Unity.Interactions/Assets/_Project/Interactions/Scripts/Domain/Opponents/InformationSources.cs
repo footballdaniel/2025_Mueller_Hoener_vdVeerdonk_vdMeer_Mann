@@ -31,13 +31,12 @@ namespace Interactions.Domain.Opponents
 			}
 		}
 
-		public void Update(IInformationSource source, float weight)
+		public void AddNewSource(IInformationSource source, float weight)
 		{
-			var (_, _, isActive) = _sources.Find(x => x.Item1.GetType() == source.GetType());
 			_sources.RemoveAll(x => x.Item1.GetType() == source.GetType());
 			
 			source.Weight = weight;
-			_sources.Add((source, weight, isActive));
+			_sources.Add((source, weight, true));
 		}
 
 		public Vector3 CombinePositions()
@@ -49,6 +48,9 @@ namespace Interactions.Domain.Opponents
 			
 			foreach (var (source, weight, isActive) in _sources)
 			{
+				if (!isActive)
+					continue;
+				
 				var sourceTargetPosition = source.TargetPosition();
 
 				if (sourceTargetPosition.x != 0)
