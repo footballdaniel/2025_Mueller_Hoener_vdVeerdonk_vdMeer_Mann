@@ -8,19 +8,19 @@ namespace Interactions.Domain.Opponents
 	{
 
 		[SerializeField] Animator _animator;
-		[SerializeField] float distanceFromAttacker = 3f;
-		[SerializeField] float maxSpeed = 5f;
-		[SerializeField] float maxAcceleration = 5f;
-		[SerializeField] float maxRotationSpeedDegreesY = 90f;
-		[SerializeField] float memoryDuration = 1f;
-		[SerializeField] float reactionDelay = 0.3f;
+		[SerializeField] float _distanceFromAttacker = 3f;
+		[SerializeField] float _maxSpeed = 5f;
+		[SerializeField] float _maxAcceleration = 5f;
+		[SerializeField] float _maxRotationSpeedDegreesY = 90f;
+		[SerializeField] float _memoryDuration = 1f;
+		[SerializeField] float _reactionDelay = 0.3f;
 		public event Action<Vector2> BallIntercepted;
 
 		public Vector3 Position => transform.position;
 
 		void Update()
 		{
-			_memory.Tick(Time.time);
+			_perception.Tick(Time.time);
 
 			transform.position = _motor.Move(_sources, transform.position, transform.rotation, Time.deltaTime);
 			transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
@@ -34,21 +34,30 @@ namespace Interactions.Domain.Opponents
 			}
 		}
 
-		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight)
+		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, bool isInteractive)
 		{
 			_user = user;
 			_goalLeft = goalLeft;
 			_goalRight = goalRight;
-
-			_memory = new DelayedPerceptionMemory(memoryDuration, reactionDelay, _user);
-			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _memory, distanceFromAttacker);
-			_footSource = new FootInformationSource(_user.DominantFoot, user.NonDominantFoot);
-			_motor = new Motor(maxSpeed, maxAcceleration, maxRotationSpeedDegreesY);
+			_isInteractive = isInteractive;
+			
+			if (isInteractive)
+			{
+				_perception = new DelayedAttackerPerception(_memoryDuration, _reactionDelay, _user);
+				_footSource = new FootInformationSource(_user.DominantFoot, user.NonDominantFoot);
+				_sources.Update(_footSource, 0.33f);
+			}
+			else
+			{
+				_perception = new InitialAttackerPerception(_user);
+			}
+			
+			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _perception, _distanceFromAttacker);
+			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
-
+			
 			_sources.Update(_attackerSource, 1f);
-			_sources.Update(_footSource, 0.33f);
 		}
 
 		public void ChangeAcceleration(float newAcceleration)
@@ -73,11 +82,14 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
-			_memory.ChangeReactionTime(newReactionTime);
+			_perception.ChangeReactionTime(newReactionTime);
 		}
 
 		public void Intercept(Ball ball)
 		{
+			if (!_isInteractive) 
+				return;
+			
 			_interceptionSource = new InterceptionInformationSource(this, ball);
 			_sources.ActivateOnly(_interceptionSource);
 		}
@@ -94,9 +106,10 @@ namespace Interactions.Domain.Opponents
 		LeftGoal _goalLeft;
 		RightGoal _goalRight;
 		IInformationSource _interceptionSource;
-		DelayedPerceptionMemory _memory;
+		IAttackerPerception _perception;
 		Motor _motor;
 		User _user;
+		bool _isInteractive;
 	}
 
 }

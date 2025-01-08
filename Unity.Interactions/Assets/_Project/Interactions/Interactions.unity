@@ -386,7 +386,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b88f07c8f13784495e50735ef914d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _experimentUI: {fileID: 403343059}
+  ExperimentUI: {fileID: 403343059}
   WebcamSelectionUI: {fileID: 1310024550}
   XRStatusUI: {fileID: 1944435368}
   InSituUI: {fileID: 630029420}
@@ -2745,8 +2745,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -71.5}
-  m_SizeDelta: {x: 200, y: 101.1}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 300, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &464788158
 MonoBehaviour:
@@ -7594,7 +7594,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Experiment:
-    Test: 0
     <InterPersonalDistance>k__BackingField: 4
     <FrameRateHz>k__BackingField: 0
     <BodyInformationWeight>k__BackingField: 1

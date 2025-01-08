@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace Interactions.Domain.Opponents
 {
-	public class DelayedPerceptionMemory
+
+	public class DelayedAttackerPerception : IAttackerPerception
 	{
 
-		public DelayedPerceptionMemory(float duration, float delay, User user)
+		public DelayedAttackerPerception(float duration, float delay, User user)
 		{
 			_entries = new List<(float time, Vector2 pos)>();
 			_duration = duration;
@@ -27,9 +28,9 @@ namespace Interactions.Domain.Opponents
 			_delay = newReactionTime;
 		}
 
-		public Vector2 Get(float time)
+		public Vector2 Perceive()
 		{
-			var targetTime = time - _delay;
+			var targetTime = Time.time - _delay;
 
 			if (_entries.Count == 0)
 				return Vector2.zero;

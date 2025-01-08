@@ -10,7 +10,6 @@ namespace Interactions.Domain
 	[Serializable]
 	public class Experiment
 	{
-		public int Test;
 		[field: SerializeReference] public float InterPersonalDistance { get; set; } = 4f;
 		[field: SerializeReference] public int FrameRateHz { get; private set; }
 		[field: SerializeReference] public float BodyInformationWeight { get; set; } = 1f;

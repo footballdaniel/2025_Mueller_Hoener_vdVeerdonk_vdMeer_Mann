@@ -76,14 +76,16 @@ namespace Interactions.Apps
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
 			var waitForNextTrial = new WaitForNextTrial(this);
-			var labTrial = new LabTrial(this);
+			var labTrialInteractive = new LaboratoryTrialInteractive(this);
+			var labTrialNonInteractive = new LaboratoryTrialNonInteractive(this);
 			var inSituTrial = new InSituTrial(this);
 
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrial, inSituTrial }, waitForNextTrial);
-			Transitions.LaboratoryTrial = new Transition(this, waitForNextTrial, labTrial);
+			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrialInteractive, labTrialNonInteractive,inSituTrial }, waitForNextTrial);
+			Transitions.LaboratoryTrialInteractive = new Transition(this, waitForNextTrial, labTrialInteractive);
+			Transitions.LaboratoryTrialNonInteractive = new Transition(this, waitForNextTrial, labTrialNonInteractive);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
 
 			// Start app
@@ -109,11 +111,11 @@ namespace Interactions.Apps
 			{
 				var recorder = WebCamRecorders.Get(0);
 				WebcamSelectionViewModel.Select(recorder);
-				Transitions.LaboratoryTrial.Execute();
+				Transitions.LaboratoryTrialInteractive.Execute();
 			}
 
 			if (Keyboard.current.digit4Key.wasPressedThisFrame)
-				Transitions.LaboratoryTrial.Execute();
+				Transitions.LaboratoryTrialInteractive.Execute();
 
 			if (Keyboard.current.digit5Key.wasPressedThisFrame)
 				Transitions.InSituTrial.Execute();

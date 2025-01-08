@@ -12,8 +12,8 @@ namespace Interactions.Apps.States
 
 		public override void Enter()
 		{
-			_app.UI._experimentUI.Bind(_app.ExperimentViewModel);
-			_app.UI._experimentUI.Show();
+			_app.UI.ExperimentUI.Bind(_app.ExperimentViewModel);
+			_app.UI.ExperimentUI.Show();
 		}
 
 		public override void Tick()

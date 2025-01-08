@@ -37,10 +37,18 @@ namespace Interactions.Apps.ViewModels
 		{
 			CanStartNextTrial.Value = false;
 
-			if (_app.ExperimentalCondition == ExperimentalCondition.Laboratory)
-				_app.Transitions.LaboratoryTrial.Execute();
-			else
-				_app.Transitions.InSituTrial.Execute();
+			switch (_app.ExperimentalCondition)
+			{
+				case ExperimentalCondition.LaboratoryInteractive:
+					_app.Transitions.LaboratoryTrialInteractive.Execute();
+					break;
+				case ExperimentalCondition.LaboratoryNonInteractive:
+					_app.Transitions.LaboratoryTrialNonInteractive.Execute();
+					break;
+				default:
+					_app.Transitions.InSituTrial.Execute();
+					break;
+			}
 		}
 
 		public void ShowData()

@@ -1,13 +1,13 @@
-﻿using Interactions.Domain;
+using Interactions.Domain;
 using Interactions.Infra;
 using UnityEngine;
 
 namespace Interactions.Apps.States
 {
-	internal class LabTrial : State
+	internal class LaboratoryTrialNonInteractive : State
 	{
 
-		public LabTrial(App app) : base(app)
+		public LaboratoryTrialNonInteractive(App app) : base(app)
 		{
 		}
 
@@ -18,7 +18,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, false);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 			
 			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);

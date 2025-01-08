@@ -3,6 +3,7 @@
 	public enum ExperimentalCondition
 	{
 		InSitu,
-		Laboratory
+		LaboratoryInteractive,
+		LaboratoryNonInteractive
 	}
 }
