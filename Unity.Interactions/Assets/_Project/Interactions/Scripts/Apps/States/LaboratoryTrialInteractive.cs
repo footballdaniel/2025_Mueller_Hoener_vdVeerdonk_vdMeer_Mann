@@ -72,10 +72,18 @@ namespace Interactions.Apps.States
 				{
 					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
 					_lastPassTime = Time.time; // Update the last pass time
-
+					
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
-					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
+					var passPosition = new Vector3( _app.User.DominantFoot.transform.position.x, 0.25f, _app.User.DominantFoot.transform.position.z);
+					
+					
+					var isOpponentToLeftOfUser = _app.Experiment.Opponent.Position.x < _app.User.DominantFoot.transform.position.x;
+					var optimalGoalPosition = isOpponentToLeftOfUser ? _app.RightGoal.transform.position : _app.LeftGoal.transform.position;
+					var correctedPassDirection = Vector3.Lerp(passDirection, optimalGoalPosition - passPosition, 0.75f).normalized;
+						
+					
+					var pass = new Pass(passVelocity.magnitude, passPosition,correctedPassDirection);
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 

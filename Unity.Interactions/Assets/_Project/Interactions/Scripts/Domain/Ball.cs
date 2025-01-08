@@ -11,8 +11,11 @@ namespace Interactions.Domain
 		
 		public void Play(Pass pass)
 		{
-			_rigidbody.linearVelocity = pass.Direction * pass.Speed * _energyTransferCoefficient;
+			var optimalPassVelocity = 15f;
+			var speed = Mathf.Lerp(pass.Speed, optimalPassVelocity, 0.75f);
+			var passDirection = new Vector3(pass.Direction.x, pass.Direction.z/5f, pass.Direction.z);
+			
+			_rigidbody.linearVelocity = passDirection * speed * _energyTransferCoefficient;
 		}
-		
 	}
 }

@@ -7752,7 +7752,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Experiment:
-    <InterPersonalDistance>k__BackingField: 5
+    <InterPersonalDistance>k__BackingField: 4
     <FrameRateHz>k__BackingField: 10
     <BodyInformationWeight>k__BackingField: 0.5
     <FootInformationWeight>k__BackingField: 0.5
