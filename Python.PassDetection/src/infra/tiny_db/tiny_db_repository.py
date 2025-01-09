@@ -55,7 +55,7 @@ class RepositoryWithInMemoryCache(BaseRepository):
         self._samples[sample.id] = sample
 
 
-class RepositoryWithCache(RepositoryWithInMemoryCache):
+class RepositoryWithTinyDBCache(RepositoryWithInMemoryCache):
     def __init__(
             self,
             samples: Iterator[Sample],

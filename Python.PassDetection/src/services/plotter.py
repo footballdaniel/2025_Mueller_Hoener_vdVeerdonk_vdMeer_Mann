@@ -1,100 +1,65 @@
 import os
 from pathlib import Path
+from typing import List
 
 from matplotlib import pyplot as plt
 
+from src.domain.common import Vector3
 from src.domain.samples import Sample
 
 
-def plot_sample_with_features(sample: Sample, plot_dir: Path):
+class TimeSeriesPlot:
+    def __init__(self, plot_dir: Path):
+        self.id = -1
+        self.dominant_foot_positions: List[Vector3] = []
+        self.non_dominant_foot_positions: List[Vector3] = []
+        self.plot_dir = plot_dir
+        self.fig, self.axs = None, None
+        self.num_features = 0
+        self.timestamps: List[float] = []
+        self.features = []
+        self.events = []
 
-    if not plot_dir.exists():
-        plot_dir.mkdir(parents=True, exist_ok=True)
+    def add_sample(self, sample: Sample):
+        self.timestamps = sample.recording.timestamps
+        self.dominant_foot_positions = sample.recording.user_dominant_foot_positions
+        self.non_dominant_foot_positions = sample.recording.user_non_dominant_foot_positions
+        self.events = sample.recording.events
+        self.id = sample.id
 
-    num_features = len(sample.inference.computed_features.features)
-    fig_height = num_features * 2  # Smaller figure height per feature
-    fig, axs = plt.subplots(
-        num_features, 1, figsize=(10, fig_height),
-        gridspec_kw={'hspace': 2}  # Increase vertical space between subplots
-    )
+    def add_feature(self, feature_name: str, feature_values: List[float]):
+        self.features.append((feature_name, feature_values))
 
-    start_time = round(sample.recording.input_data.timestamps[0], 1) if sample.recording.input_data.timestamps else 0.0
-    end_time = round(sample.recording.input_data.timestamps[-1], 1) if sample.recording.input_data.timestamps else 0.0
+    def save(self):
+        if not self.plot_dir.exists():
+            self.plot_dir.mkdir(parents=True, exist_ok=True)
+        plot_path = os.path.join(str(self.plot_dir), str(self.id))
 
-    # Pass probability
-    prediction = f"Prediction: {sample.inference.prediction:.2f}" if sample.inference.prediction is not None else "Prediction: N/A"
+        num_features = len(self.features)
+        fig_height = num_features * 2
+        fig, axs = plt.subplots(num_features, 1, figsize=(10, fig_height), gridspec_kw={'hspace': 2})
+        if num_features == 1:
+            axs = [axs]
 
-    # Main title
-    pass_text = 'Pass' if sample.event.is_pass else 'No Pass'
-    fig.suptitle(
-        f"Split: {sample.inference.split.name.lower()} Trial Number: {sample.recording.trial_number} - {pass_text} \n"
-        f"Start: {start_time}s, End: {end_time}s, {prediction}",
-        fontsize=16
-    )
+        for i, (feature_name, feature_values) in enumerate(self.features):
+            ax = axs[i]
+            ax.set_title(feature_name)
+            ax.plot(self.timestamps, feature_values, label=feature_name)
+            ax.legend()
+            ax.set_xlabel('Time (s)')
+            ax.set_ylabel('Value')
+            ax.grid(True)
 
-    if num_features == 1:
-        axs = [axs]
+            # Plot vertical line if an event has happened
+            for event in self.events:
+                if event.is_pass:
+                    ax.axvline(x=event.timestamp, color='green', linestyle='--', linewidth=2, label='Pass Event')
+                    handles, labels = ax.get_legend_handles_labels()
+                    if 'Pass Event' not in labels:
+                        ax.legend(handles, labels)
 
-    for i in range(num_features):
-        ax = axs[i]
-        feature = sample.inference.computed_features.features[i]
-        time = sample.recording.input_data.timestamps
-        ax.set_title(feature.name)
-        ax.plot(time, feature.values, label=feature.name)
-        ax.legend()
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel('Value')
-        ax.grid(True)
-
-        # If there is a pass event, add vertical line
-        if sample.event.is_pass and sample.event.pass_id is not None:
-            ax.axvline(
-                x=sample.event.timestamp,
-                color='green',
-                linestyle='--',
-                linewidth=2,
-                label='Pass Event'
-            )
-            # Update legend to include the pass event line
-            handles, labels = ax.get_legend_handles_labels()
-            if 'Pass Event' not in labels:
-                ax.legend(handles, labels)
-
-    filename = f"sample_{sample.id}_pass{sample.event.is_pass}.png"
-    plot_path = os.path.join(str(plot_dir), filename)
-    fig.savefig(plot_path)
-    plt.close(fig)
-
-
-def plot_sample(sample: Sample):
-    dominant_x = [pos.x for pos in sample.recording.input_data.user_dominant_foot_positions]
-    dominant_y = [pos.y for pos in sample.recording.input_data.user_dominant_foot_positions]
-    dominant_z = [pos.z for pos in sample.recording.input_data.user_dominant_foot_positions]
-
-    non_dominant_x = [pos.x for pos in sample.recording.input_data.user_non_dominant_foot_positions]
-    non_dominant_y = [pos.y for pos in sample.recording.input_data.user_non_dominant_foot_positions]
-    non_dominant_z = [pos.z for pos in sample.recording.input_data.user_non_dominant_foot_positions]
-
-    timestamps = sample.recording.input_data.timestamps
-
-    plt.figure(figsize=(12, 8))
-    plt.subplot(3, 1, 1)
-    plt.plot(timestamps, dominant_x, label="Dominant Foot X")
-    plt.plot(timestamps, non_dominant_x, label="Non-Dominant Foot X")
-    plt.ylabel("X Position")
-    plt.legend()
-
-    plt.subplot(3, 1, 2)
-    plt.plot(timestamps, dominant_y, label="Dominant Foot Y")
-    plt.plot(timestamps, non_dominant_y, label="Non-Dominant Foot Y")
-    plt.ylabel("Y Position")
-    plt.legend()
-
-    plt.subplot(3, 1, 3)
-    plt.plot(timestamps, dominant_z, label="Dominant Foot Z")
-    plt.plot(timestamps, non_dominant_z, label="Non-Dominant Foot Z")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Z Position")
-    plt.legend()
-
-    plt.tight_layout()
+        # Add a main title to the figure
+        fig.suptitle(f"Sample ID: {self.id} - Pass Event Plot", fontsize=16)
+        fig.tight_layout()
+        fig.savefig(plot_path)
+        plt.close(fig)

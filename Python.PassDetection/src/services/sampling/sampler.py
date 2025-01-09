@@ -18,8 +18,11 @@ class Sampler:
             event_idx = event.frame_number  # Index of the event
 
             # Generate windows where the event shifts from last to first index
-            for offset in range(sequence_length):
-                start_idx = event_idx - sequence_length + 1 + offset
+            dont_export_event_when_its_on_last_frame_offset = 1
+            export_only_timeseries_where_event_is_on_last_half_of_sequence = sequence_length // 2
+
+            for offset in range(export_only_timeseries_where_event_is_on_last_half_of_sequence):
+                start_idx = event_idx - sequence_length + dont_export_event_when_its_on_last_frame_offset + offset
                 end_idx = start_idx + sequence_length
 
                 # Ensure indices are within valid range

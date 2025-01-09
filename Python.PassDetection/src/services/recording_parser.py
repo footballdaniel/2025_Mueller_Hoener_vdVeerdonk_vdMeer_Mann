@@ -6,7 +6,7 @@ from typing import Iterator, TypeVar
 
 from src.domain.common import Vector3
 from src.domain.samples import Sample, Foot, Event, Recording
-from src.services.label_creator import Sampler
+from src.services.sampling.sampler import Sampler
 
 T = TypeVar('T', bound='RecordingParser')
 

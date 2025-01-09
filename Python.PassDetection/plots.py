@@ -1,42 +1,38 @@
-# """SAVE PREDICTIONS TO DATASET"""
-# model = best_run.model
-# engineer = FeatureEngineer()
-# for feature in best_run.config.features:
-#     feature_instance = FeatureRegistry.create(feature)
-#     engineer.add_feature(feature_instance)
+from pathlib import Path
 
-# dataset = PassDataset(repo, num_samples, engineer)
-#
-# with torch.no_grad():
-#     for idx in range(num_samples):
-#         input_tensor, label = dataset[idx]
-#         input_tensor = input_tensor.unsqueeze(0).to(device)
-#         output = model(input_tensor)
-#         probability = output.item()
-#         sample = repo.get(idx)
-#         computed_features = engineer.engineer(sample.recording.input_data)
-#         sample_with_prediction = replace(
-#             sample,
-#             inference=Inference(
-#                 prediction=probability,
-#                 split=sample.inference.split,
-#                 computed_features=computed_features,
-#                 label=sample.recording.contains_a_pass,
-#             )
-#         )
-#         repo.add(sample_with_prediction)
+from src.domain.inferences import InputData
+from src.features.feature_registry import FeatureRegistry
+from src.services.feature_engineer import FeatureEngineer
+from src.services.ingester import DataIngester
+from src.services.plotter import TimeSeriesPlot
+from src.services.sampling.sample_generator import SampleGenerator
 
-# """SAVE DATASET"""
-# samples = [repo.get(idx) for idx in test_indices]
-# # Save some to folder
-# with open('dataset.pkl', 'wb') as f:
-#     pickle.dump(samples, f)
-#
-# with open("dataset.json", 'w') as f:
-#     json.dump(samples, f, cls=CustomEncoder)
-#
-# """PLOT SAMPLES"""
-# for idx, id in enumerate(samples):
-#     if not save_plots:
-#         break
-#     plot_sample_with_features(id, plot_dir)
+"""CONFIGURATION"""
+data_path = Path("../Data/Pilot_4")
+plot_dir = Path("plots")
+features_to_plot = ['VelocityMagnitudeDominantFoot', 'VelocityMagnitudeNonDominantFoot']
+
+"""PIPELINE"""
+recordings = DataIngester.ingest(data_path)
+samples_iterator = SampleGenerator.generate(recordings)
+
+for sample in samples_iterator:
+
+    plot = TimeSeriesPlot(plot_dir)
+
+    input_data = InputData(
+        sample.recording.user_dominant_foot_positions,
+        sample.recording.user_non_dominant_foot_positions,
+        sample.recording.timestamps
+    )
+
+    plot.add_sample(sample)
+
+    for feature_name in features_to_plot:
+        engineer = FeatureEngineer()
+        feature_instance = FeatureRegistry.create(feature_name)
+        engineer.add_feature(feature_instance)
+        flattened_values = engineer.engineer(input_data)
+        plot.add_feature(feature_name, flattened_values)
+
+    plot.save()

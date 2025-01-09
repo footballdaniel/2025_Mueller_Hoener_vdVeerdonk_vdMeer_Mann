@@ -1,7 +1,7 @@
 from typing import List, Iterator
 
 from src.domain.samples import IngestableRecording, Sample
-from src.services.label_creator import Sampler
+from src.services.sampling.sampler import Sampler
 from src.services.recording_parser import RecordingParser
 
 

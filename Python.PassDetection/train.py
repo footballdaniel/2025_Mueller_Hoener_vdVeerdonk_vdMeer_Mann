@@ -21,7 +21,7 @@ from src.infra.nn.pass_dataset import PassDataset
 from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 from src.services.feature_engineer import FeatureEngineer
 from src.services.ingester import DataIngester
-from src.services.sample_generator import SampleGenerator
+from src.services.sampling.sample_generator import SampleGenerator
 from src.services.traintestsplitter import TrainTestValidationSplitter
 
 """LOGGING"""
@@ -45,7 +45,6 @@ test_percentage = 0.1
 plot_dir = Path("plots")
 output_dir_model = Path("../Unity.Interactions/Assets/Resources")
 save_plots = True
-# set pytorch seed
 torch.manual_seed(0)
 
 """PIPELINE"""
