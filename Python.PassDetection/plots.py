@@ -18,15 +18,18 @@ samples_iterator = SampleGenerator.generate(recordings)
 
 for sample in samples_iterator:
 
+    if not sample.contains_a_pass():
+        print("Pass detected")
+        continue
+
     plot = TimeSeriesPlot(plot_dir)
+    plot.add_sample(sample)
 
     input_data = InputData(
         sample.recording.user_dominant_foot_positions,
         sample.recording.user_non_dominant_foot_positions,
         sample.recording.timestamps
     )
-
-    plot.add_sample(sample)
 
     for feature_name in features_to_plot:
         engineer = FeatureEngineer()
