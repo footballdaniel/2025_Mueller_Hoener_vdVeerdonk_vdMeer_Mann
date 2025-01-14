@@ -17,7 +17,8 @@ namespace Interactions.Domain
 		[field: SerializeReference] public float OpponentAcceleration { get; set; } = 10f;
 		[field: SerializeReference] public float OpponentReactionTimeBody { get; set; } = 1f;
 		[field: SerializeReference] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
-		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2f;
+		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2.5f;
+		public PassCorrector PassCorrector { get; set; } = new PassCorrector(); 
 		public Side DominantFoot { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();
 		public Opponent Opponent { get; set; }

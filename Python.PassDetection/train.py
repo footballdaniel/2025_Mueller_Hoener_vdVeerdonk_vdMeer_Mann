@@ -42,9 +42,7 @@ max_samples = 1_000_000
 train_percentage = 0.7
 validation_percentage = 0.2
 test_percentage = 0.1
-plot_dir = Path("plots")
 output_dir_model = Path("../Unity.Interactions/Assets/Resources")
-save_plots = True
 torch.manual_seed(0)
 
 """PIPELINE"""

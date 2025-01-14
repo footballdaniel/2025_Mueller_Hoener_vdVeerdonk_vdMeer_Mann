@@ -1,7 +1,7 @@
 from dataclasses import replace
 from typing import Iterator
 
-from src.domain.samples import Sample, Recording, Event
+from src.domain.samples import Sample, Recording
 
 
 class Sampler:
@@ -19,7 +19,7 @@ class Sampler:
 
             # Generate windows where the event shifts from last to first index
             dont_export_event_when_its_on_last_frame_offset = 1
-            export_only_timeseries_where_event_is_on_last_half_of_sequence = sequence_length
+            export_only_timeseries_where_event_is_on_last_half_of_sequence = sequence_length //2 # remove //2 and events are recognized in whole trial
 
             for offset in range(export_only_timeseries_where_event_is_on_last_half_of_sequence):
                 start_idx = event_idx - sequence_length + dont_export_event_when_its_on_last_frame_offset + offset

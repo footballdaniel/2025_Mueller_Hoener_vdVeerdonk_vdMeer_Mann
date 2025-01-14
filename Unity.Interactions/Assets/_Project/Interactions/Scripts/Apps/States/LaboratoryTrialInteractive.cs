@@ -20,6 +20,8 @@ namespace Interactions.Apps.States
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, true);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
+
+			_app.Experiment.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.Opponent, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
 			
 			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);
 			_app.UI.SettingsUI.Show();
@@ -71,19 +73,13 @@ namespace Interactions.Apps.States
 				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
 				{
 					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
-					_lastPassTime = Time.time; // Update the last pass time
+					_lastPassTime = Time.time;
 					
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
-					var passPosition = new Vector3( _app.User.DominantFoot.transform.position.x, 0.25f, _app.User.DominantFoot.transform.position.z);
 					
-					
-					var isOpponentToLeftOfUser = _app.Experiment.Opponent.Position.x < _app.User.DominantFoot.transform.position.x;
-					var optimalGoalPosition = isOpponentToLeftOfUser ? _app.RightGoal.transform.position : _app.LeftGoal.transform.position;
-					var correctedPassDirection = Vector3.Lerp(passDirection, optimalGoalPosition - passPosition, 0.75f).normalized;
-						
-					
-					var pass = new Pass(passVelocity.magnitude, passPosition,correctedPassDirection);
+					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
+					pass = _app.Experiment.PassCorrector.Correct(pass);
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 

@@ -16,11 +16,13 @@ namespace Interactions.Apps.States
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
-			
+
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, false);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
-			
+
+			_app.Experiment.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.Opponent, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
+
 			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);
 			_app.UI.SettingsUI.Show();
 
@@ -29,22 +31,17 @@ namespace Interactions.Apps.States
 			_lastPassTime = Time.time;
 		}
 
-		void OnBallIntercepted(Vector2 direction)
-		{
-			_ball.Play(new Pass(3, _ball.transform.position, new Vector3(direction.x, 0, direction.y)));
-		}
-
 		public override void Exit()
 		{
 			_hasPassed = false;
 			Object.Destroy(_app.Experiment.Ball?.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
-			
+
 			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
 			_app.Experiment.CurrentTrial.Save();
-			
+
 			_app.Experiment.WebcamRecorder.StopRecording();
-			
+
 			_app.UI.SettingsUI.Hide();
 		}
 
@@ -54,12 +51,12 @@ namespace Interactions.Apps.States
 			var deltaTime = 1f / frameRateHz;
 			_updateTimer += Time.deltaTime;
 			var epsilon = 0.0001f;
-			
+
 			if (_updateTimer >= deltaTime - epsilon)
 			{
 				_app.Experiment.WebcamRecorder.Tick();
 				_app.Experiment.CurrentTrial.Tick(deltaTime);
-				
+
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
@@ -71,19 +68,14 @@ namespace Interactions.Apps.States
 				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
 				{
 					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
-					_lastPassTime = Time.time; // Update the last pass time
-					
+					_lastPassTime = Time.time;
+
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
-					var passPosition = new Vector3( _app.User.DominantFoot.transform.position.x, 0.25f, _app.User.DominantFoot.transform.position.z);
-					
-					
-					var isOpponentToLeftOfUser = _app.Experiment.Opponent.Position.x < _app.User.DominantFoot.transform.position.x;
-					var optimalGoalPosition = isOpponentToLeftOfUser ? _app.RightGoal.transform.position : _app.LeftGoal.transform.position;
-					var correctedPassDirection = Vector3.Lerp(passDirection, optimalGoalPosition - passPosition, 0.75f).normalized;
-						
-					
-					var pass = new Pass(passVelocity.magnitude, passPosition,correctedPassDirection);
+
+					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
+					pass = _app.Experiment.PassCorrector.Correct(pass);
+
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 
@@ -95,10 +87,16 @@ namespace Interactions.Apps.States
 			}
 		}
 
+		void OnBallIntercepted(Vector2 direction)
+		{
+			_ball.Play(new Pass(3, _ball.transform.position, new Vector3(direction.x, 0, direction.y)));
+		}
+
+		Ball _ball;
+
 		bool _hasPassed;
 		InputDataQueue _inputDataQueue;
 		float _lastPassTime;
 		float _updateTimer;
-		Ball _ball;
 	}
 }
