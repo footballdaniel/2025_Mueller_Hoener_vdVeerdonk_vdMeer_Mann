@@ -1,6 +1,5 @@
 using System;
 using Interactions.Apps.ViewModels;
-using Interactions.Domain.VideoRecorder;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +15,6 @@ namespace Interactions.UI
 		[SerializeField] Button _stopTrialButton;
 		[SerializeField] Button _showDataButton;
 		[SerializeField] Button _exitButton;
-		[SerializeField] TMP_Text _progressText;
-		[SerializeField] Slider _progressSlider;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		[SerializeField] Toggle _passCorrectionToggle;
@@ -25,11 +22,6 @@ namespace Interactions.UI
 		void Update()
 		{
 			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
-
-			_progressSlider.maxValue = _newProgress.MaxValue;
-			_progressText.text = $"{_newProgress.Title}: {_newProgress.Task}";
-			_progressSlider.value = _newProgress.Value;
-			
 			_cameraFeed.texture = _viewmodel.Frame;
 		}
 
@@ -37,7 +29,6 @@ namespace Interactions.UI
 		{
 			Unbind();
 
-			_newProgress = new ProgressStatement();
 			_viewmodel = viewModel;
 			_cameraFeed.gameObject.SetActive(true);
 
@@ -50,7 +41,6 @@ namespace Interactions.UI
 			_stopTrialButton.interactable = false;
 
 			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;
-			viewModel.Progress.ProgressChanged += OnProgressChanged;
 
 			var headTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
 			var dominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
@@ -72,11 +62,6 @@ namespace Interactions.UI
 		}
 
 
-		void OnProgressChanged(ProgressStatement progress)
-		{
-			_newProgress = progress;
-		}
-
 		void Unbind()
 		{
 			_nextTrialButton.onClick.RemoveAllListeners();
@@ -85,16 +70,12 @@ namespace Interactions.UI
 			_exitButton.onClick.RemoveAllListeners();
 
 			if (_viewmodel != null)
-			{
 				_viewmodel.CanStartNextTrial.ValueChanged -= OnCanStartNextTrialChanged;
-				_viewmodel.Progress.ProgressChanged -= OnProgressChanged;
-			}
 
 			foreach (Transform child in _xrTrackerStatusContainer)
 				Destroy(child.gameObject);
 		}
 
-		ProgressStatement _newProgress;
 		bool _shouldUpdate;
 		ExperimentViewModel _viewmodel;
 	}

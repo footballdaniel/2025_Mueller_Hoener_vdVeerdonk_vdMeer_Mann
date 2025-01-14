@@ -17,7 +17,6 @@ namespace Interactions.Apps.ViewModels
 			_app.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
 		}
 
-		public ProgressIndicator Progress { get; } = ProgressIndicator.Instance;
 		public Observable<bool> CanStartNextTrial { get; } = new(true);
 		public XRTracker HeadTracker => _app.Trackers.HeadTracker;
 		public XRTracker DominantFootTracker => _app.Trackers.DominantFootTracker;
