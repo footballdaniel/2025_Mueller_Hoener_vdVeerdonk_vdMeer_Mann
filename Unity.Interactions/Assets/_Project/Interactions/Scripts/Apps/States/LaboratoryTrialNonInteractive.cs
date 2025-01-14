@@ -67,6 +67,9 @@ namespace Interactions.Apps.States
 
 				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
 				{
+					if (_ball)
+						Object.Destroy(_ball.gameObject);
+					
 					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
 					_lastPassTime = Time.time;
 
