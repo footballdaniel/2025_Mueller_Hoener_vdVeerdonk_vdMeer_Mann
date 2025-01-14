@@ -45,8 +45,14 @@ namespace Interactions.Apps.ViewModels
 				case ExperimentalCondition.LaboratoryNonInteractive:
 					_app.Transitions.LaboratoryTrialNonInteractive.Execute();
 					break;
-				default:
+				case ExperimentalCondition.LaboratoryNoOpponent:
+					_app.Transitions.LaboratoryNoOpponent.Execute();
+					break;
+				case ExperimentalCondition.InSitu:
 					_app.Transitions.InSituTrial.Execute();
+					break;
+				default:
+					Debug.Log("No trial type selected");
 					break;
 			}
 		}

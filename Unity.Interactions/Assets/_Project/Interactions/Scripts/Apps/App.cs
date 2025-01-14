@@ -78,6 +78,7 @@ namespace Interactions.Apps
 			var waitForNextTrial = new WaitForNextTrial(this);
 			var labTrialInteractive = new LaboratoryTrialInteractive(this);
 			var labTrialNonInteractive = new LaboratoryTrialNonInteractive(this);
+			var labTrialNoOpponent = new LaboratoryTrialNoOpponent(this);
 			var inSituTrial = new InSituTrial(this);
 
 			// Flow for starting app
@@ -86,6 +87,7 @@ namespace Interactions.Apps
 			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrialInteractive, labTrialNonInteractive,inSituTrial }, waitForNextTrial);
 			Transitions.LaboratoryTrialInteractive = new Transition(this, waitForNextTrial, labTrialInteractive);
 			Transitions.LaboratoryTrialNonInteractive = new Transition(this, waitForNextTrial, labTrialNonInteractive);
+			Transitions.LaboratoryNoOpponent = new Transition(this, waitForNextTrial, labTrialNoOpponent); 
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
 
 			// Start app

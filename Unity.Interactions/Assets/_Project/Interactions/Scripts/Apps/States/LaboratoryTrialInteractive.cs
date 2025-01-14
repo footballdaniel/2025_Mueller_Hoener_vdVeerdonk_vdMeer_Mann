@@ -20,8 +20,6 @@ namespace Interactions.Apps.States
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, true);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
-
-			_app.Experiment.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.Opponent, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
 			
 			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);
 			_app.UI.SettingsUI.Show();
@@ -82,7 +80,7 @@ namespace Interactions.Apps.States
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
 					
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
-					pass = _app.Experiment.PassCorrector.Correct(pass);
+					pass = _app.Experiment.PassCorrector.Correct(pass, _app.Experiment.Opponent.transform.position);
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 

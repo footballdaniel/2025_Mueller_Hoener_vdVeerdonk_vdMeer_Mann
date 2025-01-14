@@ -1,6 +1,7 @@
 using Interactions.Apps.ViewModels;
 using Interactions.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SettingsUI : UIScreen
 {
@@ -34,5 +35,7 @@ public class SettingsUI : UIScreen
 		
 		_goalDistanceSlider.Slider.onValueChanged.AddListener(viewModel.ChangeGoalDistance);
 		_goalDistanceSlider.Bind("Goal Distance", viewModel.GoalDistance, 0, 5);
+		
+		
 	}
 }
