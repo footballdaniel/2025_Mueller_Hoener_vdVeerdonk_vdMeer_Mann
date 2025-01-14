@@ -70,14 +70,22 @@ namespace Interactions.Apps.States
 
 				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
 				{
+					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
+					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
+					
+					var forwardDirection = Vector3.right;
+					var angle = Vector3.Angle(forwardDirection, passDirection);
+					if (angle > 45)
+					{
+						Debug.LogWarning("Pass at large angle detected, skip");
+						return;
+					}
+					
 					if (_ball)
 						Object.Destroy(_ball.gameObject);
 					
 					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
 					_lastPassTime = Time.time;
-					
-					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
-					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
 					
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
 					pass = _app.PassCorrector.Correct(pass, _app.Experiment.Opponent.transform.position);
