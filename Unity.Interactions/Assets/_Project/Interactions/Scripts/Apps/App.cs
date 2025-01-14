@@ -40,6 +40,7 @@ namespace Interactions.Apps
 		public ExperimentViewModel ExperimentViewModel { get; private set; }
 		public XRTrackers Trackers { get; set; }
 		public OpponentViewModel OpponentViewModel { get; private set; }
+		public IPassCorrector PassCorrector { get; set; }
 
 		void Start()
 		{

@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace Interactions.Domain
 {
-	public class PassCorrector
+
+	public class PassCorrector : IPassCorrector
 	{
 
 		public PassCorrector(DominantFoot dominantFoot, RightGoal rightGoal, LeftGoal leftGoal)

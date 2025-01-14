@@ -80,7 +80,7 @@ namespace Interactions.Apps.States
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
 					
 					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
-					pass = _app.Experiment.PassCorrector.Correct(pass, _app.Experiment.Opponent.transform.position);
+					pass = _app.PassCorrector.Correct(pass, _app.Experiment.Opponent.transform.position);
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 

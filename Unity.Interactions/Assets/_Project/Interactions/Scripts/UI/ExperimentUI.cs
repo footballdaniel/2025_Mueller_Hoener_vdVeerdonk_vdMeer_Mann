@@ -20,6 +20,7 @@ namespace Interactions.UI
 		[SerializeField] Slider _progressSlider;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
+		[SerializeField] Toggle _passCorrectionToggle;
 
 		void Update()
 		{
@@ -44,6 +45,7 @@ namespace Interactions.UI
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
 			_showDataButton.onClick.AddListener(viewModel.ShowData);
 			_exitButton.onClick.AddListener(viewModel.Exit);
+			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 
 			_stopTrialButton.interactable = false;
 
