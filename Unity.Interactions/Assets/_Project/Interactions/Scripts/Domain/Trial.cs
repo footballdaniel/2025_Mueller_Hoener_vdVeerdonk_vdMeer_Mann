@@ -28,6 +28,7 @@ namespace Interactions.Domain
 		public List<Vector3> UserHeadPositions { get; set; } = new();
 		public List<Vector3> UserDominantFootPositions { get; set; } = new();
 		public List<Vector3> UserNonDominantFootPositions { get; set; } = new();
+		public List<Vector3> UserHipPositions { get; set; } = new();
 
 		public void Save()
 		{

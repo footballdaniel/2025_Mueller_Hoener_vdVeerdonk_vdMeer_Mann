@@ -21,7 +21,7 @@ class DataIngester:
                     break
 
             if not matching_ingest:
-                matching_ingest = IngestableRecording()
+                matching_ingest = IngestableRecording(file.stem)
                 ingest_files.add(matching_ingest)
 
             if file.suffix == ".csv":

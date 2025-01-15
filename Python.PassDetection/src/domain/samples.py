@@ -9,18 +9,16 @@ from src.domain.common import Vector3
 
 
 class IngestableRecording:
-    def __init__(self):
+    def __init__(self, stem: str):
         self.event_file: Optional[Path] = None
         self.timeseries_file: Optional[Path] = None
-        self.stem: str = str()
+        self.stem = stem
 
     def add_event_file(self, file: Path) -> None:
         self.event_file = file
-        self.stem = file.stem
 
     def add_timeseries_file(self, file: Path) -> None:
         self.timeseries_file = file
-        self.stem = file.stem
 
     def both_files_present(self) -> bool:
         return self.event_file is not None and self.timeseries_file is not None

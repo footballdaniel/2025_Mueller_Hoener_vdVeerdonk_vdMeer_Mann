@@ -9,6 +9,7 @@ namespace Interactions.Domain
 		[field: SerializeReference] public DominantFoot DominantFoot { get; private set; }
 		[field: SerializeReference] public NonDominantFoot NonDominantFoot { get; private set; }
 		[field: SerializeReference] public Head Head { get; private set; }
+		[field: SerializeReference] public Hips Hips { get; private set; }
 	
 		void Start()
 		{
