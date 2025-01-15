@@ -1,9 +1,9 @@
 namespace Interactions.Apps.ViewModels
 {
-	public class OpponentViewModel
+	public class OpponentSettingsViewModel
 	{
 
-		public OpponentViewModel(App app)
+		public OpponentSettingsViewModel(App app)
 		{
 			_app = app;
 		}

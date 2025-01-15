@@ -39,7 +39,7 @@ namespace Interactions.Apps
 		public LeftGoal LeftGoal { get; private set; }
 		public ExperimentViewModel ExperimentViewModel { get; private set; }
 		public XRTrackers Trackers { get; set; }
-		public OpponentViewModel OpponentViewModel { get; private set; }
+		public OpponentSettingsViewModel OpponentSettingsViewModel { get; private set; }
 		public IPassCorrector PassCorrector { get; set; }
 
 		void Start()
@@ -66,7 +66,7 @@ namespace Interactions.Apps
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
 			XRStatusViewModel = new XRStatusViewModel(this);
 			ExperimentViewModel = new ExperimentViewModel(this);
-			OpponentViewModel = new OpponentViewModel(this);
+			OpponentSettingsViewModel = new OpponentSettingsViewModel(this);
 
 			// State machine
 			StateMachine = new StateMachine();

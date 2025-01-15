@@ -38,6 +38,7 @@ namespace Interactions.UI
 			_exitButton.onClick.AddListener(viewModel.Exit);
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 
+			viewModel.TogglePassCorrection(_passCorrectionToggle.isOn);
 			_stopTrialButton.interactable = false;
 
 			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;

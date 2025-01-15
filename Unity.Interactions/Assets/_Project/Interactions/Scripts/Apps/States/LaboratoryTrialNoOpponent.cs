@@ -16,10 +16,6 @@ namespace Interactions.Apps.States
 			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
-
-			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);
-			_app.UI.SettingsUI.Show();
-
 			_lastPassTime = Time.time;
 		}
 
@@ -32,7 +28,7 @@ namespace Interactions.Apps.States
 
 			_app.Experiment.WebcamRecorder.StopRecording();
 
-			_app.UI.SettingsUI.Hide();
+			_app.UI.OpponentSettingsUI.Hide();
 		}
 
 		public override void Tick()

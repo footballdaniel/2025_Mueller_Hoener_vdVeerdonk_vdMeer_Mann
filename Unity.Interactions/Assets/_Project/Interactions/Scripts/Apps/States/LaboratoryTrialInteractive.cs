@@ -21,8 +21,8 @@ namespace Interactions.Apps.States
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, true);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 			
-			_app.UI.SettingsUI.Bind(_app.OpponentViewModel);
-			_app.UI.SettingsUI.Show();
+			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
+			_app.UI.OpponentSettingsUI.Show();
 
 			_app.Experiment.Opponent.BallIntercepted += OnBallIntercepted;
 
@@ -45,7 +45,7 @@ namespace Interactions.Apps.States
 			
 			_app.Experiment.WebcamRecorder.StopRecording();
 			
-			_app.UI.SettingsUI.Hide();
+			_app.UI.OpponentSettingsUI.Hide();
 		}
 
 		public override void Tick()

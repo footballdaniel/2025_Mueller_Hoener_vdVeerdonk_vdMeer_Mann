@@ -10,6 +10,6 @@ namespace Interactions.UI
 		public XRStatusUI XRStatusUI;
 		public InSituUI InSituUI;
 		public ExperimentSetupUI ExperimentSetupUI;
-		public SettingsUI SettingsUI;
+		public OpponentSettingsUI OpponentSettingsUI;
 	}
 }
