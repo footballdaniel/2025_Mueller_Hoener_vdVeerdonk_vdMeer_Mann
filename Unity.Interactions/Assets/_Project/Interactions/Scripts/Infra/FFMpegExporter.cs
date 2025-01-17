@@ -53,8 +53,9 @@ namespace Interactions.Infra
 			
 			//var previousArguments = $"-f rawvideo -pix_fmt rgba -s {Specs.Width}x{Specs.Height} -r {Specs.FrameRate} -i - -y \"{fileName}\"",
 			var arguments = $"-f rawvideo -pix_fmt rgba -s {width}x{height} -r {frameRate} -i - " +
-			                $"-vf \"transpose=2,transpose=2,drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" " +
+			                $"-vf \"hflip,transpose=2,transpose=2,drawtext=fontfile=/path/to/font.ttf:text='%{{n}}':x=(w-tw)/2:y=h-th-10:fontsize=24:fontcolor=white\" " +
 			                $"-vcodec libx264 -crf 18 -pix_fmt yuv420p -y \"{videoOutputPath}\"";
+
 
 			_ffmpegProcess = new Process
 			{
