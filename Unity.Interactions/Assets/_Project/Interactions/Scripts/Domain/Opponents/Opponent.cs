@@ -21,6 +21,16 @@ namespace Interactions.Domain.Opponents
 
 		void Update()
 		{
+			if (InterceptedBall())
+			{
+				BallIntercepted?.Invoke(_motor.Velocity);
+				_sources.Remove(_interceptionSource);
+				_sources.ActivateAll();
+			}
+			
+			if (IsUserInStartingArea())
+				return;
+			
 			_attackerPerception.Tick(Time.time);
 			_footPerception.Tick(Time.time);
 
@@ -28,13 +38,11 @@ namespace Interactions.Domain.Opponents
 			transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
 
 			_animations.Apply(_motor.LocalVelocity);
+		}
 
-			if (InterceptedBall())
-			{
-				BallIntercepted?.Invoke(_motor.Velocity);
-				_sources.Remove(_interceptionSource);
-				_sources.ActivateAll();
-			}
+		bool IsUserInStartingArea()
+		{
+			return _user.Head.transform.position.x < -2f;
 		}
 
 		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, bool isInteractive)

@@ -34,7 +34,7 @@ namespace Interactions.Domain
 
 		static float CorrectVelocity(Pass pass)
 		{
-			var optimalPassVelocity = 10f;
+			var optimalPassVelocity = 15f;
 			var correctedKickVelocity = Mathf.Lerp(pass.KickVelocity, optimalPassVelocity, 0.5f);
 			return correctedKickVelocity;
 		}
