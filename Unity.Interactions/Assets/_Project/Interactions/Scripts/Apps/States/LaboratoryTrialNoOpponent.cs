@@ -77,7 +77,8 @@ namespace Interactions.Apps.States
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
 
-					_app.Experiment.Opponent.Intercept(_ball);
+					// NOT HERE!
+					// _app.Experiment.Opponent.Intercept(_ball);
 					_app.Experiment.Ball = _ball;
 				}
 
