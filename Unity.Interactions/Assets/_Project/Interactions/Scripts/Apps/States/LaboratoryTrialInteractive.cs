@@ -1,4 +1,5 @@
 ﻿using Interactions.Domain;
+using Interactions.Domain.Opponents;
 using Interactions.Infra;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, true);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMovementConstraint , true);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 			
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
@@ -36,7 +37,6 @@ namespace Interactions.Apps.States
 
 		public override void Exit()
 		{
-			_hasPassed = false;
 			Object.Destroy(_app.Experiment.Ball?.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 			
@@ -100,8 +100,7 @@ namespace Interactions.Apps.States
 				_updateTimer -= deltaTime;
 			}
 		}
-
-		bool _hasPassed;
+		
 		InputDataQueue _inputDataQueue;
 		float _lastPassTime;
 		float _updateTimer;

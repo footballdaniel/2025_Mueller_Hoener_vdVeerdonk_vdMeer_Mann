@@ -1,4 +1,5 @@
 using Interactions.Domain;
+using Interactions.Domain.Opponents;
 using Interactions.Infra;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, false);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMovementConstraint,false);
 			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);

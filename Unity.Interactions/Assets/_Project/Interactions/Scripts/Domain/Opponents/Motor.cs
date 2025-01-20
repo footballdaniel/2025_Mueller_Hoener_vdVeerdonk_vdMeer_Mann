@@ -8,21 +8,27 @@ namespace Interactions.Domain.Opponents
 		Vector3 _currentVelocity = Vector3.zero;
 		readonly float _maxRotationSpeedDegreesY;
 		readonly float _maxSpeed;
+		Vector3 _currentPosition;
+		Quaternion _currentRotation;
 
-		public Motor(float maxSpeed, float acceleration, float maxRotationSpeedDegreesY)
+		public Motor(float maxSpeed, float acceleration, float maxRotationSpeedDegreesY, Vector3 currentPosition, Quaternion currentRotation)
 		{
 			_maxSpeed = maxSpeed;
 			_acceleration = acceleration;
 			_maxRotationSpeedDegreesY = maxRotationSpeedDegreesY;
+			_currentPosition = currentPosition;
+			_currentRotation = currentRotation;
 		}
 
 		public Vector2 LocalVelocity { get; private set; }
 		public Vector2 Velocity { get; private set; }
 
-		public Vector3 Move(InformationSources sources, Vector3 currentPosition, Quaternion currentRotation, float deltaTime)
+		public Vector3 Move(InformationSources sources, OpponentMovementConstraint opponentMovementConstraint, float deltaTime)
 		{
-			var finalPos = sources.CombinePositions();
-			var targetDirection = finalPos - currentPosition;
+			var desiredPosition = sources.CombinePositions();
+			var constrainedDesiredPosition = opponentMovementConstraint.Constrain(desiredPosition);
+			
+			var targetDirection = constrainedDesiredPosition - _currentPosition;
 			targetDirection.y = 0;
 			var distanceToTarget = targetDirection.magnitude;
 
@@ -42,39 +48,47 @@ namespace Interactions.Domain.Opponents
 			if (step.magnitude > distanceToTarget)
 				desiredVelocity3D = targetDirection * (distanceToTarget / deltaTime);
 
-			Velocity = new Vector2(desiredVelocity3D.x, desiredVelocity3D.z);			
+			Velocity = new Vector2(desiredVelocity3D.x, desiredVelocity3D.z);
 			var localVelocity2D = new Vector2(
-				Vector3.Dot(desiredVelocity3D, currentRotation * Vector3.right),
-				Vector3.Dot(desiredVelocity3D, currentRotation * Vector3.forward)
+				Vector3.Dot(desiredVelocity3D, _currentRotation * Vector3.right),
+				Vector3.Dot(desiredVelocity3D, _currentRotation * Vector3.forward)
 			);
 			LocalVelocity = localVelocity2D;
+			
+			var newPosition = _currentPosition + desiredVelocity3D * deltaTime;
 			_currentVelocity = desiredVelocity3D;
-			return currentPosition + desiredVelocity3D * deltaTime;
+			_currentPosition = newPosition;
+			return newPosition;
 		}
 
-		public Quaternion Rotate(InformationSources sources, Vector3 currentPosition, Quaternion currentRotation, float deltaTime)
+
+
+		public Quaternion Rotate(InformationSources sources, float deltaTime)
 		{
 			var finalY = sources.CombineRotationsY();
 			if (Mathf.Abs(finalY) < 0.0001f)
 			{
 				var finalPos = sources.CombinePositions();
-				var lookDirection = finalPos - currentPosition;
+				var lookDirection = finalPos - _currentPosition;
 				lookDirection.y = 0;
 				if (lookDirection.sqrMagnitude <= 0.001f)
-					return currentRotation;
-				var localForward = currentRotation * Vector3.forward;
+					return _currentRotation;
+				var localForward = _currentRotation * Vector3.forward;
 				var angleToTarget = Vector3.SignedAngle(localForward, lookDirection.normalized, Vector3.up);
 				var maxRotationDelta = _maxRotationSpeedDegreesY * deltaTime;
 				var clampedAngle = Mathf.Clamp(angleToTarget, -maxRotationDelta, maxRotationDelta);
-				return Quaternion.Euler(0, currentRotation.eulerAngles.y + clampedAngle, 0);
+				_currentRotation = Quaternion.Euler(0, _currentRotation.eulerAngles.y + clampedAngle, 0);
+				
 			}
 			else
 			{
-				var currentY = currentRotation.eulerAngles.y;
+				var currentY = _currentRotation.eulerAngles.y;
 				var angle = Mathf.DeltaAngle(currentY, finalY);
 				var rotationDelta = Mathf.Clamp(angle, -_maxRotationSpeedDegreesY * deltaTime, _maxRotationSpeedDegreesY * deltaTime);
-				return Quaternion.Euler(0, currentY + rotationDelta, 0);
+				_currentRotation = Quaternion.Euler(0, currentY + rotationDelta, 0);
 			}
+			
+			return _currentRotation;
 		}
 
 		public void ChangeAcceleration(float newAcceleration)
@@ -82,4 +96,5 @@ namespace Interactions.Domain.Opponents
 			_acceleration = newAcceleration;
 		}
 	}
+
 }

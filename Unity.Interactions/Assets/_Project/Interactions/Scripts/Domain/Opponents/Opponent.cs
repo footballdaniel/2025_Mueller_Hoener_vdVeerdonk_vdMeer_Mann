@@ -34,8 +34,8 @@ namespace Interactions.Domain.Opponents
 			_attackerPerception.Tick(Time.time);
 			_footPerception.Tick(Time.time);
 
-			transform.position = _motor.Move(_sources, transform.position, transform.rotation, Time.deltaTime);
-			transform.rotation = _motor.Rotate(_sources, transform.position, transform.rotation, Time.deltaTime);
+			transform.position = _motor.Move(_sources, _opponentMovementConstraint, Time.deltaTime);
+			transform.rotation = _motor.Rotate(_sources, Time.deltaTime);
 
 			_animations.Apply(_motor.LocalVelocity);
 		}
@@ -45,12 +45,13 @@ namespace Interactions.Domain.Opponents
 			return _user.Head.transform.position.x < -2f;
 		}
 
-		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, bool isInteractive)
+		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMovementConstraint opponentMovementConstraint, bool isInteractive)
 		{
 			_user = user;
 			_goalLeft = goalLeft;
 			_goalRight = goalRight;
 			_isInteractive = isInteractive;
+			_opponentMovementConstraint = opponentMovementConstraint;
 
 			if (isInteractive)
 			{
@@ -65,7 +66,7 @@ namespace Interactions.Domain.Opponents
 
 			_footSource = new FootInformationSource(_footPerception);
 			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
-			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY);
+			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 
@@ -129,6 +130,7 @@ namespace Interactions.Domain.Opponents
 		bool _isInteractive;
 		Motor _motor;
 		User _user;
+		OpponentMovementConstraint _opponentMovementConstraint;
 	}
 
 }

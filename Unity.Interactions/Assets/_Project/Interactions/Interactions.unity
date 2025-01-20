@@ -3942,7 +3942,7 @@ MonoBehaviour:
   _positionAction: {fileID: -5922019433432456627, guid: 53a08a6060541574788d1f5191c83ae0,
     type: 3}
   _isXForward: 1
-  <TrackerMappingName>k__BackingField: Chest
+  <TrackerMappingName>k__BackingField: User Hips (Chest Tracker)
 --- !u!1 &793940995
 GameObject:
   m_ObjectHideFlags: 0
@@ -4025,7 +4025,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1158561872}
   m_HandleRect: {fileID: 1158561871}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4214,7 +4214,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1016489696}
   m_HandleRect: {fileID: 1016489695}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -6149,7 +6149,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1754912865}
   m_HandleRect: {fileID: 1754912864}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -6750,7 +6750,7 @@ PrefabInstance:
     - target: {fileID: 8560577731247974805, guid: 441787973748a7f4d9060d5715508af1,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.51
       objectReference: {fileID: 0}
     - target: {fileID: 8560577732318790478, guid: 441787973748a7f4d9060d5715508af1,
         type: 3}
@@ -7287,7 +7287,7 @@ MonoBehaviour:
   _positionAction: {fileID: -7951496117301714602, guid: 53a08a6060541574788d1f5191c83ae0,
     type: 3}
   _isXForward: 1
-  <TrackerMappingName>k__BackingField: Waist
+  <TrackerMappingName>k__BackingField: Defender Hips (Waist Tracker)
 --- !u!4 &1689288789
 Transform:
   m_ObjectHideFlags: 0
@@ -8288,7 +8288,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 713316054}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
