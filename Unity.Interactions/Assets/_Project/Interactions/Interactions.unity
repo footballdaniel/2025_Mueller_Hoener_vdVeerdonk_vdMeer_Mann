@@ -6780,7 +6780,7 @@ PrefabInstance:
     - target: {fileID: 8560577731247974805, guid: 441787973748a7f4d9060d5715508af1,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.51
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8560577732318790478, guid: 441787973748a7f4d9060d5715508af1,
         type: 3}
@@ -7594,11 +7594,11 @@ MonoBehaviour:
     <InterPersonalDistance>k__BackingField: 4.5
     <FrameRateHz>k__BackingField: 10
     <BodyInformationWeight>k__BackingField: 0.5
-    <FootInformationWeight>k__BackingField: 0.5
+    <FootInformationWeight>k__BackingField: 0.3
     <OpponentAcceleration>k__BackingField: 4
     <OpponentReactionTimeBody>k__BackingField: 1
     <OpponentReactionTimeFoot>k__BackingField: 0.2
-    <DistanceBetweenGoals>k__BackingField: 1
+    <DistanceBetweenGoals>k__BackingField: 3
   LstmModelAsset: {fileID: 11400000, guid: a0277abb140ae2c498c3bcc052e47bd2, type: 2}
   PassSoundClip: {fileID: 8300000, guid: 16f8e268a70602f4ebd9d9789d950d86, type: 3}
 --- !u!1001 &1784216646

@@ -34,24 +34,48 @@ namespace Interactions.Infra
 			if (dominantFootList.Count < 2 || timestampList.Count < 2)
 				return Vector3.zero;
 
-			var highestVelocity = Vector3.zero;
-
+			// Step 1: Calculate velocity vectors
+			var velocities = new List<Vector3>();
 			for (var i = 1; i < dominantFootList.Count; i++)
 			{
 				var deltaPosition = dominantFootList[i] - dominantFootList[i - 1];
 				var deltaTime = timestampList[i] - timestampList[i - 1];
 
 				if (deltaTime > 0)
-				{
-					var velocity = deltaPosition / deltaTime;
+					velocities.Add(deltaPosition / deltaTime);
+				else
+					velocities.Add(Vector3.zero);
+			}
 
-					if (velocity.magnitude > highestVelocity.magnitude)
-						highestVelocity = velocity;
+			// Step 2: Find the highest velocity
+			var highestVelocity = Vector3.zero;
+			var highestVelocityIndex = -1;
+
+			for (var i = 0; i < velocities.Count; i++)
+			{
+				if (velocities[i].magnitude > highestVelocity.magnitude)
+				{
+					highestVelocity = velocities[i];
+					highestVelocityIndex = i + 1; // Shift index to match dominantFootList
+				}
+			}
+
+			// Step 3: Check if there is a timestamp 300ms later
+			if (highestVelocityIndex != -1)
+			{
+				for (var i = highestVelocityIndex; i < timestampList.Count; i++)
+				{
+					if (timestampList[i] - timestampList[highestVelocityIndex - 1] >= 0.3f)
+					{
+						highestVelocity = Vector3.zero;
+						break;
+					}
 				}
 			}
 
 			return highestVelocity;
 		}
+
 
 		public InputData ToInputData()
 		{

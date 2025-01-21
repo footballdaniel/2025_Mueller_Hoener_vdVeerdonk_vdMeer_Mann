@@ -33,7 +33,9 @@ namespace Interactions.Apps.States
 		public override void Exit()
 		{
 			_hasPassed = false;
-			Object.Destroy(_app.Experiment.Ball?.gameObject);
+			
+			if (_ball)
+				Object.Destroy(_ball.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 
 			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;

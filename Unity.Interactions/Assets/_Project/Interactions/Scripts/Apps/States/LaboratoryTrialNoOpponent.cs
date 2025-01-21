@@ -22,7 +22,8 @@ namespace Interactions.Apps.States
 		public override void Exit()
 		{
 			_hasPassed = false;
-			Object.Destroy(_app.Experiment.Ball?.gameObject);
+			if (_ball)
+				Object.Destroy(_ball.gameObject);
 
 			_app.Experiment.CurrentTrial.Save();
 

@@ -60,7 +60,7 @@ namespace Interactions.Domain.Opponents
 			}
 			else
 			{
-				_attackerPerception = new InitialPercept(_user);
+				_attackerPerception = new InitialPerceptWithGaussianNoise(_user);
 				_footPerception = new NoFootPerception();
 			}
 
