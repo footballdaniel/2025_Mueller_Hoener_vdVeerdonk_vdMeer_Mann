@@ -9088,10 +9088,11 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: 2, y: 0, z: 2.5}
+  - {x: -2, y: 0, z: 2.5}
   - {x: 8, y: 0, z: 2.5}
   - {x: 8, y: 0, z: -2.5}
-  - {x: 2, y: 0, z: -2.5}
+  - {x: -2, y: 0, z: -2.5}
+  - {x: -2, y: 0, z: 2.5}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1

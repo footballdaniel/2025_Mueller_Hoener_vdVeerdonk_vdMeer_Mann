@@ -68,12 +68,13 @@ namespace Interactions.Domain.Opponents
 			}
 
 			_footSource = new FootInformationSource(_footPerception);
-			_putPressureOnAttackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
+			// _attackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
+			_attackerSource = new MirroredPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, this, _attackerPerception, _distanceFromAttacker);
 			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 
-			_sources.AddNewSource(_putPressureOnAttackerSource, 1f);
+			_sources.AddNewSource(_attackerSource, 1f);
 			_sources.AddNewSource(_footSource, 0.33f);
 		}
 
@@ -84,7 +85,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeBodyInformationWeight(float newWeight)
 		{
-			_sources.AddNewSource(_putPressureOnAttackerSource, newWeight);
+			_sources.AddNewSource(_attackerSource, newWeight);
 		}
 
 		public void ChangeFootInformation(float newWeight)
@@ -94,7 +95,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeInterpersonalDistance(float newInterpersonalDistance)
 		{
-			_putPressureOnAttackerSource.ChangeInterpersonalDistance(newInterpersonalDistance);
+			_attackerSource.ChangeInterpersonalDistance(newInterpersonalDistance);
 		}
 
 		public void ChangeReactionTimeBody(float newReactionTime)
@@ -124,7 +125,7 @@ namespace Interactions.Domain.Opponents
 		readonly InformationSources _sources = new();
 		Animations _animations;
 		IPercept _attackerPerception;
-		PutPressureOnAttackerSource _putPressureOnAttackerSource;
+		MirroredPressureOnAttackerSource _attackerSource;
 		IPercept _footPerception;
 		IInformationSource _footSource;
 		LeftGoal _goalLeft;

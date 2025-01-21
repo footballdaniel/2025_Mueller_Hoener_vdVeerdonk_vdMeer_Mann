@@ -23,9 +23,9 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 		{
 			var positionBetweenGoals = (_goalLeft.position + _goalRight.position) / 2;
 			var pos = _perceptionOfAttacker.Perceive();
-			var userPosition = new Vector3(pos.x, 0, pos.y);
-			var dir = (userPosition - positionBetweenGoals).normalized;
-			return userPosition - dir * _desiredInterpersonalDistance;
+			var attackerPosition = new Vector3(pos.x, 0, pos.y);
+			var dir = (attackerPosition - positionBetweenGoals).normalized;
+			return attackerPosition - dir * _desiredInterpersonalDistance;
 		}
 
 		public float TargetRotationY()

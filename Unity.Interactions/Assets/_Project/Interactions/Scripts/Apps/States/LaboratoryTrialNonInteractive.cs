@@ -1,5 +1,4 @@
 using Interactions.Domain;
-using Interactions.Domain.Opponents;
 using Interactions.Infra;
 using UnityEngine;
 
