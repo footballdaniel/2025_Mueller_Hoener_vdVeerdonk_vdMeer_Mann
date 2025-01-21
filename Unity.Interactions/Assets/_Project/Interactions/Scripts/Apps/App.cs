@@ -2,6 +2,7 @@ using Interactions.Apps.States;
 using Interactions.Apps.Transitions;
 using Interactions.Apps.ViewModels;
 using Interactions.Domain;
+using Interactions.Domain.DecisionMaking.Constraints;
 using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorder;
@@ -41,7 +42,7 @@ namespace Interactions.Apps
 		public XRTrackers Trackers { get; set; }
 		public OpponentSettingsViewModel OpponentSettingsViewModel { get; private set; }
 		public IPassCorrector PassCorrector { get; set; }
-		public OpponentMovementConstraint OpponentMovementConstraint { get; set; }
+		public OpponentMaximalPositionConstraint OpponentMaximalPositionConstraint { get; set; }
 
 		void Start()
 		{
@@ -62,7 +63,7 @@ namespace Interactions.Apps
 			// Other Dependencies
 			Experiment.Bind(DominantFootSide, LeftGoal, RightGoal);
 			LstmModel = new LstmModel(LstmModelAsset);
-			OpponentMovementConstraint = new OpponentMovementConstraint(2);
+			OpponentMaximalPositionConstraint = new OpponentMaximalPositionConstraint(2);
 
 			// View models for showing data on the UI
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);

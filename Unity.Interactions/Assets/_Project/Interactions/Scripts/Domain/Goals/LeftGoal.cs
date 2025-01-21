@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Interactions.Domain
+namespace Interactions.Domain.Goals
 {
 	public class LeftGoal : MonoBehaviour
 	{

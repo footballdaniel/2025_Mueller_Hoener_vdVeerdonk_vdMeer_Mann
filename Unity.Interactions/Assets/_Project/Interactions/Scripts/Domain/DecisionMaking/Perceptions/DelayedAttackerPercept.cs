@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Interactions.Domain.Opponents
+namespace Interactions.Domain.DecisionMaking.Perceptions
 {
 
 	public class DelayedAttackerPercept : IPercept

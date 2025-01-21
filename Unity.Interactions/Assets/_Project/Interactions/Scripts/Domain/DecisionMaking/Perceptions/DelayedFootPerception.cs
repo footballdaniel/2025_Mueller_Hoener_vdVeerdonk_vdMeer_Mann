@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Interactions.Domain.Feet;
 using UnityEngine;
 
-namespace Interactions.Domain.Opponents
+namespace Interactions.Domain.DecisionMaking.Perceptions
 {
 	public class DelayedFootPerception : IPercept
 	{

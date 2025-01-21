@@ -1,4 +1,7 @@
 using System;
+using Interactions.Domain.DecisionMaking.Constraints;
+using Interactions.Domain.DecisionMaking.InformationCoupling;
+using Interactions.Domain.DecisionMaking.Perceptions;
 using Interactions.Domain.Goals;
 using UnityEngine;
 
@@ -34,7 +37,7 @@ namespace Interactions.Domain.Opponents
 			_attackerPerception.Tick(Time.time);
 			_footPerception.Tick(Time.time);
 
-			transform.position = _motor.Move(_sources, _opponentMovementConstraint, Time.deltaTime);
+			transform.position = _motor.Move(_sources, _opponentMaximalPositionConstraint, Time.deltaTime);
 			transform.rotation = _motor.Rotate(_sources, Time.deltaTime);
 
 			_animations.Apply(_motor.LocalVelocity);
@@ -45,13 +48,13 @@ namespace Interactions.Domain.Opponents
 			return _user.Head.transform.position.x < -2f;
 		}
 
-		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMovementConstraint opponentMovementConstraint, bool isInteractive)
+		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMaximalPositionConstraint opponentMaximalPositionConstraint, bool isInteractive)
 		{
 			_user = user;
 			_goalLeft = goalLeft;
 			_goalRight = goalRight;
 			_isInteractive = isInteractive;
-			_opponentMovementConstraint = opponentMovementConstraint;
+			_opponentMaximalPositionConstraint = opponentMaximalPositionConstraint;
 
 			if (isInteractive)
 			{
@@ -65,12 +68,12 @@ namespace Interactions.Domain.Opponents
 			}
 
 			_footSource = new FootInformationSource(_footPerception);
-			_attackerSource = new AttackerInformationSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
+			_putPressureOnAttackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
 			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 
-			_sources.AddNewSource(_attackerSource, 1f);
+			_sources.AddNewSource(_putPressureOnAttackerSource, 1f);
 			_sources.AddNewSource(_footSource, 0.33f);
 		}
 
@@ -81,7 +84,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeBodyInformationWeight(float newWeight)
 		{
-			_sources.AddNewSource(_attackerSource, newWeight);
+			_sources.AddNewSource(_putPressureOnAttackerSource, newWeight);
 		}
 
 		public void ChangeFootInformation(float newWeight)
@@ -91,7 +94,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeInterpersonalDistance(float newInterpersonalDistance)
 		{
-			_attackerSource.ChangeInterpersonalDistance(newInterpersonalDistance);
+			_putPressureOnAttackerSource.ChangeInterpersonalDistance(newInterpersonalDistance);
 		}
 
 		public void ChangeReactionTimeBody(float newReactionTime)
@@ -121,7 +124,7 @@ namespace Interactions.Domain.Opponents
 		readonly InformationSources _sources = new();
 		Animations _animations;
 		IPercept _attackerPerception;
-		AttackerInformationSource _attackerSource;
+		PutPressureOnAttackerSource _putPressureOnAttackerSource;
 		IPercept _footPerception;
 		IInformationSource _footSource;
 		LeftGoal _goalLeft;
@@ -130,7 +133,7 @@ namespace Interactions.Domain.Opponents
 		bool _isInteractive;
 		Motor _motor;
 		User _user;
-		OpponentMovementConstraint _opponentMovementConstraint;
+		OpponentMaximalPositionConstraint _opponentMaximalPositionConstraint;
 	}
 
 }

@@ -19,7 +19,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMovementConstraint , true);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMaximalPositionConstraint , true);
 			
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
 			_app.UI.OpponentSettingsUI.Show();

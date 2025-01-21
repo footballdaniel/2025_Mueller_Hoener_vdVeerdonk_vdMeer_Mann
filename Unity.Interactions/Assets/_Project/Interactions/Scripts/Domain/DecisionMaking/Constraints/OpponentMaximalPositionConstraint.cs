@@ -1,12 +1,12 @@
 using UnityEngine;
 
-namespace Interactions.Domain.Opponents
+namespace Interactions.Domain.DecisionMaking.Constraints
 {
-	public class OpponentMovementConstraint
+	public class OpponentMaximalPositionConstraint
 	{
 		readonly float _minXPosition;
 
-		public OpponentMovementConstraint(float minXPosition)
+		public OpponentMaximalPositionConstraint(float minXPosition)
 		{
 			_minXPosition = minXPosition;
 		}

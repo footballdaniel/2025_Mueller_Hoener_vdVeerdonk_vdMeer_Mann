@@ -1,4 +1,0 @@
-﻿namespace Interactions.Domain
-{
-    
-}

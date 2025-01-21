@@ -1,7 +1,8 @@
+using Interactions.Domain.DecisionMaking.Perceptions;
 using Interactions.Domain.Feet;
 using UnityEngine;
 
-namespace Interactions.Domain.Opponents
+namespace Interactions.Domain.DecisionMaking.InformationCoupling
 {
 	public class FootInformationSource : IInformationSource
 	{

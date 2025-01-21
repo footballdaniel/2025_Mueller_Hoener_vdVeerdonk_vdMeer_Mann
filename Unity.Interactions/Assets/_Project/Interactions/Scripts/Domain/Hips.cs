@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public class Hips : MonoBehaviour
+namespace Interactions.Domain
 {
-	[SerializeField] XRTracker _hipsTracker;
-	
-	public Vector3 Position => transform.position;
-
-	void Start()
+	public class Hips : MonoBehaviour
 	{
-		transform.parent = _hipsTracker.gameObject.transform;
+		[SerializeField] XRTracker _hipsTracker;
+	
+		public Vector3 Position => transform.position;
+
+		void Start()
+		{
+			transform.parent = _hipsTracker.gameObject.transform;
+		}
 	}
 }

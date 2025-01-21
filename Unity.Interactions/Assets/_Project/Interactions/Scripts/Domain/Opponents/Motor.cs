@@ -1,3 +1,5 @@
+using Interactions.Domain.DecisionMaking.Constraints;
+using Interactions.Domain.DecisionMaking.InformationCoupling;
 using UnityEngine;
 
 namespace Interactions.Domain.Opponents
@@ -23,10 +25,10 @@ namespace Interactions.Domain.Opponents
 		public Vector2 LocalVelocity { get; private set; }
 		public Vector2 Velocity { get; private set; }
 
-		public Vector3 Move(InformationSources sources, OpponentMovementConstraint opponentMovementConstraint, float deltaTime)
+		public Vector3 Move(InformationSources sources, OpponentMaximalPositionConstraint opponentMaximalPositionConstraint, float deltaTime)
 		{
 			var desiredPosition = sources.CombinePositions();
-			var constrainedDesiredPosition = opponentMovementConstraint.Constrain(desiredPosition);
+			var constrainedDesiredPosition = opponentMaximalPositionConstraint.Constrain(desiredPosition);
 			
 			var targetDirection = constrainedDesiredPosition - _currentPosition;
 			targetDirection.y = 0;
