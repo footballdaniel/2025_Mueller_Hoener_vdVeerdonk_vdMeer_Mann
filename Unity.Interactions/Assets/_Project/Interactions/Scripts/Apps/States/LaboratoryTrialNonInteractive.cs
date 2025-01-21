@@ -20,7 +20,6 @@ namespace Interactions.Apps.States
 
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMovementConstraint,false);
-			_app.Experiment.Opponent.transform.Rotate(0, -90, 0);
 
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
 			_app.UI.OpponentSettingsUI.Show();
