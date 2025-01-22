@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Interactions.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorders
 {
 	public class WebcamSelector : MonoBehaviour
 	{
 		[field: SerializeReference] public List<string> Webcams { get; private set; }
-	
+
 		void OnValidate()
 		{
 			Webcams = new List<string>();

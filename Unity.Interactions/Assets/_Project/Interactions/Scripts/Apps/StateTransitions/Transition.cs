@@ -1,7 +1,7 @@
 using System;
 using Interactions.Apps.States;
 
-namespace Interactions.Apps.Transitions
+namespace Interactions.Apps.StateTransitions
 {
 	public class Transition
 	{
@@ -10,7 +10,6 @@ namespace Interactions.Apps.Transitions
 			_stateMachine = app.StateMachine;
 			_from = new[] { from };
 			_to = to;
-
 		}
 
 		public Transition(App app, State[] from, State to)
@@ -24,7 +23,7 @@ namespace Interactions.Apps.Transitions
 		{
 			if (Array.IndexOf(_from, _stateMachine.CurrentState) < 0)
 				return;
-			
+
 			_stateMachine.SetState(_to);
 		}
 

@@ -16,7 +16,7 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			_sources.RemoveAll(x => x.Item1.GetType() == activeSource.GetType());
 			_sources.Add((activeSource, 1f, true));
 		}
-		
+
 		public void Remove(IInformationSource source)
 		{
 			_sources.RemoveAll(x => x.Item1.GetType() == source.GetType());
@@ -34,7 +34,7 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 		public void AddNewSource(IInformationSource source, float weight)
 		{
 			_sources.RemoveAll(x => x.Item1.GetType() == source.GetType());
-			
+
 			source.Weight = weight;
 			_sources.Add((source, weight, true));
 		}
@@ -45,12 +45,12 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			var totalWeightX = 0f;
 			var totalWeightY = 0f;
 			var totalWeightZ = 0f;
-			
+
 			foreach (var (source, weight, isActive) in _sources)
 			{
 				if (!isActive)
 					continue;
-				
+
 				var sourceTargetPosition = source.TargetPosition();
 
 				if (sourceTargetPosition.x != 0)
@@ -71,11 +71,11 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 					totalWeightZ += weight;
 				}
 			}
-			
+
 			var desiredPositionX = totalWeightX > 0 ? desiredPosition.x / totalWeightX : 0;
 			var desiredPositionY = totalWeightY > 0 ? desiredPosition.y / totalWeightY : 0;
 			var desiredPositionZ = totalWeightZ > 0 ? desiredPosition.z / totalWeightZ : 0;
-			
+
 			return new Vector3(desiredPositionX, desiredPositionY, desiredPositionZ);
 		}
 
@@ -93,7 +93,6 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 					accumulatedRotation += source.TargetRotationY() * weight;
 					totalWeight += weight;
 				}
-				
 			}
 
 			if (totalWeight > 0f)

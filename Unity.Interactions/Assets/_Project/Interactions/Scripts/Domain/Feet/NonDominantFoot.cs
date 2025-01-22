@@ -21,10 +21,12 @@ namespace Interactions.Domain.Feet
 			var currentVelocity = (transform.position - _positionLastFrame) / Time.deltaTime;
 
 			_velocityHistory.Enqueue(currentVelocity);
+
 			if (_velocityHistory.Count > FrameWindow)
 				_velocityHistory.Dequeue();
-			
+
 			var averagedVelocity = Vector3.zero;
+
 			foreach (var velocity in _velocityHistory)
 				averagedVelocity += velocity;
 			averagedVelocity /= _velocityHistory.Count;

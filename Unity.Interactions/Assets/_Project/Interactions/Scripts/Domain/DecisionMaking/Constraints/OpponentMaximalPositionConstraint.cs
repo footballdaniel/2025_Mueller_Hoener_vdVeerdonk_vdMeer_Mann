@@ -10,14 +10,13 @@ namespace Interactions.Domain.DecisionMaking.Constraints
 		{
 			_minXPosition = minXPosition;
 		}
-			
-		
-		
+
+
 		public Vector3 Constrain(Vector3 translation)
 		{
 			if (translation.x < _minXPosition)
 				translation.x = _minXPosition;
-			
+
 			return translation;
 		}
 	}

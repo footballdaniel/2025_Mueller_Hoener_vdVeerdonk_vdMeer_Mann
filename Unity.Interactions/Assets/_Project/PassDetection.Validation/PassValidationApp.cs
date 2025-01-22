@@ -21,7 +21,7 @@ namespace PassDetection.Validation
 		{
 			var asset = Resources.Load<ModelAsset>(_modelWithMetadata.ModelAssetPath);
 			var model = ModelLoader.Load(asset);
-			
+
 			_worker = new Worker(model, BackendType.GPUCompute);
 			var shape = new TensorShape(_modelWithMetadata.InputShape.ToArray());
 			var input = new Tensor<float>(shape, _modelWithMetadata.SampleInput.ToArray());

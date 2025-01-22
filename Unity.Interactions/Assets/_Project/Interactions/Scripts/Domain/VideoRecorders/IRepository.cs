@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Interactions.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorders
 {
 	public interface IRepository<T>
 	{

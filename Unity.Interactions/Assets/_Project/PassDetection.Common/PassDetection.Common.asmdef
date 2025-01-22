@@ -1,17 +1,17 @@
 {
-    "name": "PassDetection.Common",
-    "rootNamespace": "",
-    "references": [
-        "GUID:8e674e8499285184d9dbfbbd325f1b14",
-        "GUID:c98377141161c7746a178fb5cb1af075"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "PassDetection.Common",
+  "rootNamespace": "",
+  "references": [
+    "GUID:8e674e8499285184d9dbfbbd325f1b14",
+    "GUID:c98377141161c7746a178fb5cb1af075"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

@@ -14,8 +14,8 @@ public class PassDetectionUI : MonoBehaviour
 		_slider = _uiDocument.rootVisualElement.Q<Slider>();
 		_passCountLabel = _uiDocument.rootVisualElement.Q<Label>("pass-count");
 	}
-	
-	
+
+
 	void Update()
 	{
 		_slider.value = _app.Prediction;

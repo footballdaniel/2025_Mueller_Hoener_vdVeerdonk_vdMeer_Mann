@@ -1,20 +1,20 @@
 {
-    "name": "Tactive.MachineLearning.Editor",
-    "rootNamespace": "",
-    "references": [
-        "Unity.Sentis",
-        "Unity.Sentis.ONNX",
-        "Tactive.MachineLearning"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Tactive.MachineLearning.Editor",
+  "rootNamespace": "",
+  "references": [
+    "Unity.Sentis",
+    "Unity.Sentis.ONNX",
+    "Tactive.MachineLearning"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

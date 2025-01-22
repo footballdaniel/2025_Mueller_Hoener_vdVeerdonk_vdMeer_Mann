@@ -19,14 +19,14 @@ namespace _Project.Replay.Scripts
 		public void Tick(int frameIndex)
 		{
 			var currentEvent = _frameEvents.LastOrDefault(e => e.FrameIndex <= frameIndex);
-		
+
 			if (currentEvent == null)
 			{
 				_leftGoal.NoFeedback();
 				_rightGoal.NoFeedback();
 				return;
 			}
-		
+
 			if (currentEvent.EventType == EventType.Pass)
 			{
 				if (currentEvent.GoalDirection == GoalDirection.Left)
@@ -41,8 +41,6 @@ namespace _Project.Replay.Scripts
 				else if (currentEvent.GoalDirection == GoalDirection.Right)
 					_rightGoal.Miss();
 			}
-		
-		
 		}
 	}
 }

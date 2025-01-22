@@ -8,11 +8,11 @@ namespace Interactions.Domain
 	public class PassCorrector : IPassCorrector
 	{
 
-		public PassCorrector(DominantFoot dominantFoot, RightGoal rightGoal, LeftGoal leftGoal)
+		public PassCorrector(User user, RightGoal rightGoal, LeftGoal leftGoal)
 		{
-			_dominantFoot = dominantFoot;
 			_rightGoal = rightGoal;
 			_leftGoal = leftGoal;
+			_user = user;
 		}
 
 		public Pass Correct(Pass pass, Vector3 referencePosition)
@@ -25,8 +25,9 @@ namespace Interactions.Domain
 
 		Vector3 CorrectedPosition(Pass pass, Vector3 referencePosition, out Vector3 correctedPassDirection)
 		{
-			var passPosition = new Vector3(_dominantFoot.transform.position.x, 0.25f, _dominantFoot.transform.position.z);
-			var isOpponentToLeftOfUser = referencePosition.z < _dominantFoot.transform.position.z;
+			var dominantFoot = _user.DominantFoot;
+			var passPosition = new Vector3(dominantFoot.transform.position.x, 0.25f, dominantFoot.transform.position.z);
+			var isOpponentToLeftOfUser = referencePosition.z < dominantFoot.transform.position.z;
 			var optimalGoalPosition = isOpponentToLeftOfUser ? _leftGoal.transform.position : _rightGoal.transform.position;
 			correctedPassDirection = Vector3.Lerp(pass.Direction, optimalGoalPosition - passPosition, 0.1f).normalized;
 			return passPosition;
@@ -39,10 +40,10 @@ namespace Interactions.Domain
 			return correctedKickVelocity;
 		}
 
-		readonly DominantFoot _dominantFoot;
 
 		readonly Experiment _experiment;
 		readonly LeftGoal _leftGoal;
 		readonly RightGoal _rightGoal;
+		readonly User _user;
 	}
 }

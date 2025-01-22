@@ -19,6 +19,8 @@ namespace Interactions.Apps
 		[SerializeField] List<GameObject> _prefabs;
 		[SerializeField] List<GameObject> _monobehaviours;
 		[SerializeField] List<ServiceTypeReference> _nonMonoBehaviours;
+		[SerializeField] List<ScriptableObject> _scriptableObjects;
+		[SerializeField] List<AudioClip> _audioClips;
 
 
 		void OnEnable()
@@ -30,9 +32,19 @@ namespace Interactions.Apps
 			RegisterObjects(_monobehaviours);
 			RegisterNonMonobehaviours(_nonMonoBehaviours);
 			RegisterServices(transform);
+			RegisterScriptableObjects(_scriptableObjects);
 
 			var serviceNames = string.Join(", ", _services.Keys);
 			Debug.Log($"Registered services: {serviceNames}");
+		}
+
+		void RegisterScriptableObjects(List<ScriptableObject> scriptableObjects)
+		{
+			foreach (var scriptableObject in scriptableObjects)
+			{
+				var type = scriptableObject.GetType();
+				_services.TryAdd(type, scriptableObject);
+			}
 		}
 
 		public static T Get<T>() where T : class

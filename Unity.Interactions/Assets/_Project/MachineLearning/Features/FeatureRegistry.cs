@@ -6,7 +6,7 @@ namespace Tactive.MachineLearning.Features
 {
 	public static class FeatureRegistry
 	{
-		static readonly Dictionary<string, Type> _registry = new();
+		readonly static Dictionary<string, Type> _registry = new();
 
 		static FeatureRegistry()
 		{

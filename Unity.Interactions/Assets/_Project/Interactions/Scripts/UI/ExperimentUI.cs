@@ -18,6 +18,7 @@ namespace Interactions.UI
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		[SerializeField] Toggle _passCorrectionToggle;
+		[SerializeField] Toggle _labEnvironmentVisibilityToggle;
 
 		void Update()
 		{
@@ -37,6 +38,7 @@ namespace Interactions.UI
 			_showDataButton.onClick.AddListener(viewModel.ShowData);
 			_exitButton.onClick.AddListener(viewModel.Exit);
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
+			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
 
 			viewModel.TogglePassCorrection(_passCorrectionToggle.isOn);
 			_stopTrialButton.interactable = false;
@@ -69,6 +71,8 @@ namespace Interactions.UI
 			_stopTrialButton.onClick.RemoveAllListeners();
 			_showDataButton.onClick.RemoveAllListeners();
 			_exitButton.onClick.RemoveAllListeners();
+			_passCorrectionToggle.onValueChanged.RemoveAllListeners();
+			_labEnvironmentVisibilityToggle.onValueChanged.RemoveAllListeners();
 
 			if (_viewmodel != null)
 				_viewmodel.CanStartNextTrial.ValueChanged -= OnCanStartNextTrialChanged;

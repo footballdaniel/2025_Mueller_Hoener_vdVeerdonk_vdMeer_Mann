@@ -6,7 +6,6 @@ namespace Interactions.Domain.DecisionMaking.Perceptions
 	{
 		public void Tick(float time)
 		{
-			
 		}
 
 		public Vector2 Perceive()
@@ -16,7 +15,6 @@ namespace Interactions.Domain.DecisionMaking.Perceptions
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
-			
 		}
 	}
 }

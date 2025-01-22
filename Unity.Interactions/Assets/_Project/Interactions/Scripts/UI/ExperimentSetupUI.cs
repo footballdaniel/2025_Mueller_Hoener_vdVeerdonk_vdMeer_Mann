@@ -29,7 +29,7 @@ namespace Interactions.UI
 				conditionButton.Set((ExperimentalCondition)condition);
 				conditionButton.Button.onClick.AddListener(() => context.ConditionSelected((ExperimentalCondition)condition));
 			}
-			
+
 			_leftSideDominantButton.onClick.AddListener(() => context.DominantFootSelected(Side.LEFT));
 			_rightSideDominantButton.onClick.AddListener(() => context.DominantFootSelected(Side.RIGHT));
 		}

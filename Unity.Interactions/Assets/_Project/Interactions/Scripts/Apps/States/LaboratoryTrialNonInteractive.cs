@@ -18,7 +18,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal,_app.OpponentMaximalPositionConstraint,false);
+			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, _app.OpponentMaximalPositionConstraint, false);
 
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
 			_app.UI.OpponentSettingsUI.Show();
@@ -30,8 +30,6 @@ namespace Interactions.Apps.States
 
 		public override void Exit()
 		{
-			_hasPassed = false;
-			
 			if (_ball)
 				Object.Destroy(_ball.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
@@ -73,6 +71,7 @@ namespace Interactions.Apps.States
 
 					var forwardDirection = Vector3.right;
 					var angle = Vector3.Angle(forwardDirection, passDirection);
+
 					if (angle > 45)
 					{
 						Debug.LogWarning("Pass at large angle detected, skip");
@@ -107,8 +106,6 @@ namespace Interactions.Apps.States
 		}
 
 		Ball _ball;
-
-		bool _hasPassed;
 		InputDataQueue _inputDataQueue;
 		float _lastPassTime;
 		float _updateTimer;

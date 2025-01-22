@@ -19,7 +19,6 @@ namespace Interactions.Apps
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
 			_opponent.Bind(_app.Trackers.DefenderHipsTracker);
-			
 		}
 
 		public override void Exit()
@@ -27,7 +26,6 @@ namespace Interactions.Apps
 			Object.Destroy(_opponent.gameObject);
 			_app.Experiment.WebcamRecorder.StopRecording();
 			_app.Experiment.CurrentTrial.Save();
-			
 		}
 
 		public override void Tick()

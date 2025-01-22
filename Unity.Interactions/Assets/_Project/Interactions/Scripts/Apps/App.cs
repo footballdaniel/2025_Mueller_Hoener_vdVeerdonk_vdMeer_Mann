@@ -1,11 +1,11 @@
 using Interactions.Apps.States;
-using Interactions.Apps.Transitions;
+using Interactions.Apps.StateTransitions;
 using Interactions.Apps.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.DecisionMaking.Constraints;
 using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
-using Interactions.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorders;
 using Interactions.Infra;
 using Interactions.UI;
 using PassDetection.Replay;
@@ -19,20 +19,21 @@ namespace Interactions.Apps
 	{
 		[Header("Settings")]
 		public Experiment Experiment;
-		public ModelAssetWithMetadata LstmModelAsset;
 		public AudioClip PassSoundClip;
-
-		[Header("Services")] public MainUI UI { get; private set; }
-		public Side DominantFootSide { get; set; }
-		public ExperimentalCondition ExperimentalCondition { get; set; }
+		[Header("Entities and Services")] public MainUI UI { get; private set; }
 		public IRepository<IWebcamRecorder> WebCamRecorders { get; private set; }
 		public LstmModel LstmModel { get; private set; }
-		[Header("Entities")] public User User { get; private set; }
-		public InSituOpponent InSituOpponentPrefab { get; private set; }
+		public User User { get; private set; }
+		public LabEnvironment LabEnvironment { get; private set; }
 		[Header("Prefabs")] public Opponent OpponentPrefab { get; private set; }
+		public InSituOpponent InSituOpponentPrefab { get; private set; }
 		public Ball BallPrefab { get; private set; }
-		[Header("State")] 
-		public Transitions.Transitions Transitions { get; private set; }
+
+		[Header("State")]
+		public ExperimentalCondition ExperimentalCondition { get; set; }
+
+		public Side DominantFootSide { get; set; }
+		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
 		public XRStatusViewModel XRStatusViewModel { get; private set; }
@@ -54,16 +55,19 @@ namespace Interactions.Apps
 			LeftGoal = ServiceLocator.Get<LeftGoal>();
 			RightGoal = ServiceLocator.Get<RightGoal>();
 			Trackers = ServiceLocator.Get<XRTrackers>();
-			
+			LabEnvironment = ServiceLocator.Get<LabEnvironment>();
+
 			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			BallPrefab = ServiceLocator.Get<Ball>();
-			
+
 			// Other Dependencies
+			var lstmModelAsset = ServiceLocator.Get<ModelAssetWithMetadata>();
 			Experiment.Bind(DominantFootSide, LeftGoal, RightGoal);
-			LstmModel = new LstmModel(LstmModelAsset);
+			LstmModel = new LstmModel(lstmModelAsset);
 			OpponentMaximalPositionConstraint = new OpponentMaximalPositionConstraint(2);
+			PassCorrector = new PassCorrector(User, Experiment.RightGoal, Experiment.LeftGoal);
 
 			// View models for showing data on the UI
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
@@ -73,7 +77,7 @@ namespace Interactions.Apps
 
 			// State machine
 			StateMachine = new StateMachine();
-			Transitions = new Transitions.Transitions();
+			Transitions = new Transitions();
 
 			// States
 			var startupXr = new StartupXr(this);
@@ -91,7 +95,7 @@ namespace Interactions.Apps
 			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrialInteractive, labTrialNonInteractive, labTrialNoOpponent, inSituTrial }, waitForNextTrial);
 			Transitions.LaboratoryTrialInteractive = new Transition(this, waitForNextTrial, labTrialInteractive);
 			Transitions.LaboratoryTrialNonInteractive = new Transition(this, waitForNextTrial, labTrialNonInteractive);
-			Transitions.LaboratoryNoOpponent = new Transition(this, waitForNextTrial, labTrialNoOpponent); 
+			Transitions.LaboratoryNoOpponent = new Transition(this, waitForNextTrial, labTrialNoOpponent);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
 
 			// Start app

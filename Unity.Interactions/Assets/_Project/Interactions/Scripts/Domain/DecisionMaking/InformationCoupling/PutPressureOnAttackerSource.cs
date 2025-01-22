@@ -13,7 +13,7 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			_perceptionOfAttacker = perceptionOfAttacker;
 			_desiredInterpersonalDistance = desiredInterpersonalDistance;
 		}
-		
+
 		public void ChangeInterpersonalDistance(float distance)
 		{
 			_desiredInterpersonalDistance = distance;

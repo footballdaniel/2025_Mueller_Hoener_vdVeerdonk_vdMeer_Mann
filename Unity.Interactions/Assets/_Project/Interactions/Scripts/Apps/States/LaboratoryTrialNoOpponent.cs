@@ -21,7 +21,6 @@ namespace Interactions.Apps.States
 
 		public override void Exit()
 		{
-			_hasPassed = false;
 			if (_ball)
 				Object.Destroy(_ball.gameObject);
 
@@ -59,12 +58,13 @@ namespace Interactions.Apps.States
 
 					var forwardDirection = Vector3.right;
 					var angle = Vector3.Angle(forwardDirection, passDirection);
+
 					if (angle > 45)
 					{
 						Debug.LogWarning("Pass at large angle detected, skip");
 						return;
 					}
-					
+
 					if (_ball)
 						Object.Destroy(_ball.gameObject);
 
@@ -88,7 +88,6 @@ namespace Interactions.Apps.States
 		}
 
 		Ball _ball;
-		bool _hasPassed;
 		InputDataQueue _inputDataQueue;
 		float _lastPassTime;
 		float _updateTimer;

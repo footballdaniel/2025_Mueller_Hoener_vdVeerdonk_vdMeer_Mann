@@ -85,7 +85,7 @@ namespace Replay.Scripts
 
 			_goalController.Tick(_currentFrameIndex);
 			_ballController.Tick(_currentFrameIndex, t);
-		
+
 			DominantFoot.transform.position = Vector3.Lerp(DominantFoot.transform.position, _trial.UserDominantFootPositions[_currentFrameIndex], t);
 			NonDominantFoot.transform.position = Vector3.Lerp(NonDominantFoot.transform.position, _trial.UserNonDominantFootPositions[_currentFrameIndex], t);
 			Opponent.transform.position = Vector3.Lerp(Opponent.transform.position, _trial.OpponentHipPositions[_currentFrameIndex], t);
@@ -111,7 +111,7 @@ namespace Replay.Scripts
 		List<FrameEvent> _frameEvents;
 		GoalController _goalController;
 		bool _isPlaying;
-		
+
 		Trial _trial;
 		bool _videoReady;
 	}

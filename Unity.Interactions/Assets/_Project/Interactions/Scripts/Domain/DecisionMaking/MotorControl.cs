@@ -2,9 +2,9 @@ using Interactions.Domain.DecisionMaking.Constraints;
 using Interactions.Domain.DecisionMaking.InformationCoupling;
 using UnityEngine;
 
-namespace Interactions.Domain.Opponents
+namespace Interactions.Domain.DecisionMaking
 {
-	public class Motor
+	public class MotorController
 	{
 		float _acceleration;
 		Vector3 _currentVelocity = Vector3.zero;
@@ -13,7 +13,7 @@ namespace Interactions.Domain.Opponents
 		Vector3 _currentPosition;
 		Quaternion _currentRotation;
 
-		public Motor(float maxSpeed, float acceleration, float maxRotationSpeedDegreesY, Vector3 currentPosition, Quaternion currentRotation)
+		public MotorController(float maxSpeed, float acceleration, float maxRotationSpeedDegreesY, Vector3 currentPosition, Quaternion currentRotation)
 		{
 			_maxSpeed = maxSpeed;
 			_acceleration = acceleration;
@@ -29,7 +29,7 @@ namespace Interactions.Domain.Opponents
 		{
 			var desiredPosition = sources.CombinePositions();
 			var constrainedDesiredPosition = opponentMaximalPositionConstraint.Constrain(desiredPosition);
-			
+
 			var targetDirection = constrainedDesiredPosition - _currentPosition;
 			targetDirection.y = 0;
 			var distanceToTarget = targetDirection.magnitude;
@@ -51,12 +51,13 @@ namespace Interactions.Domain.Opponents
 				desiredVelocity3D = targetDirection * (distanceToTarget / deltaTime);
 
 			Velocity = new Vector2(desiredVelocity3D.x, desiredVelocity3D.z);
+
 			var localVelocity2D = new Vector2(
 				Vector3.Dot(desiredVelocity3D, _currentRotation * Vector3.right),
 				Vector3.Dot(desiredVelocity3D, _currentRotation * Vector3.forward)
 			);
 			LocalVelocity = localVelocity2D;
-			
+
 			var newPosition = _currentPosition + desiredVelocity3D * deltaTime;
 			_currentVelocity = desiredVelocity3D;
 			_currentPosition = newPosition;
@@ -64,15 +65,16 @@ namespace Interactions.Domain.Opponents
 		}
 
 
-
 		public Quaternion Rotate(InformationSources sources, float deltaTime)
 		{
 			var finalY = sources.CombineRotationsY();
+
 			if (Mathf.Abs(finalY) < 0.0001f)
 			{
 				var finalPos = sources.CombinePositions();
 				var lookDirection = finalPos - _currentPosition;
 				lookDirection.y = 0;
+
 				if (lookDirection.sqrMagnitude <= 0.001f)
 					return _currentRotation;
 				var localForward = _currentRotation * Vector3.forward;
@@ -80,7 +82,6 @@ namespace Interactions.Domain.Opponents
 				var maxRotationDelta = _maxRotationSpeedDegreesY * deltaTime;
 				var clampedAngle = Mathf.Clamp(angleToTarget, -maxRotationDelta, maxRotationDelta);
 				_currentRotation = Quaternion.Euler(0, _currentRotation.eulerAngles.y + clampedAngle, 0);
-				
 			}
 			else
 			{
@@ -89,7 +90,7 @@ namespace Interactions.Domain.Opponents
 				var rotationDelta = Mathf.Clamp(angle, -_maxRotationSpeedDegreesY * deltaTime, _maxRotationSpeedDegreesY * deltaTime);
 				_currentRotation = Quaternion.Euler(0, currentY + rotationDelta, 0);
 			}
-			
+
 			return _currentRotation;
 		}
 

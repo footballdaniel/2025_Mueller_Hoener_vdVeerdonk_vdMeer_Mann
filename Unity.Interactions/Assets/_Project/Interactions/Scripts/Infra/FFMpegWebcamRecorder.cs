@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Interactions.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorders;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;

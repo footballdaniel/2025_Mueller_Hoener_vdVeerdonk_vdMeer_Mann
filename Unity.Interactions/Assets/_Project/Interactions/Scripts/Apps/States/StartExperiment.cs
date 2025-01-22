@@ -11,6 +11,8 @@ namespace Interactions.Apps.States
 
 		public void ConditionSelected(ExperimentalCondition condition)
 		{
+			_app.LabEnvironment.Hide();
+			
 			_app.ExperimentalCondition = condition;
 			_app.Transitions.SelectWebcam.Execute();
 

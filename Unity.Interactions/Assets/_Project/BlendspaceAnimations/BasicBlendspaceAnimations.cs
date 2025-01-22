@@ -13,7 +13,7 @@ namespace Interactions.Animations
 		[SerializeField] float acceleration = 5f;
 		[SerializeField] float maxRotationSpeedDegreesY = 90f;
 
-		private Vector3 _currentVelocity = Vector3.zero;
+		Vector3 _currentVelocity = Vector3.zero;
 
 		void Update()
 		{
@@ -53,6 +53,7 @@ namespace Interactions.Animations
 			// Rotate to face the attacker
 			var lookDirection = _attacker.position - transform.position;
 			lookDirection.y = 0; // Ensure rotation stays on the horizontal plane
+
 			if (lookDirection.sqrMagnitude > 0.001f) // Prevent jitter when very close
 			{
 				var targetRotation = Quaternion.LookRotation(lookDirection, Vector3.up);

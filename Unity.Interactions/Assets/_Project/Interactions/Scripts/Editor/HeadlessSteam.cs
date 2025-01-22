@@ -39,7 +39,6 @@ namespace _Project.Interactions.Editor
 
 		#region Implementation
 
-
 		static FileInfo SteamVRConfig()
 		{
 			var steamVrConfig = new FileInfo(Path.Combine(
@@ -72,8 +71,7 @@ namespace _Project.Interactions.Editor
 			return nullDriver;
 		}
 
-	
-	
+
 		static void UndoModifySteamVrConfigFile()
 		{
 			var configFile = SteamVRConfig();
@@ -96,7 +94,6 @@ namespace _Project.Interactions.Editor
 			Debug.Log("Restored default.vrsettings to original settings.");
 		}
 
-	
 
 		static void ModifySteamVrConfigFile()
 		{
@@ -157,5 +154,6 @@ namespace _Project.Interactions.Editor
 		}
 
 		#endregion
+
 	}
 }

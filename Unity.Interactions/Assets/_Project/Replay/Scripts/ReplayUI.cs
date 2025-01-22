@@ -15,7 +15,7 @@ namespace _Project.Replay.Scripts
 			_timeSlider.maxValue = app.NumberOfFrames - 1;
 			_timeSlider.onValueChanged.AddListener(value => app.ShowFrame((int)value));
 			_playPauseButton.onClick.AddListener(app.TogglePlayPause);
-	
+
 			_app = app;
 			app.TogglePlayPause();
 		}

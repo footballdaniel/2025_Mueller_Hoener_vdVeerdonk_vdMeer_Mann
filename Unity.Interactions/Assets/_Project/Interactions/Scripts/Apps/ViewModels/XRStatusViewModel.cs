@@ -17,7 +17,6 @@ namespace Interactions.Apps.ViewModels
 		public bool HasErrors()
 		{
 			return XRStatusChecker.HasXRErrors();
-			
 		}
 
 		readonly App _app;

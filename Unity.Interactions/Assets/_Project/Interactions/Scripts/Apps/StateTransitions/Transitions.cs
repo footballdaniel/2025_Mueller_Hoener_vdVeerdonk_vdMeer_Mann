@@ -1,4 +1,4 @@
-namespace Interactions.Apps.Transitions
+namespace Interactions.Apps.StateTransitions
 {
 	public class Transitions
 	{

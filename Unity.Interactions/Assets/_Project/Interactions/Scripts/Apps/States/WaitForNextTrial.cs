@@ -23,7 +23,7 @@ namespace Interactions.Apps.States
 			var epsilon = 0.0001f;
 
 			if (_updateTimer >= deltaTime - epsilon)
-			{ 
+			{
 				_app.Experiment.WebcamRecorder.Tick();
 				_updateTimer -= deltaTime;
 			}

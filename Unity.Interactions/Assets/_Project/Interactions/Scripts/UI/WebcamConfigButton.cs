@@ -1,4 +1,4 @@
-using Interactions.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorders;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

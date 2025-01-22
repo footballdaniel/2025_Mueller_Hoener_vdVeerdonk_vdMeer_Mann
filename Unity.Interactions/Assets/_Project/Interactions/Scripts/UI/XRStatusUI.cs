@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Interactions.UI
 {
 	public class XRStatusUI : UIScreen
-	{	
+	{
 		[SerializeField] TMP_Text _errorText;
 
 		public void Bind(XRStatusViewModel viewModel)

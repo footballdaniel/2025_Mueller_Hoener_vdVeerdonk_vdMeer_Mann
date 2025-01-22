@@ -39,7 +39,7 @@ namespace Interactions.Domain
 
 			var jsonData = JsonConvert.SerializeObject(this, jsonSettings);
 			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-			var path = Path.Combine(UnityEngine.Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
+			var path = Path.Combine(Application.persistentDataPath, $"trial_{TrialNumber}_{fileNameWithDateTime}.json");
 			File.WriteAllText(path, jsonData);
 		}
 

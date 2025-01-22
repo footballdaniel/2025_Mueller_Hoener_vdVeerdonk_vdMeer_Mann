@@ -16,7 +16,7 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			_desiredInterpersonalDistance = desiredInterpersonalDistance;
 			_opponent = opponent;
 		}
-		
+
 		public void ChangeInterpersonalDistance(float distance)
 		{
 			_desiredInterpersonalDistance = distance;
@@ -29,9 +29,9 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			var attackerPosition = new Vector3(pos.x, 0, pos.y);
 			var dir = (attackerPosition - positionBetweenGoals).normalized;
 			// the point where the defender will finally reach
-			var interpersonalPoint =  attackerPosition - dir * _desiredInterpersonalDistance;
-			
-			
+			var interpersonalPoint = attackerPosition - dir * _desiredInterpersonalDistance;
+
+
 			// From now on progress towards the point
 			var vectorFromOpponentToInterpersonalPoint = interpersonalPoint - _opponent.Position;
 			var distanceFromOpponentToInterpersonalPoint = vectorFromOpponentToInterpersonalPoint.magnitude;
@@ -39,14 +39,14 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 
 			var maximalPogress = Math.Min(_totalXMovement, distanceFromOpponentToInterpersonalPoint);
 			var progressingFromOpponentTowardsInterpersonalPoint = _opponent.Position + directionFromOpponentToInterpersonalPoint * maximalPogress;
-			
+
 			// cache for next frame
 			if (_lastAttackerPosition.magnitude == 0)
 				_lastAttackerPosition = pos;
-			
+
 			_totalXMovement += Mathf.Abs(_lastAttackerPosition.x - pos.x);
 			_lastAttackerPosition = pos;
-			
+
 			return progressingFromOpponentTowardsInterpersonalPoint;
 		}
 

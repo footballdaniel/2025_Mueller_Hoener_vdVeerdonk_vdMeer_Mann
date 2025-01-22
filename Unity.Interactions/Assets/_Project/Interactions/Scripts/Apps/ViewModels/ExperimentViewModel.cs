@@ -1,8 +1,5 @@
 ﻿using System;
 using Interactions.Domain;
-using Interactions.Domain.Feet;
-using Interactions.Domain.Goals;
-using Interactions.Domain.VideoRecorder;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +11,6 @@ namespace Interactions.Apps.ViewModels
 		public ExperimentViewModel(App app)
 		{
 			_app = app;
-			_app.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
 		}
 
 		public Observable<bool> CanStartNextTrial { get; } = new(true);
@@ -82,9 +78,17 @@ namespace Interactions.Apps.ViewModels
 		public void TogglePassCorrection(bool shouldCorrect)
 		{
 			if (shouldCorrect)
-				_app.PassCorrector = new PassCorrector(_app.User.DominantFoot, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
+				_app.PassCorrector = new PassCorrector(_app.User, _app.Experiment.RightGoal, _app.Experiment.LeftGoal);
 			else
 				_app.PassCorrector = new NoPassCorrector();
+		}
+
+		public void ToggleLaboratoryEnvironmentVisibility(bool shouldShow)
+		{
+			if (shouldShow)
+				_app.LabEnvironment.Show();
+			else
+				_app.LabEnvironment.Hide();
 		}
 	}
 

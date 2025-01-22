@@ -1,7 +1,7 @@
 using System;
 using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
-using Interactions.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorders;
 using Interactions.Infra;
 using UnityEngine;
 

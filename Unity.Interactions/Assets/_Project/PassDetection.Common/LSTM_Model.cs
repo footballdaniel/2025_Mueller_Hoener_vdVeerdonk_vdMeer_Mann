@@ -16,23 +16,23 @@ namespace PassDetection.Replay
 			var model = ModelLoader.Load(asset);
 
 			_featureEngineer = new FeatureEngineer<InputData>();
+
 			foreach (var featureName in assetWithMetadata.FeatureNames)
 				_featureEngineer.AddFeature(FeatureRegistry.Create<InputData>(featureName));
-			
+
 			_worker = new Worker(model, BackendType.GPUCompute);
 		}
 
 		public void Dispose()
 		{
 			_worker?.Dispose();
-			
 		}
 
 
 		public float Evaluate(InputData data)
 		{
 			var flattenedValues = new List<float>();
-				flattenedValues.AddRange(_featureEngineer.Engineer(data));
+			flattenedValues.AddRange(_featureEngineer.Engineer(data));
 
 			var timeseriesCount = 10;
 			var featureCount = _featureEngineer.FeatureSize;

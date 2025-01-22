@@ -16,13 +16,13 @@ namespace _Project.Replay.Scripts
 		{
 			_meshRenderer.enabled = false;
 		}
-	
+
 		public void Score()
 		{
 			_meshRenderer.enabled = true;
 			_meshRenderer.material.color = Color.green;
 		}
-	
+
 		public void Miss()
 		{
 			_meshRenderer.enabled = true;

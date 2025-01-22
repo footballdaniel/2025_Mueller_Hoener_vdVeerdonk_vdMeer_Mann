@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Interactions.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorders
 {
 	public class NoWebcamRecorder : IWebcamRecorder
 	{
@@ -12,14 +12,13 @@ namespace Interactions.Domain.VideoRecorder
 		public void Tick()
 		{
 		}
-		
+
 		public void StartRecording(int currentTrialTrialNumber)
 		{
 		}
 
 		public void StopRecording()
 		{
-			
 		}
 
 		public void Export(int trialNumber)

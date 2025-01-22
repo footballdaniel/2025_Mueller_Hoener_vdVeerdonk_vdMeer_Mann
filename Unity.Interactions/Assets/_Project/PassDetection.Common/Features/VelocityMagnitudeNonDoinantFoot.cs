@@ -11,17 +11,18 @@ public class VelocityMagnitudeNonDominantFoot : Feature<InputData>
 		var timestamps = inputData.Timestamps;
 		var values = new List<float>();
 
-		for (int i = 1; i < nonDominantPositions.Count; i++)
+		for (var i = 1; i < nonDominantPositions.Count; i++)
 		{
-			float dt = timestamps[i] - timestamps[i - 1];
+			var dt = timestamps[i] - timestamps[i - 1];
+
 			if (dt == 0)
 				dt = 1e-6f;
 
-			float dx = (nonDominantPositions[i].x - nonDominantPositions[i - 1].x) / dt;
-			float dy = (nonDominantPositions[i].y - nonDominantPositions[i - 1].y) / dt;
-			float dz = (nonDominantPositions[i].z - nonDominantPositions[i - 1].z) / dt;
+			var dx = (nonDominantPositions[i].x - nonDominantPositions[i - 1].x) / dt;
+			var dy = (nonDominantPositions[i].y - nonDominantPositions[i - 1].y) / dt;
+			var dz = (nonDominantPositions[i].z - nonDominantPositions[i - 1].z) / dt;
 
-			float magnitude = Mathf.Sqrt(dx * dx + dy * dy + dz * dz);
+			var magnitude = Mathf.Sqrt(dx * dx + dy * dy + dz * dz);
 			values.Add(magnitude);
 		}
 

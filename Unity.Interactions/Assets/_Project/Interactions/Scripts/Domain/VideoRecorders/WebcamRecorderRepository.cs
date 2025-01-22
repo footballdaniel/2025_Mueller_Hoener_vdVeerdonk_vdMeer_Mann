@@ -3,7 +3,7 @@ using Interactions.Infra;
 using UnityEngine;
 using UnityEngine.Windows.WebCam;
 
-namespace Interactions.Domain.VideoRecorder
+namespace Interactions.Domain.VideoRecorders
 {
 	public class WebcamRecorderRepository : MonoBehaviour, IRepository<IWebcamRecorder>
 	{
@@ -17,10 +17,11 @@ namespace Interactions.Domain.VideoRecorder
 			{
 				var frameRates = VideoCapture.GetSupportedFrameRatesForResolution(resolution);
 				var minFrameRate = float.MaxValue;
+
 				foreach (var frameRate in frameRates)
 					if (frameRate < minFrameRate)
 						minFrameRate = frameRate;
-				
+
 				uniqueSettings.Add(new WebcamSpecs(device.name, resolution.width, resolution.height, (int)minFrameRate));
 			}
 

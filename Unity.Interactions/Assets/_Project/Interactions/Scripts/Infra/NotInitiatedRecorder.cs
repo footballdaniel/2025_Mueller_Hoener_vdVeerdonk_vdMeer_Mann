@@ -1,4 +1,4 @@
-using Interactions.Domain.VideoRecorder;
+using Interactions.Domain.VideoRecorders;
 using UnityEngine;
 
 namespace Interactions.Infra
@@ -9,14 +9,13 @@ namespace Interactions.Infra
 		public bool IsExportComplete { get; } = true;
 		public WebcamSpecs Specs { get; } = new("Not initiated recorder", 0, 0, 0);
 		public bool IsPlaying { get; } = false;
+
 		public void Tick()
 		{
-			
 		}
 
 		public void StartRecording(int currentTrialTrialNumber)
 		{
-			
 		}
 
 		public void StopRecording()
@@ -27,12 +26,10 @@ namespace Interactions.Infra
 
 		public void Export(int trialNumber)
 		{
-			
 		}
 
 		public void Initiate()
 		{
-			
 		}
 	}
 }

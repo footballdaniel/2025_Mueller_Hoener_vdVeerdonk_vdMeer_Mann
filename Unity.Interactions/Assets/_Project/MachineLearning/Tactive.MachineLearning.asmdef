@@ -1,17 +1,17 @@
 {
-    "name": "Tactive.MachineLearning",
-    "rootNamespace": "Tactive",
-    "references": [
-        "Unity.Sentis",
-        "Unity.Sentis.ONNX"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Tactive.MachineLearning",
+  "rootNamespace": "Tactive",
+  "references": [
+    "Unity.Sentis",
+    "Unity.Sentis.ONNX"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

@@ -1,4 +1,5 @@
 using System;
+using Interactions.Domain.DecisionMaking;
 using Interactions.Domain.DecisionMaking.Constraints;
 using Interactions.Domain.DecisionMaking.InformationCoupling;
 using Interactions.Domain.DecisionMaking.Perceptions;
@@ -26,21 +27,21 @@ namespace Interactions.Domain.Opponents
 		{
 			if (InterceptedBall())
 			{
-				BallIntercepted?.Invoke(_motor.Velocity);
+				BallIntercepted?.Invoke(_motorController.Velocity);
 				_sources.Remove(_interceptionSource);
 				_sources.ActivateAll();
 			}
-			
+
 			if (IsUserInStartingArea())
 				return;
-			
+
 			_attackerPerception.Tick(Time.time);
 			_footPerception.Tick(Time.time);
 
-			transform.position = _motor.Move(_sources, _opponentMaximalPositionConstraint, Time.deltaTime);
-			transform.rotation = _motor.Rotate(_sources, Time.deltaTime);
+			transform.position = _motorController.Move(_sources, _opponentMaximalPositionConstraint, Time.deltaTime);
+			transform.rotation = _motorController.Rotate(_sources, Time.deltaTime);
 
-			_animations.Apply(_motor.LocalVelocity);
+			_animations.Apply(_motorController.LocalVelocity);
 		}
 
 		bool IsUserInStartingArea()
@@ -68,9 +69,9 @@ namespace Interactions.Domain.Opponents
 			}
 
 			_footSource = new FootInformationSource(_footPerception);
-			// _attackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
-			_attackerSource = new MirroredPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, this, _attackerPerception, _distanceFromAttacker);
-			_motor = new Motor(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
+			_attackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
+			// _attackerSource = new MirroredPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, this, _attackerPerception, _distanceFromAttacker);
+			_motorController = new MotorController(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
 
@@ -80,7 +81,7 @@ namespace Interactions.Domain.Opponents
 
 		public void ChangeAcceleration(float newAcceleration)
 		{
-			_motor.ChangeAcceleration(newAcceleration);
+			_motorController.ChangeAcceleration(newAcceleration);
 		}
 
 		public void ChangeBodyInformationWeight(float newWeight)
@@ -125,14 +126,14 @@ namespace Interactions.Domain.Opponents
 		readonly InformationSources _sources = new();
 		Animations _animations;
 		IPercept _attackerPerception;
-		MirroredPressureOnAttackerSource _attackerSource;
+		PutPressureOnAttackerSource _attackerSource;
 		IPercept _footPerception;
 		IInformationSource _footSource;
 		LeftGoal _goalLeft;
 		RightGoal _goalRight;
 		IInformationSource _interceptionSource;
 		bool _isInteractive;
-		Motor _motor;
+		MotorController _motorController;
 		User _user;
 		OpponentMaximalPositionConstraint _opponentMaximalPositionConstraint;
 	}
