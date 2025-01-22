@@ -25,6 +25,7 @@ namespace Interactions.Domain
 		public Trial CurrentTrial { get; private set; }
 		public LeftGoal LeftGoal { get; set; }
 		public RightGoal RightGoal { get; set; }
+		public int CurrentTrialIndex => _currentTrialIndex;
 
 		public void Bind(Side dominantFoot, LeftGoal leftGoal, RightGoal rightGoal)
 		{

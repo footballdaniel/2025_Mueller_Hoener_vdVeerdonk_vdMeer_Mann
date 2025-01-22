@@ -10,7 +10,7 @@ namespace Interactions.Domain.Opponents
 {
 	public class Opponent : MonoBehaviour
 	{
-
+		[SerializeField] Head _head;
 		[SerializeField] Animator _animator;
 		[SerializeField] float _distanceFromAttacker = 3f;
 		[SerializeField] float _maxSpeed = 5f;
@@ -25,13 +25,6 @@ namespace Interactions.Domain.Opponents
 
 		void Update()
 		{
-			if (InterceptedBall())
-			{
-				BallIntercepted?.Invoke(_motorController.Velocity);
-				_sources.Remove(_interceptionSource);
-				_sources.ActivateAll();
-			}
-
 			if (IsUserInStartingArea())
 				return;
 
@@ -42,11 +35,18 @@ namespace Interactions.Domain.Opponents
 			transform.rotation = _motorController.Rotate(_sources, Time.deltaTime);
 
 			_animations.Apply(_motorController.LocalVelocity);
+			
+			if (InterceptedBall())
+			{
+				BallIntercepted?.Invoke(_motorController.Velocity);
+				_sources.Remove(_interceptionSource);
+				_sources.ActivateAll();
+			}
 		}
 
 		bool IsUserInStartingArea()
 		{
-			return _user.Head.transform.position.x < -2f;
+			return _user.TrackedHead.transform.position.x < -2f;
 		}
 
 		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMaximalPositionConstraint opponentMaximalPositionConstraint, bool isInteractive)
@@ -61,6 +61,7 @@ namespace Interactions.Domain.Opponents
 			{
 				_attackerPerception = new DelayedAttackerPercept(_memoryDuration, _reactionDelayBody, _user);
 				_footPerception = new DelayedFootPerception(_memoryDuration, _reactionDelayFoot, 0.4f, _user.DominantFoot, user.NonDominantFoot);
+				_head.LookAt(_user.TrackedHead.transform);
 			}
 			else
 			{
@@ -113,6 +114,8 @@ namespace Interactions.Domain.Opponents
 		{
 			if (!_isInteractive)
 				return;
+			
+			_head.LookAt(ball.transform);
 
 			_interceptionSource = new InterceptionInformationSource(this, ball);
 			_sources.ActivateOnly(_interceptionSource);

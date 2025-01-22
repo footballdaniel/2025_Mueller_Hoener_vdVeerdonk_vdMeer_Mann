@@ -56,7 +56,7 @@ namespace Interactions.Apps.States
 
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
 				_app.Experiment.CurrentTrial.UserHipPositions.Add(_app.User.Hips.Position);
-				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.Head.transform.position);
+				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.TrackedHead.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 				_inputDataQueue.EnQueue(_app.User.DominantFoot.transform.position, _app.User.NonDominantFoot.transform.position, _app.Experiment.CurrentTrial.Duration);

@@ -2,7 +2,7 @@
 
 namespace Interactions.Domain
 {
-	public class Head : MonoBehaviour
+	public class TrackedHead : MonoBehaviour
 	{
 		[SerializeField] XRTracker _headTracker;
 

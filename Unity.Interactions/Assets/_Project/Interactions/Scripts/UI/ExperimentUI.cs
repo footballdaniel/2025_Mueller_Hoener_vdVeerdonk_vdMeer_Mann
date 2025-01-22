@@ -15,6 +15,7 @@ namespace Interactions.UI
 		[SerializeField] Button _stopTrialButton;
 		[SerializeField] Button _showDataButton;
 		[SerializeField] Button _exitButton;
+		[SerializeField] TMP_Text _trialNumberText;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		[SerializeField] Toggle _passCorrectionToggle;
@@ -32,13 +33,16 @@ namespace Interactions.UI
 
 			_viewmodel = viewModel;
 			_cameraFeed.gameObject.SetActive(true);
+			_trialNumberText.SetText($"Trial {_viewmodel.CurrentTrialIndex + 1}");
 
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
 			_showDataButton.onClick.AddListener(viewModel.ShowData);
 			_exitButton.onClick.AddListener(viewModel.Exit);
+			
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
+			_labEnvironmentVisibilityToggle.SetIsOnWithoutNotify(viewModel.IsLabEnvironmentVisible);
 
 			viewModel.TogglePassCorrection(_passCorrectionToggle.isOn);
 			_stopTrialButton.interactable = false;
