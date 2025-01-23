@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bodyOrientation: {fileID: 3046328495400075443}
+  _legs: {fileID: 5485312058924903744}
   _animator: {fileID: 6631056919050492578}
   _distanceFromAttacker: 3
   _maxSpeed: 5
@@ -391,11 +392,43 @@ PrefabInstance:
         type: 3}
       insertIndex: 0
       addedObject: {fileID: 6949046309723360031}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dce5d2f312a4d20408d1d3c7029a1840,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5485312058924903744}
   m_SourcePrefab: {fileID: 100100000, guid: dce5d2f312a4d20408d1d3c7029a1840, type: 3}
+--- !u!1 &120967558716922466 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: dce5d2f312a4d20408d1d3c7029a1840,
+    type: 3}
+  m_PrefabInstance: {fileID: 967335535744263987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5485312058924903744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120967558716922466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e12cab4b9e44e88a72fcf3e6ae3bb79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ball: {fileID: 0}
+  _animator: {fileID: 6631056919050492578}
+  _foot: {fileID: 4320731154394178423}
+  _startKickDistance: 1.25
 --- !u!4 &785337132642943192 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dce5d2f312a4d20408d1d3c7029a1840,
+    type: 3}
+  m_PrefabInstance: {fileID: 967335535744263987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4320731154394178423 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5288641459987758012, guid: dce5d2f312a4d20408d1d3c7029a1840,
     type: 3}
   m_PrefabInstance: {fileID: 967335535744263987}
   m_PrefabAsset: {fileID: 0}

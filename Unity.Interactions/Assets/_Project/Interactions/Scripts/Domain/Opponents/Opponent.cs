@@ -11,6 +11,7 @@ namespace Interactions.Domain.Opponents
 	public class Opponent : MonoBehaviour
 	{
 		[SerializeField] BodyOrientation _bodyOrientation;
+		[SerializeField] Legs _legs;
 		[SerializeField] Animator _animator;
 		[SerializeField] float _distanceFromAttacker = 3f;
 		[SerializeField] float _maxSpeed = 5f;
@@ -35,18 +36,16 @@ namespace Interactions.Domain.Opponents
 			transform.rotation = _motorController.Rotate(_sources, Time.deltaTime);
 
 			_animations.Apply(_motorController.LocalVelocity);
-			
-			if (InterceptedBall())
+
+			if (IsCloseToTheBall(1.5f))
+				_legs.StartKickingTheBall(_ball, 1.5f);
+
+			if (IsCloseToTheBall(0.2f))
 			{
 				BallIntercepted?.Invoke(_motorController.Velocity);
 				_sources.Remove(_interceptionSource);
 				_sources.ActivateAll();
 			}
-		}
-
-		bool IsUserInStartingArea()
-		{
-			return _user.TrackedHead.transform.position.x < -2f;
 		}
 
 		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMaximalPositionConstraint opponentMaximalPositionConstraint, bool isInteractive)
@@ -114,22 +113,29 @@ namespace Interactions.Domain.Opponents
 		{
 			if (!_isInteractive)
 				return;
-			
+
 			_bodyOrientation.LookAt(ball.transform);
 
 			_interceptionSource = new InterceptionInformationSource(this, ball);
+			_ball = ball;
 			_sources.ActivateOnly(_interceptionSource);
 		}
 
-		bool InterceptedBall()
+		bool IsCloseToTheBall(float distance)
 		{
-			return Vector3.Distance(transform.position, _interceptionSource.TargetPosition()) < 0.5f;
+			return Vector3.Distance(transform.position, _interceptionSource.TargetPosition()) < distance;
+		}
+
+		bool IsUserInStartingArea()
+		{
+			return _user.TrackedHead.transform.position.x < -2f;
 		}
 
 		readonly InformationSources _sources = new();
 		Animations _animations;
 		IPercept _attackerPerception;
 		PutPressureOnAttackerSource _attackerSource;
+		Ball _ball;
 		IPercept _footPerception;
 		IInformationSource _footSource;
 		LeftGoal _goalLeft;
@@ -137,8 +143,8 @@ namespace Interactions.Domain.Opponents
 		IInformationSource _interceptionSource;
 		bool _isInteractive;
 		MotorController _motorController;
-		User _user;
 		OpponentMaximalPositionConstraint _opponentMaximalPositionConstraint;
+		User _user;
 	}
 
 }
