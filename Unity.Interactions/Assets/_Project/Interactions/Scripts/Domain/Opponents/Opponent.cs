@@ -37,8 +37,8 @@ namespace Interactions.Domain.Opponents
 
 			_animations.Apply(_motorController.LocalVelocity);
 
-			if (IsCloseToTheBall(1.5f))
-				_legs.StartKickingTheBall(_ball, 1.5f);
+			if (IsCloseToTheBall(4f))
+				_legs.StartKickingTheBall(_ball, 4f);
 		}
 
 		public void FinishedKicking()

@@ -113,7 +113,7 @@ Transform:
   m_GameObject: {fileID: 5629581505529870963}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -419,6 +419,7 @@ MonoBehaviour:
   _ball: {fileID: 0}
   _animator: {fileID: 6631056919050492578}
   _rightFoot: {fileID: 3692357955918901761}
+  _leftFoot: {fileID: 4185600661047196353}
   _startKickDistance: 1.25
 --- !u!4 &785337132642943192 stripped
 Transform:
@@ -429,6 +430,12 @@ Transform:
 --- !u!4 &3692357955918901761 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4732920970547555022, guid: dce5d2f312a4d20408d1d3c7029a1840,
+    type: 3}
+  m_PrefabInstance: {fileID: 967335535744263987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4185600661047196353 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3997673733949857266, guid: dce5d2f312a4d20408d1d3c7029a1840,
     type: 3}
   m_PrefabInstance: {fileID: 967335535744263987}
   m_PrefabAsset: {fileID: 0}
