@@ -20,9 +20,9 @@ namespace Interactions.Domain.Opponents
 		[SerializeField] float _memoryDuration = 1f;
 		[SerializeField] float _reactionDelayBody = 0.4f;
 		[SerializeField] float _reactionDelayFoot = 0.4f;
-		public event Action<Vector2> BallIntercepted;
 
 		public Vector3 Position => transform.position;
+		public Legs Legs => _legs;
 
 		void Update()
 		{
@@ -39,13 +39,12 @@ namespace Interactions.Domain.Opponents
 
 			if (IsCloseToTheBall(1.5f))
 				_legs.StartKickingTheBall(_ball, 1.5f);
+		}
 
-			if (IsCloseToTheBall(0.2f))
-			{
-				BallIntercepted?.Invoke(_motorController.Velocity);
-				_sources.Remove(_interceptionSource);
-				_sources.ActivateAll();
-			}
+		public void FinishedKicking()
+		{
+			_sources.Remove(_interceptionSource);
+			_sources.ActivateAll();
 		}
 
 		public void Bind(User user, LeftGoal goalLeft, RightGoal goalRight, OpponentMaximalPositionConstraint opponentMaximalPositionConstraint, bool isInteractive)
@@ -55,6 +54,7 @@ namespace Interactions.Domain.Opponents
 			_goalRight = goalRight;
 			_isInteractive = isInteractive;
 			_opponentMaximalPositionConstraint = opponentMaximalPositionConstraint;
+			_legs.Bind(this);
 
 			if (isInteractive)
 			{

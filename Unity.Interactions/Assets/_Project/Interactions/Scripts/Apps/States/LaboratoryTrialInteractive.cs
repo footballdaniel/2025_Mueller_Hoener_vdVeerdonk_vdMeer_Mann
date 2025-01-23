@@ -24,14 +24,14 @@ namespace Interactions.Apps.States
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
 			_app.UI.OpponentSettingsUI.Show();
 
-			_app.Experiment.Opponent.BallIntercepted += OnBallIntercepted;
+			_app.Experiment.Opponent.Legs.BallIntercepted += OnBallIntercepted;
 
 			_lastPassTime = Time.time;
 		}
 
-		void OnBallIntercepted(Vector2 direction)
+		void OnBallIntercepted(Vector3 direction)
 		{
-			_ball.Play(new Pass(3, _ball.transform.position, new Vector3(direction.x, 0, direction.y)));
+			_ball.Play(new Pass(3, _ball.transform.position, direction));
 		}
 
 		public override void Exit()
@@ -40,7 +40,7 @@ namespace Interactions.Apps.States
 				Object.Destroy(_ball.gameObject);
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 
-			_app.Experiment.Opponent.BallIntercepted -= OnBallIntercepted;
+			_app.Experiment.Opponent.Legs.BallIntercepted -= OnBallIntercepted;
 			_app.Experiment.CurrentTrial.Save();
 
 			_app.Experiment.WebcamRecorder.StopRecording();

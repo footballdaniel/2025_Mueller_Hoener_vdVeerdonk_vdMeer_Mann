@@ -418,7 +418,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ball: {fileID: 0}
   _animator: {fileID: 6631056919050492578}
-  _foot: {fileID: 4320731154394178423}
+  _rightFoot: {fileID: 3692357955918901761}
   _startKickDistance: 1.25
 --- !u!4 &785337132642943192 stripped
 Transform:
@@ -426,9 +426,9 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 967335535744263987}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4320731154394178423 stripped
+--- !u!4 &3692357955918901761 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -5288641459987758012, guid: dce5d2f312a4d20408d1d3c7029a1840,
+  m_CorrespondingSourceObject: {fileID: -4732920970547555022, guid: dce5d2f312a4d20408d1d3c7029a1840,
     type: 3}
   m_PrefabInstance: {fileID: 967335535744263987}
   m_PrefabAsset: {fileID: 0}
