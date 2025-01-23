@@ -10,7 +10,7 @@ namespace Interactions.Domain.Opponents
 {
 	public class Opponent : MonoBehaviour
 	{
-		[SerializeField] Head _head;
+		[SerializeField] BodyOrientation _bodyOrientation;
 		[SerializeField] Animator _animator;
 		[SerializeField] float _distanceFromAttacker = 3f;
 		[SerializeField] float _maxSpeed = 5f;
@@ -61,7 +61,7 @@ namespace Interactions.Domain.Opponents
 			{
 				_attackerPerception = new DelayedAttackerPercept(_memoryDuration, _reactionDelayBody, _user);
 				_footPerception = new DelayedFootPerception(_memoryDuration, _reactionDelayFoot, 0.4f, _user.DominantFoot, user.NonDominantFoot);
-				_head.LookAt(_user.TrackedHead.transform);
+				_bodyOrientation.LookAt(_user.TrackedHead.transform);
 			}
 			else
 			{
@@ -115,7 +115,7 @@ namespace Interactions.Domain.Opponents
 			if (!_isInteractive)
 				return;
 			
-			_head.LookAt(ball.transform);
+			_bodyOrientation.LookAt(ball.transform);
 
 			_interceptionSource = new InterceptionInformationSource(this, ball);
 			_sources.ActivateOnly(_interceptionSource);
