@@ -111,13 +111,11 @@ namespace Interactions.Domain.Opponents
 
 		public void Intercept(Ball ball)
 		{
-			if (!_isInteractive)
-				return;
-
-			_bodyOrientation.LookAt(ball.transform);
+			_bodyOrientation.LookStraightAhead();
 
 			_interceptionSource = new InterceptionInformationSource(this, ball);
 			_ball = ball;
+			Debug.Log("Intercept command");
 			_sources.ActivateOnly(_interceptionSource);
 		}
 
@@ -129,6 +127,12 @@ namespace Interactions.Domain.Opponents
 		bool IsUserInStartingArea()
 		{
 			return _user.TrackedHead.transform.position.x < -2f;
+		}
+
+		void OnDrawGizmos()
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(_sources.CombinePositions(), 0.5f);
 		}
 
 		readonly InformationSources _sources = new();

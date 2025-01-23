@@ -26,5 +26,10 @@ namespace Interactions.Domain.Opponents
 		{
 			_target = target;
 		}
+		
+		public void LookStraightAhead()
+		{
+			_target = null;
+		}
 	}
 }

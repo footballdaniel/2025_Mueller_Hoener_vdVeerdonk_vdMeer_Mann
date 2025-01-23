@@ -10,6 +10,8 @@ namespace PassDetection.Replay
 {
 	public class LstmModel : IDisposable
 	{
+		public static float ProbabilityThreshold = 0.75f; 
+		
 		public LstmModel(ModelAssetWithMetadata assetWithMetadata)
 		{
 			var asset = Resources.Load<ModelAsset>(assetWithMetadata.ModelAssetPath);

@@ -58,17 +58,18 @@ namespace Interactions.Infra
 					highestVelocity = velocities[i];
 					highestVelocityIndex = i + 1; // Shift index to match dominantFootList
 				}
-
-			// Step 3: Check if there is a timestamp 300ms later
-			if (highestVelocityIndex != -1)
-			{
-				for (var i = highestVelocityIndex; i < timestampList.Count; i++)
-					if (timestampList[i] - timestampList[highestVelocityIndex - 1] >= 0.3f)
-					{
-						highestVelocity = Vector3.zero;
-						break;
-					}
-			}
+			
+			// OPTIONAL: If needed, report not the peak but the direction after a short delay
+			// // Step 3: Check if there is a timestamp 300ms later
+			// if (highestVelocityIndex != -1)
+			// {
+			// 	for (var i = highestVelocityIndex; i < timestampList.Count; i++)
+			// 		if (timestampList[i] - timestampList[highestVelocityIndex - 1] >= 0.3f)
+			// 		{
+			// 			highestVelocity = Vector3.zero;
+			// 			break;
+			// 		}
+			// }
 
 			return highestVelocity;
 		}

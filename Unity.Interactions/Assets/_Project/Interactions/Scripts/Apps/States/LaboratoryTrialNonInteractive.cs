@@ -1,5 +1,6 @@
 using Interactions.Domain;
 using Interactions.Infra;
+using PassDetection.Replay;
 using UnityEngine;
 
 namespace Interactions.Apps.States
@@ -63,7 +64,7 @@ namespace Interactions.Apps.States
 
 				var prediction = _app.LstmModel.Evaluate(_inputDataQueue.ToInputData());
 
-				if (prediction > 0.95f && Time.time - _lastPassTime >= 1f)
+				if (prediction > LstmModel.ProbabilityThreshold && Time.time - _lastPassTime >= 1f)
 				{
 					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
 					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
@@ -91,8 +92,7 @@ namespace Interactions.Apps.States
 
 					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
 					_ball.Play(pass);
-
-					_app.Experiment.Opponent.Intercept(_ball);
+					
 					_app.Experiment.Ball = _ball;
 				}
 

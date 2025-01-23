@@ -17,20 +17,29 @@ namespace Interactions.Domain
 
 		public Pass Correct(Pass pass, Vector3 referencePosition)
 		{
-			var passPosition = CorrectedPosition(pass, referencePosition, out var correctedPassDirection);
+			CorrectedPosition(referencePosition, out var correctedPassDirection);
 			var correctedKickVelocity = CorrectVelocity(pass);
 
-			return new Pass(correctedKickVelocity, passPosition, correctedPassDirection);
+			return new Pass(correctedKickVelocity, pass.Position, correctedPassDirection);
 		}
 
-		Vector3 CorrectedPosition(Pass pass, Vector3 referencePosition, out Vector3 correctedPassDirection)
+		void CorrectedPosition(Vector3 referencePosition, out Vector3 correctedPassDirection)
 		{
 			var dominantFoot = _user.DominantFoot;
 			var passPosition = new Vector3(dominantFoot.transform.position.x, 0.25f, dominantFoot.transform.position.z);
 			var isOpponentToLeftOfUser = referencePosition.z < dominantFoot.transform.position.z;
 			var optimalGoalPosition = isOpponentToLeftOfUser ? _leftGoal.transform.position : _rightGoal.transform.position;
-			correctedPassDirection = Vector3.Lerp(pass.Direction, optimalGoalPosition - passPosition, 0.1f).normalized;
-			return passPosition;
+			
+			// make pass go towards goal, and have a random offset around goal
+			var lateralNoise = 0f;
+			if (isOpponentToLeftOfUser)
+				lateralNoise += Random.Range(-1f, 0.25f);
+			else
+				lateralNoise += Random.Range(1f, -0.25f);
+			var optimalGoalPositionWithNoise = new Vector3(optimalGoalPosition.x, optimalGoalPosition.y, optimalGoalPosition.z + lateralNoise);
+			
+			correctedPassDirection = (optimalGoalPositionWithNoise - passPosition).normalized;
+			// correctedPassDirection = Vector3.Lerp(pass.Direction, optimalGoalPosition - passPosition, 0.1f).normalized;
 		}
 
 		static float CorrectVelocity(Pass pass)

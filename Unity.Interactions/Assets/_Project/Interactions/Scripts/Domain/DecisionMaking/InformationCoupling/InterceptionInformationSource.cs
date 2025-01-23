@@ -17,8 +17,7 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 		public Vector3 TargetPosition()
 		{
 			var ballPosition = _ball.transform.position;
-			var ballDirection = _ball.Velocity.normalized;
-			return ballPosition + ballDirection * (_opponent.Position.x - ballPosition.x);
+			return ballPosition;
 		}
 
 		public float TargetRotationY()

@@ -37,7 +37,7 @@ namespace Interactions.Domain.Opponents
 			{
 				_hasKicked = true;
 				_lastKickTime = Time.time;
-				var clampedRightFootVelocity = Vector3.ClampMagnitude(_rightFootVelocity, 10);
+				var clampedRightFootVelocity = Vector3.ClampMagnitude(_rightFootVelocity, 5);
 				BallIntercepted?.Invoke(clampedRightFootVelocity);
 				_opponent.FinishedKicking();
 			}
