@@ -26,7 +26,7 @@ namespace Interactions.Domain.Opponents
 
 		void Update()
 		{
-			if (IsUserInStartingArea())
+			if (!HasUserStartedTrial())
 				return;
 
 			_attackerPerception.Tick(Time.time);
@@ -36,9 +36,6 @@ namespace Interactions.Domain.Opponents
 			transform.rotation = _motorController.Rotate(_sources, Time.deltaTime);
 
 			_animations.Apply(_motorController.LocalVelocity);
-
-			if (IsCloseToTheBall(4f))
-				_legs.StartKickingTheBall(_ball, 4f);
 		}
 
 		public void FinishedKicking()
@@ -54,7 +51,7 @@ namespace Interactions.Domain.Opponents
 			_goalRight = goalRight;
 			_isInteractive = isInteractive;
 			_opponentMaximalPositionConstraint = opponentMaximalPositionConstraint;
-			_legs.Bind(this);
+			_legs.Bind(this, user);
 
 			if (isInteractive)
 			{
@@ -117,16 +114,19 @@ namespace Interactions.Domain.Opponents
 			_ball = ball;
 			Debug.Log("Intercept command");
 			_sources.ActivateOnly(_interceptionSource);
+			
+			_legs.StartKickingTheBall(_ball, 4f);
 		}
 
-		bool IsCloseToTheBall(float distance)
-		{
-			return Vector3.Distance(transform.position, _interceptionSource.TargetPosition()) < distance;
-		}
 
-		bool IsUserInStartingArea()
+
+		bool HasUserStartedTrial()
 		{
-			return _user.TrackedHead.transform.position.x < -2f;
+			if (_hasUserStartedTrial)
+				return true;
+			
+			_hasUserStartedTrial  =  _user.TrackedHead.transform.position.x > -2f;
+			return _hasUserStartedTrial;
 		}
 
 		void OnDrawGizmos()
@@ -149,6 +149,7 @@ namespace Interactions.Domain.Opponents
 		MotorController _motorController;
 		OpponentMaximalPositionConstraint _opponentMaximalPositionConstraint;
 		User _user;
+		bool _hasUserStartedTrial;
 	}
 
 }

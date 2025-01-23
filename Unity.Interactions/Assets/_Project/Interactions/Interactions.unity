@@ -8901,10 +8901,10 @@ MonoBehaviour:
   Experiment:
     <InterPersonalDistance>k__BackingField: 4
     <FrameRateHz>k__BackingField: 10
-    <BodyInformationWeight>k__BackingField: 1
-    <FootInformationWeight>k__BackingField: 0.3
+    <BodyInformationWeight>k__BackingField: 0.5
+    <FootInformationWeight>k__BackingField: 0.5
     <OpponentAcceleration>k__BackingField: 4
-    <OpponentReactionTimeBody>k__BackingField: 1
+    <OpponentReactionTimeBody>k__BackingField: 0.8
     <OpponentReactionTimeFoot>k__BackingField: 0.2
     <DistanceBetweenGoals>k__BackingField: 3
   PassSoundClip: {fileID: 8300000, guid: 16f8e268a70602f4ebd9d9789d950d86, type: 3}

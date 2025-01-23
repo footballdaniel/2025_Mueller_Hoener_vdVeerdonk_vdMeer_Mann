@@ -28,9 +28,8 @@ namespace Interactions.Domain.Opponents
 			var distanceBallToRightFoot = Vector3.Distance(_ball.transform.position, _rightFoot.position);
 			var distanceBallToLeftFoot = Vector3.Distance(_ball.transform.position, _leftFoot.position);
 			var distanceBallToCloserFoot = Mathf.Min(distanceBallToRightFoot, distanceBallToLeftFoot);
-
-			var ballDirection = _ball.Velocity.normalized;
-			_isInterceptingWithRightFoot = ballDirection.z < 0;
+			
+			_isInterceptingWithRightFoot = _attacker.Position.y > 0;
 			Debug.Log("Intercepting with right foot: " + _isInterceptingWithRightFoot);
 
 			var distancePlayerToBall = Vector3.Distance(transform.position, _ball.transform.position);
@@ -68,9 +67,10 @@ namespace Interactions.Domain.Opponents
 			_ikWeight = kickProgressPercentage;
 		}
 
-		public void Bind(Opponent opponent)
+		public void Bind(Opponent opponent, User attacker)
 		{
 			_opponent = opponent;
+			_attacker = attacker;
 		}
 
 		public void StartKickingTheBall(Ball ball, float startKickDistance)
@@ -92,7 +92,7 @@ namespace Interactions.Domain.Opponents
 			}
 			else
 			{
-				_animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, _ikWeight);
+				_animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, _ikWeight);
 				_animator.SetIKPosition(AvatarIKGoal.LeftFoot, _ball.transform.position);
 			}
 		}
@@ -107,5 +107,6 @@ namespace Interactions.Domain.Opponents
 		Opponent _opponent;
 		Vector3 _rightFootPositionLastFrame;
 		Vector3 _rightFootVelocity;
+		User _attacker;
 	}
 }
