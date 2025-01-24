@@ -42,7 +42,6 @@ namespace Interactions.UI
 			
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
-			_labEnvironmentVisibilityToggle.SetIsOnWithoutNotify(viewModel.IsLabEnvironmentVisible);
 
 			viewModel.TogglePassCorrection(_passCorrectionToggle.isOn);
 			_stopTrialButton.interactable = false;

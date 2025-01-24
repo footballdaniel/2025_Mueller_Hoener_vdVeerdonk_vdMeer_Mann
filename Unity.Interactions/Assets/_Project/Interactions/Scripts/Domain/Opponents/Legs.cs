@@ -10,6 +10,7 @@ namespace Interactions.Domain.Opponents
 		[SerializeField] Transform _rightFoot;
 		[SerializeField] Transform _leftFoot;
 		[SerializeField] float _startKickDistance = 1.5f;
+		[SerializeField] User _attacker;
 
 		public event Action<Vector3> BallIntercepted;
 
@@ -30,7 +31,6 @@ namespace Interactions.Domain.Opponents
 			var distanceBallToCloserFoot = Mathf.Min(distanceBallToRightFoot, distanceBallToLeftFoot);
 			
 			_isInterceptingWithRightFoot = _attacker.Position.y > 0;
-			Debug.Log("Intercepting with right foot: " + _isInterceptingWithRightFoot);
 
 			var distancePlayerToBall = Vector3.Distance(transform.position, _ball.transform.position);
 
@@ -113,6 +113,5 @@ namespace Interactions.Domain.Opponents
 		Opponent _opponent;
 		Vector3 _rightFootPositionLastFrame;
 		Vector3 _rightFootVelocity;
-		User _attacker;
 	}
 }
