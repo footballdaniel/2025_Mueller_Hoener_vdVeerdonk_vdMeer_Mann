@@ -118,8 +118,6 @@ namespace Interactions.Domain.Opponents
 			_legs.StartKickingTheBall(_ball, 4f);
 		}
 
-
-
 		bool HasUserStartedTrial()
 		{
 			if (_hasUserStartedTrial)

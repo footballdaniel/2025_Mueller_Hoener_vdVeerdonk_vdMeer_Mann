@@ -85,17 +85,23 @@ namespace Interactions.Domain.Opponents
 			if (!_ball)
 				return;
 
+			var ballPosition = _ball.transform.position;
+			var localBallPosition = transform.InverseTransformPoint(ballPosition);
+			var constrainedPosition = new Vector3(localBallPosition.x, localBallPosition.y, 0); // Use only left/right (X) and up/down (Y)
+			var worldConstrainedPosition = transform.TransformPoint(constrainedPosition);
+
 			if (_isInterceptingWithRightFoot)
 			{
 				_animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, _ikWeight);
-				_animator.SetIKPosition(AvatarIKGoal.RightFoot, _ball.transform.position);
+				_animator.SetIKPosition(AvatarIKGoal.RightFoot, worldConstrainedPosition);
 			}
 			else
 			{
 				_animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, _ikWeight);
-				_animator.SetIKPosition(AvatarIKGoal.LeftFoot, _ball.transform.position);
+				_animator.SetIKPosition(AvatarIKGoal.LeftFoot, worldConstrainedPosition);
 			}
 		}
+
 
 		bool _hasKicked;
 

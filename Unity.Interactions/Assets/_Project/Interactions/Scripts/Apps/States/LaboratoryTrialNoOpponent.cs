@@ -65,6 +65,8 @@ namespace Interactions.Apps.States
 						Debug.LogWarning("Pass at large angle detected, skip");
 						return;
 					}
+					
+					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass",_app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
 
 					if (_ball)
 						Object.Destroy(_ball.gameObject);

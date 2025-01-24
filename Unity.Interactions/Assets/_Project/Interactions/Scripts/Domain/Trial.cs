@@ -24,6 +24,7 @@ namespace Interactions.Domain
 		public List<float> Timestamps { get; }
 		public int TrialNumber { get; }
 		public float Duration { get; private set; }
+		public List<BallEvent> BallEvents { get; } = new();
 		public List<Vector3> OpponentHipPositions { get; } = new();
 		public List<Vector3> UserHeadPositions { get; set; } = new();
 		public List<Vector3> UserDominantFootPositions { get; set; } = new();
@@ -49,4 +50,5 @@ namespace Interactions.Domain
 			Timestamps.Add(Duration);
 		}
 	}
+
 }

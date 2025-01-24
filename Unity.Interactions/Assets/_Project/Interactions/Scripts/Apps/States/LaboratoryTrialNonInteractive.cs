@@ -78,6 +78,7 @@ namespace Interactions.Apps.States
 						Debug.LogWarning("Pass at large angle detected, skip");
 						return;
 					}
+					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass",_app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
 
 
 					if (_ball)
@@ -103,6 +104,7 @@ namespace Interactions.Apps.States
 		void OnBallIntercepted(Vector3 direction)
 		{
 			_ball.Play(new Pass(3, _ball.transform.position, direction));
+			_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Intercepted", _app.Experiment.CurrentTrial.Timestamps[^1], _app.Experiment.Opponent.Position));
 		}
 
 		Ball _ball;
