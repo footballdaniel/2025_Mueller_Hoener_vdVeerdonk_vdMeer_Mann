@@ -28,7 +28,7 @@ namespace Interactions.Apps.ViewModels
 		{
 			CanStartNextTrial.Value = false;
 
-			switch (_app.ExperimentalCondition)
+			switch (_app.Experiment.ExperimentalCondition)
 			{
 				case ExperimentalCondition.LaboratoryInteractive:
 					_app.Transitions.LaboratoryTrialInteractive.Execute();

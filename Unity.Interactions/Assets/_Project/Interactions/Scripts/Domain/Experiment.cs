@@ -1,4 +1,5 @@
 using System;
+using Interactions.Apps;
 using Interactions.Domain.Goals;
 using Interactions.Domain.Opponents;
 using Interactions.Domain.VideoRecorders;
@@ -19,10 +20,10 @@ namespace Interactions.Domain
 		[field: SerializeReference] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
 		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2.5f;
 		[field: SerializeReference, Range(0,1)] public float PassDetectionThreshold { get; set; } = 0.9f;
+		public ExperimentalCondition ExperimentalCondition { get; set; }
 		public Side DominantFoot { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; } = new NotInitiatedRecorder();
 		public Opponent Opponent { get; set; }
-		public Ball Ball { get; set; }
 		public Trial CurrentTrial { get; private set; }
 		public LeftGoal LeftGoal { get; set; }
 		public RightGoal RightGoal { get; set; }
@@ -33,13 +34,14 @@ namespace Interactions.Domain
 			DominantFoot = dominantFoot;
 			LeftGoal = leftGoal;
 			RightGoal = rightGoal;
+			CurrentTrial = new NoTrial();
 		}
 
 
 		public void NextTrial()
 		{
 			_currentTrialIndex++;
-			CurrentTrial = new Trial(_currentTrialIndex, FrameRateHz, DominantFoot);
+			CurrentTrial = new Trial(_currentTrialIndex, FrameRateHz, DominantFoot, ExperimentalCondition);
 		}
 
 		int _currentTrialIndex;

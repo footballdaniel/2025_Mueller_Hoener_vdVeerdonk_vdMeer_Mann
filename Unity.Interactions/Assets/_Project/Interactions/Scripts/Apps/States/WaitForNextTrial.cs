@@ -25,6 +25,8 @@ namespace Interactions.Apps.States
 			if (_updateTimer >= deltaTime - epsilon)
 			{
 				_app.Experiment.WebcamRecorder.Tick();
+				_app.Experiment.CurrentTrial.Tick(deltaTime);
+				_app.PassDetector.DetectPass();
 				_updateTimer -= deltaTime;
 			}
 		}

@@ -14,7 +14,6 @@ namespace Interactions.Apps.States
 
 		public override void Enter()
 		{
-			_inputDataQueue = new InputDataQueue();
 			_app.Experiment.NextTrial();
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
 
@@ -25,8 +24,6 @@ namespace Interactions.Apps.States
 			_app.UI.OpponentSettingsUI.Show();
 
 			_app.Experiment.Opponent.Legs.BallIntercepted += OnBallIntercepted;
-
-			_lastPassTime = Time.time;
 		}
 
 		public override void Exit()
@@ -60,42 +57,9 @@ namespace Interactions.Apps.States
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.TrackedHead.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
-				_inputDataQueue.EnQueue(_app.User.DominantFoot.transform.position, _app.User.NonDominantFoot.transform.position, _app.Experiment.CurrentTrial.Duration);
-
-				var prediction = _app.LstmModel.Evaluate(_inputDataQueue.ToInputData());
-
-				if (prediction > LstmModel.ProbabilityThreshold && Time.time - _lastPassTime >= 1f)
-				{
-					var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
-					var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
-
-
-					var forwardDirection = Vector3.right;
-					var angle = Vector3.Angle(forwardDirection, passDirection);
-
-					if (angle > 45)
-					{
-						Debug.LogWarning("Pass at large angle detected, skip");
-						return;
-					}
-					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass",_app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
-
-
-					if (_ball)
-						Object.Destroy(_ball.gameObject);
-
-					AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
-					_lastPassTime = Time.time;
-
-
-					var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
-					pass = _app.PassCorrector.Correct(pass, _app.Experiment.Opponent.transform.position);
-
-					_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-					_ball.Play(pass);
-					
-					_app.Experiment.Ball = _ball;
-				}
+				
+				if (_app.PassDetector.DetectPass())
+					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass", _app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
 
 				_updateTimer -= deltaTime;
 			}
@@ -108,8 +72,6 @@ namespace Interactions.Apps.States
 		}
 
 		Ball _ball;
-		InputDataQueue _inputDataQueue;
-		float _lastPassTime;
 		float _updateTimer;
 	}
 }

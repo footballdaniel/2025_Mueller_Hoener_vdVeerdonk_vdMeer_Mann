@@ -11,7 +11,7 @@ namespace Interactions.Apps.States
 
 		public void ConditionSelected(ExperimentalCondition condition)
 		{
-			_app.ExperimentalCondition = condition;
+			_app.Experiment.ExperimentalCondition = condition;
 			_app.Transitions.SelectWebcam.Execute();
 
 			if (condition == ExperimentalCondition.InSitu)

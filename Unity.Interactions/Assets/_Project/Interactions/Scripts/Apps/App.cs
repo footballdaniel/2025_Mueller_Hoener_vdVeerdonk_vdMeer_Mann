@@ -30,8 +30,6 @@ namespace Interactions.Apps
 		public Ball BallPrefab { get; private set; }
 
 		[Header("State")]
-		public ExperimentalCondition ExperimentalCondition { get; set; }
-
 		public Side DominantFootSide { get; set; }
 		public Transitions Transitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
@@ -44,6 +42,7 @@ namespace Interactions.Apps
 		public OpponentSettingsViewModel OpponentSettingsViewModel { get; private set; }
 		public IPassCorrector PassCorrector { get; set; }
 		public OpponentMaximalPositionConstraint OpponentMaximalPositionConstraint { get; set; }
+		public PassDetector PassDetector { get; set; }
 
 		void Start()
 		{
@@ -68,6 +67,7 @@ namespace Interactions.Apps
 			LstmModel = new LstmModel(lstmModelAsset);
 			OpponentMaximalPositionConstraint = new OpponentMaximalPositionConstraint(2);
 			PassCorrector = new PassCorrector(User, Experiment.RightGoal, Experiment.LeftGoal);
+			PassDetector = new PassDetector(this);
 
 			// View models for showing data on the UI
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
