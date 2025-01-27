@@ -14,7 +14,6 @@ namespace Interactions.UI
 		[SerializeField] Button _nextTrialButton;
 		[SerializeField] Button _stopTrialButton;
 		[SerializeField] Button _showDataButton;
-		[SerializeField] Button _exitButton;
 		[SerializeField] TMP_Text _trialNumberText;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
@@ -38,7 +37,6 @@ namespace Interactions.UI
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
 			_showDataButton.onClick.AddListener(viewModel.ShowData);
-			_exitButton.onClick.AddListener(viewModel.Exit);
 			
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
@@ -73,7 +71,6 @@ namespace Interactions.UI
 			_nextTrialButton.onClick.RemoveAllListeners();
 			_stopTrialButton.onClick.RemoveAllListeners();
 			_showDataButton.onClick.RemoveAllListeners();
-			_exitButton.onClick.RemoveAllListeners();
 			_passCorrectionToggle.onValueChanged.RemoveAllListeners();
 			_labEnvironmentVisibilityToggle.onValueChanged.RemoveAllListeners();
 

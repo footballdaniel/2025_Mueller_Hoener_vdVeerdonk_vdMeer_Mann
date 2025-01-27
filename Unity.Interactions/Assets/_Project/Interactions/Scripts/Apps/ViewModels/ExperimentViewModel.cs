@@ -23,16 +23,7 @@ namespace Interactions.Apps.ViewModels
 		public int CurrentTrialIndex => _app.Experiment.CurrentTrialIndex;
 		public bool IsLabEnvironmentVisible => _app.LabEnvironment.IsVisible;
 
-		public void Exit()
-		{
-#if UNITY_EDITOR
-			if (Application.isEditor)
-				EditorApplication.isPlaying = false;
-			else
-#endif
-				Application.Quit();
-		}
-
+		
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
