@@ -2,6 +2,7 @@ using System;
 using Interactions.Apps.ViewModels;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Interactions.UI
@@ -14,6 +15,7 @@ namespace Interactions.UI
 		[SerializeField] Button _nextTrialButton;
 		[SerializeField] Button _stopTrialButton;
 		[SerializeField] Button _showDataButton;
+		[SerializeField] Button _containsError;
 		[SerializeField] TMP_Text _trialNumberText;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
@@ -23,20 +25,21 @@ namespace Interactions.UI
 		void Update()
 		{
 			_fpsText.text = $"FPS: {Math.Round(1 / Time.deltaTime)} FPS Fixed: {Math.Round(1 / Time.fixedDeltaTime)}";
-			_cameraFeed.texture = _viewmodel.Frame;
+			_cameraFeed.texture = _viewModel.Frame;
 		}
 
 		public void Bind(ExperimentViewModel viewModel)
 		{
 			Unbind();
 
-			_viewmodel = viewModel;
+			_viewModel = viewModel;
 			_cameraFeed.gameObject.SetActive(true);
-			_trialNumberText.SetText($"Trial {_viewmodel.CurrentTrialIndex + 1}");
+			_trialNumberText.SetText($"Trial {_viewModel.CurrentTrialIndex + 1}");
 
 			_nextTrialButton.onClick.AddListener(viewModel.NextTrial);
 			_stopTrialButton.onClick.AddListener(viewModel.StopTrial);
 			_showDataButton.onClick.AddListener(viewModel.ShowData);
+			_containsError.onClick.AddListener(OnContainsError);
 			
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
@@ -59,6 +62,12 @@ namespace Interactions.UI
 			defenderHipsTracker.Bind(viewModel.DefenderHipsTracker);
 		}
 
+		void OnContainsError()
+		{
+			_viewModel.ContainsError();
+			_containsError.interactable = false;
+		}
+
 		void OnCanStartNextTrialChanged(bool canStart)
 		{
 			_stopTrialButton.interactable = !canStart;
@@ -73,15 +82,18 @@ namespace Interactions.UI
 			_showDataButton.onClick.RemoveAllListeners();
 			_passCorrectionToggle.onValueChanged.RemoveAllListeners();
 			_labEnvironmentVisibilityToggle.onValueChanged.RemoveAllListeners();
+			_containsError.onClick.RemoveAllListeners();
+			
+			_containsError.interactable = true;
 
-			if (_viewmodel != null)
-				_viewmodel.CanStartNextTrial.ValueChanged -= OnCanStartNextTrialChanged;
+			if (_viewModel != null)
+				_viewModel.CanStartNextTrial.ValueChanged -= OnCanStartNextTrialChanged;
 
 			foreach (Transform child in _xrTrackerStatusContainer)
 				Destroy(child.gameObject);
 		}
 
 		bool _shouldUpdate;
-		ExperimentViewModel _viewmodel;
+		ExperimentViewModel _viewModel;
 	}
 }

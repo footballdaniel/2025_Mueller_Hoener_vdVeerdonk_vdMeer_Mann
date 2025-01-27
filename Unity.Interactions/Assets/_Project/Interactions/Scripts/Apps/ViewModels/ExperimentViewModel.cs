@@ -82,6 +82,11 @@ namespace Interactions.Apps.ViewModels
 			else
 				_app.LabEnvironment.Hide();
 		}
+
+		public void ContainsError()
+		{
+			_app.Experiment.CurrentTrial.ContainsError = true;
+		}
 	}
 
 }
