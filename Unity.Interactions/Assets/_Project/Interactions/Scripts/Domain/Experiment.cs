@@ -20,7 +20,7 @@ namespace Interactions.Domain
 		[field: SerializeReference] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
 		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2.5f;
 		[field: SerializeReference, Range(0,1)] public float PassDetectionThreshold { get; set; } = 0.9f;
-		public ExperimentalCondition ExperimentalCondition { get; set; }
+		public ExperimentalCondition ExperimentalCondition { get; private set; }
 		public Side DominantFoot { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; } = new NoWebcamRecorder();
 		public Opponent Opponent { get; set; }
@@ -28,6 +28,13 @@ namespace Interactions.Domain
 		public LeftGoal LeftGoal { get; set; }
 		public RightGoal RightGoal { get; set; }
 		public int CurrentTrialIndex => _currentTrialIndex;
+
+		public void ChangeCondition(ExperimentalCondition newCondition)
+		{
+			ExperimentalCondition = newCondition;
+			CurrentTrial = new NoTrial();
+			_currentTrialIndex = 0;
+		}
 
 		public void Bind(Side dominantFoot, LeftGoal leftGoal, RightGoal rightGoal)
 		{

@@ -18,5 +18,11 @@ namespace Interactions.UI
 				webcamElement.Button.onClick.AddListener(() => viewModel.Select(webcam));
 			}
 		}
+		
+		void OnDisable()
+		{
+			foreach (Transform child in _webcamConfigRoot.transform)
+				Destroy(child.gameObject);
+		}
 	}
 }

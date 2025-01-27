@@ -1,3 +1,4 @@
+using System;
 using Interactions.Apps.ViewModels;
 using UnityEngine;
 
@@ -35,6 +36,17 @@ namespace Interactions.UI
 
 			_goalDistanceSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeGoalDistance);
 			_goalDistanceSlider.Bind("Goal Distance", settingsViewModel.GoalDistance, 0, 5);
+		}
+
+		public void OnDisable()
+		{
+			_interPersonalDistanceSlider.Slider.onValueChanged.RemoveAllListeners();
+			_bodyInformationSlider.Slider.onValueChanged.RemoveAllListeners();
+			_footInformationSlider.Slider.onValueChanged.RemoveAllListeners();
+			_reactionTimeBodySlider.Slider.onValueChanged.RemoveAllListeners();
+			_reactionTimeFootSlider.Slider.onValueChanged.RemoveAllListeners();
+			_accelerationSlider.Slider.onValueChanged.RemoveAllListeners();
+			_goalDistanceSlider.Slider.onValueChanged.RemoveAllListeners();
 		}
 	}
 }

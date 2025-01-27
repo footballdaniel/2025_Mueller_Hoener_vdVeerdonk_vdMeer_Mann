@@ -33,16 +33,17 @@ namespace Interactions.Domain
 		public Side DominantFoot { get; private set; }
 		public int FrameRateHz { get; private set; }
 		public int NumberOfFrames => Timestamps.Count;
+		public bool ContainsError { get; set; }
 		public List<float> Timestamps { get; }
 		public int TrialNumber { get; }
 		public float Duration { get; private set; }
 		public List<BallEvent> BallEvents { get; } = new();
-		public List<Vector3> OpponentHipPositions { get; } = new();
 		public List<Vector3> UserHeadPositions { get; set; } = new();
 		public List<Vector3> UserDominantFootPositions { get; set; } = new();
 		public List<Vector3> UserNonDominantFootPositions { get; set; } = new();
 		public List<Vector3> UserHipPositions { get; set; } = new();
-		public bool ContainsError { get; set; }
+		public List<Vector3> OpponentHipPositions { get; } = new();
+
 
 		public void Save()
 		{

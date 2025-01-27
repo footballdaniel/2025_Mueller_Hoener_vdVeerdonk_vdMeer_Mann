@@ -92,6 +92,21 @@ namespace Interactions.Apps.ViewModels
 		{
 			_app.Experiment.PassDetectionThreshold = arg0;
 		}
+		
+		public void SelectInteractiveCondition()
+		{
+			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryInteractive);
+		}
+		
+		public void SelectNonInteractiveCondition()
+		{
+			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryNonInteractive);
+		}
+		
+		public void SelectNoOpponentCondition()
+		{
+			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryNoOpponent);
+		}
 	}
 
 }

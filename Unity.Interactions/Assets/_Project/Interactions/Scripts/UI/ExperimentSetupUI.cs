@@ -19,6 +19,9 @@ namespace Interactions.UI
 		{
 			_leftSideDominantButton.onClick.RemoveAllListeners();
 			_rightSideDominantButton.onClick.RemoveAllListeners();
+			
+			foreach (Transform child in _conditionButtonContainer)
+				Destroy(child.gameObject);
 		}
 
 		public void Bind(StartExperiment context)

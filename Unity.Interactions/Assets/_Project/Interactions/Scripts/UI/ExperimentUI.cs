@@ -21,6 +21,9 @@ namespace Interactions.UI
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		[SerializeField] Toggle _passCorrectionToggle;
 		[SerializeField] Toggle _labEnvironmentVisibilityToggle;
+		[SerializeField] Button _laboratoryInteractiveButton;
+		[SerializeField] Button _laboratoryNonInteractiveButton;
+		[SerializeField] Button _laboratoryNoOpponentButton;
 
 		void Update()
 		{
@@ -50,6 +53,10 @@ namespace Interactions.UI
 			_stopTrialButton.interactable = false;
 
 			viewModel.CanStartNextTrial.ValueChanged += OnCanStartNextTrialChanged;
+			
+			_laboratoryInteractiveButton.onClick.AddListener(viewModel.SelectInteractiveCondition);
+			_laboratoryNonInteractiveButton.onClick.AddListener(viewModel.SelectNonInteractiveCondition);
+			_laboratoryNoOpponentButton.onClick.AddListener(viewModel.SelectNoOpponentCondition);
 
 			var headTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
 			var dominantFootTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
@@ -86,6 +93,10 @@ namespace Interactions.UI
 			_labEnvironmentVisibilityToggle.onValueChanged.RemoveAllListeners();
 			_containsError.onClick.RemoveAllListeners();
 			_passProbabilitySlider.onValueChanged.RemoveAllListeners();
+			
+			_laboratoryInteractiveButton.onClick.RemoveAllListeners();
+			_laboratoryNonInteractiveButton.onClick.RemoveAllListeners();
+			_laboratoryNoOpponentButton.onClick.RemoveAllListeners();
 			
 			_containsError.interactable = true;
 
