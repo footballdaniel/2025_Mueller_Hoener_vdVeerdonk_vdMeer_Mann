@@ -39,13 +39,12 @@ namespace Interactions.Domain
 			var optimalGoalPositionWithNoise = new Vector3(optimalGoalPosition.x, optimalGoalPosition.y, optimalGoalPosition.z + lateralNoise);
 			
 			correctedPassDirection = (optimalGoalPositionWithNoise - passPosition).normalized;
-			// correctedPassDirection = Vector3.Lerp(pass.Direction, optimalGoalPosition - passPosition, 0.1f).normalized;
 		}
 
 		static float CorrectVelocity(Pass pass)
 		{
-			var optimalPassVelocity = 15f;
-			var correctedKickVelocity = Mathf.Lerp(pass.KickVelocity, optimalPassVelocity, 0.5f);
+			var optimalPassVelocityEnergyCoefficient = 5f;
+			var correctedKickVelocity = Mathf.Lerp(pass.KickVelocity, optimalPassVelocityEnergyCoefficient, 0.9f);
 			return correctedKickVelocity;
 		}
 

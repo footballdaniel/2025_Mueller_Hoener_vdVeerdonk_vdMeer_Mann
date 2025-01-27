@@ -4,7 +4,7 @@ namespace Interactions.Domain
 {
 	public class Ball : MonoBehaviour
 	{
-		[SerializeField] float _energyTransferCoefficient = 3f;
+		[SerializeField] float _energyTransferCoefficient = 5f;
 		[SerializeField] Rigidbody _rigidbody;
 
 		public Vector3 Velocity => _rigidbody.linearVelocity;

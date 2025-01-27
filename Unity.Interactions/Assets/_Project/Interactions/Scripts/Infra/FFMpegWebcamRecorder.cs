@@ -33,6 +33,9 @@ namespace Interactions.Infra
 
 		public void StartRecording(int currentTrialTrialNumber)
 		{
+			if (_isRecording) 
+				return;
+			
 			_isRecording = true;
 
 			var videoPath = Path.Combine(Application.persistentDataPath, $"trial{currentTrialTrialNumber}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.avi");
@@ -41,6 +44,9 @@ namespace Interactions.Infra
 
 		public void StopRecording()
 		{
+			if (!_isRecording) 
+				return;
+			
 			_isRecording = false;
 			FFMpegExporter.EndExport();
 		}

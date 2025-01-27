@@ -49,7 +49,6 @@ namespace Interactions.Apps.States
 			}
 		}
 
-		Ball _ball;
 		float _updateTimer;
 	}
 }

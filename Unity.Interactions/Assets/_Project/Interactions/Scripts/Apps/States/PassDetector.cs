@@ -16,8 +16,8 @@ namespace Interactions.Apps.States
 
 		public void DespawnBall()
 		{
-			if (_ball)
-				Object.Destroy(_ball.gameObject);
+			if (_app.Ball)
+				Object.Destroy(_app.Ball.gameObject);
 		}
 
 		public bool DetectPass()
@@ -41,18 +41,17 @@ namespace Interactions.Apps.States
 				}
 
 
-				if (_ball)
-					Object.Destroy(_ball.gameObject);
+				if (_app.Ball)
+					Object.Destroy(_app.Ball.gameObject);
 
 				AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
 				_lastPassTime = Time.time;
-
-
+				
 				var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
 				pass = _app.PassCorrector.Correct(pass, Vector3.zero);
 
-				_ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
-				_ball.Play(pass);
+				_app.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
+				_app.Ball.Play(pass);
 
 				return true;
 			}
@@ -62,7 +61,6 @@ namespace Interactions.Apps.States
 
 		readonly App _app;
 		readonly InputDataQueue _inputDataQueue;
-		Ball _ball;
 		float _lastPassTime;
 	}
 }

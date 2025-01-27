@@ -4,8 +4,8 @@ namespace Interactions.Domain.VideoRecorders
 {
 	public class NoWebcamRecorder : IWebcamRecorder
 	{
-		public RenderTexture Frame => null;
 		public bool IsExportComplete => true;
+		public RenderTexture Frame => null;
 		public WebcamSpecs Specs => new("No Recorder", 0, 0, 0);
 		public bool IsPlaying => true;
 
@@ -21,9 +21,6 @@ namespace Interactions.Domain.VideoRecorders
 		{
 		}
 
-		public void Export(int trialNumber)
-		{
-		}
 
 		public void Initiate()
 		{

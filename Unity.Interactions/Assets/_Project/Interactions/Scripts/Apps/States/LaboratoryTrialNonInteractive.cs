@@ -1,6 +1,4 @@
 using Interactions.Domain;
-using Interactions.Infra;
-using PassDetection.Replay;
 using UnityEngine;
 
 namespace Interactions.Apps.States
@@ -28,8 +26,7 @@ namespace Interactions.Apps.States
 
 		public override void Exit()
 		{
-			if (_ball)
-				Object.Destroy(_ball.gameObject);
+			_app.PassDetector.DespawnBall();
 			Object.Destroy(_app.Experiment.Opponent.gameObject);
 
 			_app.Experiment.Opponent.Legs.BallIntercepted -= OnBallIntercepted;
@@ -57,7 +54,7 @@ namespace Interactions.Apps.States
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.TrackedHead.transform.position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
-				
+
 				if (_app.PassDetector.DetectPass())
 					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass", _app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
 
@@ -67,11 +64,10 @@ namespace Interactions.Apps.States
 
 		void OnBallIntercepted(Vector3 direction)
 		{
-			_ball.Play(new Pass(3, _ball.transform.position, direction));
+			_app.Ball.Play(new Pass(3, _app.Ball.transform.position, direction));
 			_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Intercepted", _app.Experiment.CurrentTrial.Timestamps[^1], _app.Experiment.Opponent.Position));
 		}
 
-		Ball _ball;
 		float _updateTimer;
 	}
 }

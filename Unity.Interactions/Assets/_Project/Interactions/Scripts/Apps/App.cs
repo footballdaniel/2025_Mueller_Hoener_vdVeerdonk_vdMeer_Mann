@@ -43,6 +43,7 @@ namespace Interactions.Apps
 		public IPassCorrector PassCorrector { get; set; }
 		public OpponentMaximalPositionConstraint OpponentMaximalPositionConstraint { get; set; }
 		public PassDetector PassDetector { get; set; }
+		public Ball Ball { get; set; }
 
 		void Start()
 		{
@@ -97,6 +98,7 @@ namespace Interactions.Apps
 			Transitions.LaboratoryTrialNonInteractive = new Transition(this, waitForNextTrial, labTrialNonInteractive);
 			Transitions.LaboratoryNoOpponent = new Transition(this, waitForNextTrial, labTrialNoOpponent);
 			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
+			Transitions.Quit = new ImmediateTransition(this);
 
 			// Start app
 			StateMachine.SetState(startupXr);
