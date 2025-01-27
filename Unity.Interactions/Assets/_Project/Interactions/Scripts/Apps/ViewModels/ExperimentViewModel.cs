@@ -1,6 +1,5 @@
 ﻿using System;
 using Interactions.Domain;
-using UnityEditor;
 using UnityEngine;
 
 namespace Interactions.Apps.ViewModels
@@ -22,8 +21,9 @@ namespace Interactions.Apps.ViewModels
 		public RenderTexture Frame => _app.Experiment.WebcamRecorder?.Frame ?? new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32);
 		public int CurrentTrialIndex => _app.Experiment.CurrentTrialIndex;
 		public bool IsLabEnvironmentVisible => _app.LabEnvironment.IsVisible;
+		public float PassProbabilityDetectionThreshold => _app.Experiment.PassDetectionThreshold;
 
-		
+
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
@@ -86,6 +86,11 @@ namespace Interactions.Apps.ViewModels
 		public void ContainsError()
 		{
 			_app.Experiment.CurrentTrial.ContainsError = true;
+		}
+
+		public void ChangePassProbabilityDetectionThreshold(float arg0)
+		{
+			_app.Experiment.PassDetectionThreshold = arg0;
 		}
 	}
 

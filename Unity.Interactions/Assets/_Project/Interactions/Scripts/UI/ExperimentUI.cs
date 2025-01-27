@@ -2,7 +2,6 @@ using System;
 using Interactions.Apps.ViewModels;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Interactions.UI
@@ -17,6 +16,7 @@ namespace Interactions.UI
 		[SerializeField] Button _showDataButton;
 		[SerializeField] Button _containsError;
 		[SerializeField] TMP_Text _trialNumberText;
+		[SerializeField] Slider _passProbabilitySlider;
 		[SerializeField] XRTrackerStatus _xrTrackerStatusPrefab;
 		[SerializeField] RectTransform _xrTrackerStatusContainer;
 		[SerializeField] Toggle _passCorrectionToggle;
@@ -43,6 +43,8 @@ namespace Interactions.UI
 			
 			_passCorrectionToggle.onValueChanged.AddListener(viewModel.TogglePassCorrection);
 			_labEnvironmentVisibilityToggle.onValueChanged.AddListener(viewModel.ToggleLaboratoryEnvironmentVisibility);
+			_passProbabilitySlider.onValueChanged.AddListener(viewModel.ChangePassProbabilityDetectionThreshold);
+			_passProbabilitySlider.SetValueWithoutNotify(viewModel.PassProbabilityDetectionThreshold);
 
 			viewModel.TogglePassCorrection(_passCorrectionToggle.isOn);
 			_stopTrialButton.interactable = false;
@@ -83,6 +85,7 @@ namespace Interactions.UI
 			_passCorrectionToggle.onValueChanged.RemoveAllListeners();
 			_labEnvironmentVisibilityToggle.onValueChanged.RemoveAllListeners();
 			_containsError.onClick.RemoveAllListeners();
+			_passProbabilitySlider.onValueChanged.RemoveAllListeners();
 			
 			_containsError.interactable = true;
 
