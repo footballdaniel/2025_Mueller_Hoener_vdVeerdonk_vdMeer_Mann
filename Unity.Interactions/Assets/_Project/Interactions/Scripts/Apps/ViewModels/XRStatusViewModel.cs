@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Interactions.Apps.ViewModels
 {
 	public class XRStatusViewModel

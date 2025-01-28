@@ -6,8 +6,16 @@ namespace Interactions.Apps
 	{
 		public static bool HasXRErrors()
 		{
-			var initialized = XRGeneralSettings.Instance.Manager.isInitializationComplete;
-			return !initialized;
+			try
+			{
+				var initialized = XRGeneralSettings.Instance.Manager.isInitializationComplete;
+				return !initialized;
+				
+			}
+			catch
+			{
+				return true;
+			}
 		}
 	}
 }

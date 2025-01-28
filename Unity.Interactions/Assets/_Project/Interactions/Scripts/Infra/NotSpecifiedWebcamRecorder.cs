@@ -1,14 +1,15 @@
-using Interactions.Apps;
+﻿using Interactions.Apps;
+using Interactions.Domain.VideoRecorders;
 using UnityEngine;
 
-namespace Interactions.Domain.VideoRecorders
+namespace Interactions.Infra
 {
-	public class NoWebcamRecorder : IWebcamRecorder
+	public class NotSpecifiedWebcamRecorder : IWebcamRecorder
 	{
 		public bool IsExportComplete => true;
 		public RenderTexture Frame => null;
 		public WebcamSpecs Specs => new("No Recorder", 0, 0, 0);
-		public bool IsPlaying => true;
+		public bool IsPlaying => false;
 
 		public void Tick()
 		{

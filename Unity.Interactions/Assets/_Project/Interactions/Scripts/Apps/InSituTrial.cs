@@ -16,7 +16,7 @@ namespace Interactions.Apps
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
-			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
+			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber, _app.Experiment.ExperimentalCondition);
 			_opponent = Object.Instantiate(_app.InSituOpponentPrefab);
 			_opponent.Bind(_app.Trackers.DefenderHipsTracker);
 		}

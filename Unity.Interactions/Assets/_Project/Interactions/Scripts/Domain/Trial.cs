@@ -50,6 +50,7 @@ namespace Interactions.Domain
 			var jsonSettings = new JsonSerializerSettings();
 			jsonSettings.Converters.Add(new Vector3Converter());
 			jsonSettings.Converters.Add(new SideEnumConverter());
+			jsonSettings.Converters.Add(new ExperimentalConditionEnumConverter());
 			jsonSettings.Formatting = Formatting.Indented;
 
 			var jsonData = JsonConvert.SerializeObject(this, jsonSettings);
@@ -64,5 +65,4 @@ namespace Interactions.Domain
 			Timestamps.Add(Duration);
 		}
 	}
-
 }

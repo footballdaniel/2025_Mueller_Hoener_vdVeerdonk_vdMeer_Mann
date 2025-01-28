@@ -1,3 +1,4 @@
+using Interactions.Apps;
 using UnityEngine;
 
 namespace Interactions.Domain.VideoRecorders
@@ -8,7 +9,7 @@ namespace Interactions.Domain.VideoRecorders
 		public WebcamSpecs Specs { get; }
 		bool IsPlaying { get; }
 		void Tick();
-		void StartRecording(int currentTrialTrialNumber);
+		void StartRecording(int currentTrialTrialNumber, ExperimentalCondition condition);
 		void StopRecording();
 		void Initiate();
 	}

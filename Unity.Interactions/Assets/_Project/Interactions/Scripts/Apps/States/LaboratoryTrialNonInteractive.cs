@@ -13,7 +13,7 @@ namespace Interactions.Apps.States
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
-			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
+			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber, _app.Experiment.ExperimentalCondition);
 
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, _app.OpponentMaximalPositionConstraint, false);

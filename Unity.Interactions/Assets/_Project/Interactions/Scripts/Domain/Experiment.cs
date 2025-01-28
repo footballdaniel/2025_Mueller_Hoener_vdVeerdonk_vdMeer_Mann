@@ -22,7 +22,7 @@ namespace Interactions.Domain
 		[field: SerializeReference, Range(0,1)] public float PassDetectionThreshold { get; set; } = 0.9f;
 		public ExperimentalCondition ExperimentalCondition { get; private set; }
 		public Side DominantFoot { get; set; }
-		public IWebcamRecorder WebcamRecorder { get; set; } = new NoWebcamRecorder();
+		public IWebcamRecorder WebcamRecorder { get; set; } = new NotSpecifiedWebcamRecorder();
 		public Opponent Opponent { get; set; }
 		public Trial CurrentTrial { get; private set; }
 		public LeftGoal LeftGoal { get; set; }

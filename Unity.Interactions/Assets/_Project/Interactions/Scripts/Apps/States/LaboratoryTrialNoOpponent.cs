@@ -1,5 +1,4 @@
 using Interactions.Domain;
-using Interactions.Infra;
 using UnityEngine;
 
 namespace Interactions.Apps.States
@@ -14,7 +13,7 @@ namespace Interactions.Apps.States
 		public override void Enter()
 		{
 			_app.Experiment.NextTrial();
-			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber);
+			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber, _app.Experiment.ExperimentalCondition);
 		}
 
 		public override void Exit()

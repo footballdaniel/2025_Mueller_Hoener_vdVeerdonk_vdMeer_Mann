@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Interactions.Apps;
 using Interactions.Domain.VideoRecorders;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -31,15 +32,16 @@ namespace Interactions.Infra
 			_renderTexture.Create();
 		}
 
-		public void StartRecording(int currentTrialTrialNumber)
+		public void StartRecording(int currentTrialTrialNumber, ExperimentalCondition condition)
 		{
 			if (_isRecording) 
 				return;
 			
 			_isRecording = true;
 
-			var videoPath = Path.Combine(Application.persistentDataPath, $"trial{currentTrialTrialNumber}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.avi");
-			FFMpegExporter.StartExport(videoPath, Specs.Width, Specs.Height, Specs.FrameRate);
+			var fileNameWithDateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+			var path = Path.Combine(Application.persistentDataPath, $"trial_{currentTrialTrialNumber}_{condition.ToString()}_{fileNameWithDateTime}.avi");
+			FFMpegExporter.StartExport(path, Specs.Width, Specs.Height, Specs.FrameRate);
 		}
 
 		public void StopRecording()
