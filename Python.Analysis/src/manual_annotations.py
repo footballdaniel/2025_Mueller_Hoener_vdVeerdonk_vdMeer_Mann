@@ -37,7 +37,6 @@ def process_file(csv_file: str, json_file: str) -> Trial:
     elif condition == "NoOpponent":
         condition = Condition.NO_OPPONENT
 
-
     timestamps = json_data.get("Timestamps", [])
     user_dominant_foot_positions = read_positions(json_data.get("UserDominantFootPositions"))
     user_non_dominant_foot_positions = read_positions(json_data.get("UserNonDominantFootPositions"))
@@ -120,7 +119,6 @@ def process_file(csv_file: str, json_file: str) -> Trial:
 
             if "OffTarget" in event_tag:
                 pass_action.success = True  # !!! to keep all conditions comparable
-
 
     if condition != Condition.IN_SITU:
         ball_events = json_data.get("BallEvents", [])
