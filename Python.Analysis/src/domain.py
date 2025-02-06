@@ -69,6 +69,9 @@ class NoPass(Pass):
 
 @dataclass
 class Trial:
+    path: str
+    condition: Condition
+    trial_number: int
     timestamps: List[float]
     dominant_foot_positions: List[Position]
     non_dominant_foot_positions: List[Position]
@@ -78,3 +81,13 @@ class Trial:
     start: Action
     end: Action
     dominant_foot_side: Footedness
+
+    def duration(self):
+        first_action = self.actions[0]
+        last_action = self.actions[-1]
+        first_action_time = self.timestamps[first_action.time_index]
+        last_action_time = self.timestamps[last_action.time_index]
+        return last_action_time - first_action_time
+
+    def number_of_touches(self):
+        return len([action for action in self.actions if isinstance(action, Touch)])

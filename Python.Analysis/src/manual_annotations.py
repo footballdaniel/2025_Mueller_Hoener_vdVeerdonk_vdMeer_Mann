@@ -25,16 +25,19 @@ def process_file(csv_file: str, json_file: str) -> Trial:
     with open(json_file, "r") as json_file_content:
         json_data = json.load(json_file_content)
 
+    trial_number = json_data.get("TrialNumber", 0)
+    path = csv_file
+
     dominant_foot_str = json_data.get("DominantFoot", "Right")
     is_dominant_foot_right = dominant_foot_str == "Right"
     condition = json_data.get("Condition", "Unknown")
     if condition == "InSitu":
         condition = Condition.IN_SITU
-    elif condition == "Interaction":
+    elif condition == "LaboratoryInteractive":
         condition = Condition.INTERACTION
-    elif condition == "NoInteraction":
+    elif condition == "LaboratoryNonInteractive":
         condition = Condition.NO_INTERACTION
-    elif condition == "NoOpponent":
+    elif condition == "LaboratoryNoOpponent":
         condition = Condition.NO_OPPONENT
 
     timestamps = json_data.get("Timestamps", [])
@@ -44,6 +47,9 @@ def process_file(csv_file: str, json_file: str) -> Trial:
     opponent_hip_positions = read_positions(json_data.get("OpponentHipPositions"))
 
     trial = Trial(
+        path=path,
+        condition=condition,
+        trial_number=trial_number,
         timestamps=timestamps,
         dominant_foot_positions=user_dominant_foot_positions,
         non_dominant_foot_positions=user_non_dominant_foot_positions,
