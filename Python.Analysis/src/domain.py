@@ -3,6 +3,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 
+import numpy as np
+from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
+
 
 class Condition(Enum):
     IN_SITU = 'InSitu'
@@ -86,6 +90,7 @@ class Trial:
     condition: Condition
     trial_number: int
     timestamps: List[float]
+    head_positions: List[Position]
     dominant_foot_positions: List[Position]
     non_dominant_foot_positions: List[Position]
     hip_positions: List[Position]
@@ -111,10 +116,8 @@ class Trial:
         return time_difference
 
     def duration(self):
-        first_action = self.actions[0]
-        last_action = self.actions[-1]
-        first_action_time = self.timestamps[first_action.time_index]
-        last_action_time = self.timestamps[last_action.time_index]
+        first_action_time = self.timestamps[self.start.time_index]
+        last_action_time = self.timestamps[self.end.time_index]
         return last_action_time - first_action_time
 
     def number_of_touches(self):
@@ -125,10 +128,12 @@ class Trial:
             return 0
 
         total_distance = 0
-        for i in range(len(self.hip_positions)):
-            total_distance += self.hip_positions[i].distance_2d(self.opponent_hip_positions[i])
+        start_index = self.start.time_index
+        end_index = self.end.time_index
 
-        return total_distance / len(self.hip_positions)
+        for i in range(start_index, end_index):
+            total_distance += self.hip_positions[i].distance_2d(self.opponent_hip_positions[i])
+        return total_distance / (end_index - start_index)
 
     def interpersonal_distance_at_pass_time(self):
         if self.condition == Condition.NO_OPPONENT:
@@ -140,3 +145,29 @@ class Trial:
         position_of_opponent = self.opponent_hip_positions[pass_event.time_index]
 
         return position_of_player.distance_2d(position_of_opponent)
+
+    def butterworth_filter(self, data, cutoff=10, fs=100, order=3):
+        nyquist = 0.5 * fs
+        normal_cutoff = cutoff / nyquist
+        b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        return filtfilt(b, a, data)
+
+    def upsample(self, data, timestamps, target_fs=100):
+        target_times = np.arange(timestamps[0], timestamps[-1], 1 / target_fs)
+        interp_func = interp1d(timestamps, data, kind="linear", fill_value="extrapolate")
+        return target_times, interp_func(target_times)
+
+    def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
+        raw_timestamps = np.array(self.timestamps)  # Original timestamps (100ms interval)
+        z_positions = np.array([pos.z for pos in self.head_positions])  # Z positions of user's head
+
+        # Filter timestamps and z positions to match the start and end of the trial
+        z_positions = z_positions[self.start.time_index:self.end.time_index]
+        raw_timestamps = raw_timestamps[self.start.time_index:self.end.time_index]
+
+        upsampled_times, upsampled_z = self.upsample(z_positions, raw_timestamps, target_fs=target_fs)
+        filtered_z = self.butterworth_filter(upsampled_z, cutoff=cutoff, fs=target_fs, order=order)
+
+        # Compute sign changes in derivative
+        derivative = np.diff(filtered_z)
+        return np.sum(derivative[1:] * derivative[:-1] < 0)

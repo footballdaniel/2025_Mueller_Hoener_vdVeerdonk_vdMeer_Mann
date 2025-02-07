@@ -19,7 +19,7 @@ def read_positions(json_positions_data: List[dict]) -> List[Position]:
     return positions
 
 
-def process_file(csv_file: str, json_file: str) -> Trial:
+def ingest(csv_file: str, json_file: str) -> Trial:
     """
     Process a single pair of CSV and JSON files.
     """
@@ -42,17 +42,18 @@ def process_file(csv_file: str, json_file: str) -> Trial:
         condition = Condition.NO_OPPONENT
 
     timestamps = json_data.get("Timestamps", [])
+    user_head_positions = read_positions(json_data.get("UserHeadPositions"))
     user_dominant_foot_positions = read_positions(json_data.get("UserDominantFootPositions"))
     user_non_dominant_foot_positions = read_positions(json_data.get("UserNonDominantFootPositions"))
     user_hip_positions = read_positions(json_data.get("UserHipPositions"))
     opponent_hip_positions = read_positions(json_data.get("OpponentHipPositions"))
-
 
     trial = Trial(
         path=path,
         condition=condition,
         trial_number=trial_number,
         timestamps=timestamps,
+        head_positions=user_head_positions,
         dominant_foot_positions=user_dominant_foot_positions,
         non_dominant_foot_positions=user_non_dominant_foot_positions,
         hip_positions=user_hip_positions,
@@ -62,7 +63,6 @@ def process_file(csv_file: str, json_file: str) -> Trial:
         end=NoAction(),
         dominant_foot_side=Footedness.RIGHT if is_dominant_foot_right else Footedness.LEFT
     )
-
 
     if not Interpolator.try_interpolate_missing_data(user_dominant_foot_positions):
         trial.has_missing_data = True
@@ -76,7 +76,7 @@ def process_file(csv_file: str, json_file: str) -> Trial:
         trial.has_missing_data = True
         print(f"{path}: User hip has lots of missing data in trial: {path}")
 
-    if not Interpolator.try_interpolate_missing_data(opponent_hip_positions,ignore_start=True, ignore_end=True):
+    if not Interpolator.try_interpolate_missing_data(opponent_hip_positions, ignore_start=True, ignore_end=True):
         trial.has_missing_data = True
         print(f"{path}: Opponent hip has lots of missing data in trial: {path}")
 
@@ -150,5 +150,8 @@ def process_file(csv_file: str, json_file: str) -> Trial:
         for ball_event in ball_events:
             if ball_event["Name"] == "Intercepted":
                 pass_action.success = False
+
+    trial.start = trial.actions[0]
+    trial.end = trial.actions[-1]
 
     return trial
