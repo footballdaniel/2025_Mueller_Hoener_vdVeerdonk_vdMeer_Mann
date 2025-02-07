@@ -84,8 +84,19 @@ class NoPass(Pass):
         self.success = success
 
 
+class Persistence(abc.ABC):
+    @abc.abstractmethod
+    def add(self, trial):
+        ...
+
+    @abc.abstractmethod
+    def save(self, trials: List["Trial"]):
+        ...
+
+
 @dataclass
 class Trial:
+    participant: str
     path: str
     condition: Condition
     trial_number: int
@@ -97,27 +108,26 @@ class Trial:
     opponent_hip_positions: List[Position]
     actions: List[Action]
     start: Action
-    end: Action
+    pass_event: Pass
     dominant_foot_side: Footedness
     has_missing_data: bool = False
 
+    def accept(self, persistence: Persistence):
+        persistence.add(self)
+
     def distance_between_last_touch_and_pass(self):
         last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
-        pass_event = next((action for action in self.actions if isinstance(action, Pass)), None)
-
-        distance = last_touch.position.distance_2d(pass_event.position)
+        distance = last_touch.position.distance_2d(self.pass_event.position)
         return distance
 
     def timing_between_last_touch_and_pass(self):
         last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
-        pass_event = next((action for action in self.actions if isinstance(action, Pass)), None)
-
-        time_difference = self.timestamps[pass_event.time_index] - self.timestamps[last_touch.time_index]
+        time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_touch.time_index]
         return time_difference
 
     def duration(self):
         first_action_time = self.timestamps[self.start.time_index]
-        last_action_time = self.timestamps[self.end.time_index]
+        last_action_time = self.timestamps[self.pass_event.time_index]
         return last_action_time - first_action_time
 
     def number_of_touches(self):
@@ -129,7 +139,7 @@ class Trial:
 
         total_distance = 0
         start_index = self.start.time_index
-        end_index = self.end.time_index
+        end_index = self.pass_event.time_index
 
         for i in range(start_index, end_index):
             total_distance += self.hip_positions[i].distance_2d(self.opponent_hip_positions[i])
@@ -139,10 +149,8 @@ class Trial:
         if self.condition == Condition.NO_OPPONENT:
             return 0
 
-        pass_event = next((action for action in self.actions if isinstance(action, Pass)), None)
-
-        position_of_player = self.hip_positions[pass_event.time_index]
-        position_of_opponent = self.opponent_hip_positions[pass_event.time_index]
+        position_of_player = self.hip_positions[self.pass_event.time_index]
+        position_of_opponent = self.opponent_hip_positions[self.pass_event.time_index]
 
         return position_of_player.distance_2d(position_of_opponent)
 
@@ -162,8 +170,8 @@ class Trial:
         z_positions = np.array([pos.z for pos in self.head_positions])  # Z positions of user's head
 
         # Filter timestamps and z positions to match the start and end of the trial
-        z_positions = z_positions[self.start.time_index:self.end.time_index]
-        raw_timestamps = raw_timestamps[self.start.time_index:self.end.time_index]
+        z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
+        raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
 
         upsampled_times, upsampled_z = self.upsample(z_positions, raw_timestamps, target_fs=target_fs)
         filtered_z = self.butterworth_filter(upsampled_z, cutoff=cutoff, fs=target_fs, order=order)

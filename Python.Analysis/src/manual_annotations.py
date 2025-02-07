@@ -1,5 +1,6 @@
 import csv
 import json
+import re
 from typing import List
 
 from src.domain import Position, Footedness, Foot, Pass, Touch, Trial, NoAction, Side, \
@@ -26,6 +27,9 @@ def ingest(csv_file: str, json_file: str) -> Trial:
     with open(json_file, "r") as json_file_content:
         json_data = json.load(json_file_content)
 
+    # get part of the path that has pattern P[0-9] in it. its basically the participant number
+    participant_number = re.search(r'P[0-9]+', csv_file).group()
+
     trial_number = json_data.get("TrialNumber", 0)
     path = csv_file
 
@@ -49,6 +53,7 @@ def ingest(csv_file: str, json_file: str) -> Trial:
     opponent_hip_positions = read_positions(json_data.get("OpponentHipPositions"))
 
     trial = Trial(
+        participant=participant_number,
         path=path,
         condition=condition,
         trial_number=trial_number,
@@ -60,7 +65,7 @@ def ingest(csv_file: str, json_file: str) -> Trial:
         opponent_hip_positions=opponent_hip_positions,
         actions=[],
         start=NoAction(),
-        end=NoAction(),
+        pass_event=NoPass(),
         dominant_foot_side=Footedness.RIGHT if is_dominant_foot_right else Footedness.LEFT
     )
 
@@ -152,6 +157,6 @@ def ingest(csv_file: str, json_file: str) -> Trial:
                 pass_action.success = False
 
     trial.start = trial.actions[0]
-    trial.end = trial.actions[-1]
+    trial.pass_event = pass_action
 
     return trial
