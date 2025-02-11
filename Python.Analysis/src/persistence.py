@@ -13,13 +13,13 @@ class CSVPersistence(Persistence):
             writer = csv.writer(csvfile)
             writer.writerow(
                 [
-                    "Participant"
+                    "Participant",
                     "TrialNumber",
                     "Condition",
                     "Success",
                     "NumberOfTouches",
-                    "Duration",
                     "NumberLateralChangesOfDirection",
+                    "Duration",
                     "TimingBetweenLastTouchAndPass",
                     "AverageInterpersonalDistance",
                     "AverageInterpersonalDistanceAtPassTime",
@@ -32,7 +32,7 @@ class CSVPersistence(Persistence):
             return
 
         data = [
-            trial.participant,
+            trial.participant_id,
             trial.trial_number,
             trial.condition.value,
             trial.pass_event.success,

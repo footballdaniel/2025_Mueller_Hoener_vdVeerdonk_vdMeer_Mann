@@ -3,3 +3,16 @@ P2: Daan
 P3: Guus
 P4: Kirsten
 P5: Lisanne
+P6: Robin
+P7: Wesley
+P8: Jussi
+P9: Luka
+P10: Mohammed
+P11: WillemVdMeer
+P12: Willem (Danique)
+P13: Bart(Student)
+P14: Timo(Phd)
+P15: BartVdMeer
+P16: Pieter
+P17: Joeri
+P18: Jamiro

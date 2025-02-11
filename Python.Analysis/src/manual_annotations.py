@@ -28,7 +28,7 @@ def ingest(csv_file: str, json_file: str) -> Trial:
         json_data = json.load(json_file_content)
 
     # get part of the path that has pattern P[0-9] in it. its basically the participant number
-    participant_number = re.search(r'P[0-9]+', csv_file).group()
+    participant_number = int(re.search(r'P([0-9]+)', csv_file).group(1))
 
     trial_number = json_data.get("TrialNumber", 0)
     path = csv_file
@@ -53,7 +53,7 @@ def ingest(csv_file: str, json_file: str) -> Trial:
     opponent_hip_positions = read_positions(json_data.get("OpponentHipPositions"))
 
     trial = Trial(
-        participant=participant_number,
+        participant_id=participant_number,
         path=path,
         condition=condition,
         trial_number=trial_number,

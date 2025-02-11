@@ -76,8 +76,13 @@ class Pass(Action):
 
 class NoPass(Pass):
 
-    def __init__(self, position: Position = Position(0.0, 0.0, 0.0), time: int = 0, foot: Foot = Foot(Side.UNKNOWN),
-                 success: bool = False):
+    def __init__(
+            self,
+            position: Position = Position(0.0, 0.0, 0.0),
+            time: int = 0,
+            foot: Foot = Foot(Side.UNKNOWN),
+            success: bool = False
+    ):
         self.position = position
         self.time = time
         self.foot = foot
@@ -96,7 +101,7 @@ class Persistence(abc.ABC):
 
 @dataclass
 class Trial:
-    participant: str
+    participant_id: int
     path: str
     condition: Condition
     trial_number: int
