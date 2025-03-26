@@ -13,29 +13,7 @@ MonoBehaviour:
   m_Name: pass_detection_model_with_metadata
   m_EditorClassIdentifier: 
   _modelAssetPath: pass_detection_model
-  _featureNames:
-  - VelocityMagnitudeDominantFoot
-  - VelocityMagnitudeNonDominantFoot
-  _inputShape: 010000000a00000002000000
-  _sampleInput:
-  - 0
-  - 2.023895
-  - 3.630618
-  - 0.463915
-  - 3.2514324
-  - 3.2845082
-  - 2.6479616
-  - 1.9562473
-  - 0.35561728
-  - 1.8277098
-  - 0
-  - 3.9018245
-  - 1.583264
-  - 0.44743052
-  - 0.15402746
-  - 0.56939846
-  - 2.4269779
-  - 4.4362144
-  - 5.2032285
-  - 3.1701965
-  _sampleOutput: 0.009339301
+  _featureNames: []
+  _inputShape: 
+  _sampleInput: []
+  _sampleOutput: 0
