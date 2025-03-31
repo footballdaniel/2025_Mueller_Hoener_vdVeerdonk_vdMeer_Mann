@@ -3,3 +3,4 @@ dont use lose dictionaries, prefer to use dataclasses and classes instead.
 domain classes should be bundled together in a domain module or class.
 use static classes to bundle functions.
 Annotate all functions with mypy standards of typing.
+never use comments. instead, use domain driven naming of functions and classes to show the intent.

@@ -1,5 +1,5 @@
 {
-  "Condition": "LaboratoryNonInteractive",
+  "Condition": "LaboratoryInteractive",
   "DominantFoot": "Right",
   "FrameRateHz": 10,
   "NumberOfFrames": 77,

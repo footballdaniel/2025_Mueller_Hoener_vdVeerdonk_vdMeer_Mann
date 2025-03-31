@@ -1,6 +1,6 @@
 {
   "Condition": "LaboratoryNonInteractive",
-  "DominantFoot": "Right",
+  "DominantFoot": "Left",
   "FrameRateHz": 10,
   "NumberOfFrames": 68,
   "ContainsError": false,

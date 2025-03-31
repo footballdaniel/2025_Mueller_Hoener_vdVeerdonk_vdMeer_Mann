@@ -184,3 +184,26 @@ class Trial:
         # Compute sign changes in derivative
         derivative = np.diff(filtered_z)
         return np.sum(derivative[1:] * derivative[:-1] < 0)
+
+
+@dataclass
+class TrialCollection:
+    trials: List[Trial]
+
+    def __iter__(self):
+        return iter(self.trials)
+
+    def __len__(self) -> int:
+        return len(self.trials)
+
+    def filter_by_condition(self, condition: Condition) -> "TrialCollection":
+        return TrialCollection([trial for trial in self.trials if trial.condition == condition])
+
+    def filter_by_participant(self, participant_id: int) -> "TrialCollection":
+        return TrialCollection([trial for trial in self.trials if trial.participant_id == participant_id])
+
+    def get_participant_ids(self) -> List[int]:
+        return list(set(trial.participant_id for trial in self.trials))
+
+    def get_conditions(self) -> List[Condition]:
+        return list(set(trial.condition for trial in self.trials))

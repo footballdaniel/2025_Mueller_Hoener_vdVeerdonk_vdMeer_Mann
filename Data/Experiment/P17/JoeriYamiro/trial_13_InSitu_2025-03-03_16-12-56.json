@@ -1,9 +1,9 @@
 {
   "Condition": "InSitu",
-  "DominantFoot": "Right",
+  "DominantFoot": "Left",
   "FrameRateHz": 10,
   "NumberOfFrames": 103,
-  "ContainsError": false,
+  "ContainsError": true,
   "Timestamps": [
     0.1,
     0.2,
