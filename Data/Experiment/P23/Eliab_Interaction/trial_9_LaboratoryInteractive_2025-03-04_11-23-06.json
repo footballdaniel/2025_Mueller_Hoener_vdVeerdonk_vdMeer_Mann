@@ -3,7 +3,7 @@
   "DominantFoot": "Right",
   "FrameRateHz": 10,
   "NumberOfFrames": 89,
-  "ContainsError": true,
+  "ContainsError": false,
   "Timestamps": [
     0.1,
     0.2,
