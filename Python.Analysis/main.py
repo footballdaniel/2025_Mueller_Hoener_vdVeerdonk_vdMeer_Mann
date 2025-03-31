@@ -6,7 +6,7 @@ import seaborn as sns
 from src.domain import Condition, TrialCollection
 from src.persistence import CSVPersistence
 from src.reader import TrialReader
-from src.analyzer import TrialAnalyzer
+from src.visualizer import TrialVisualizer
 
 # Define the path to your data files
 data_path = "../Data/Experiment/**/*.csv"
@@ -15,9 +15,10 @@ persistence = CSVPersistence()
 # Read trials using the reader
 trials = TrialReader.read_trials(data_path, persistence)
 
-TrialAnalyzer.print_participant_analysis(trials)
-TrialAnalyzer.create_participation_grid(trials)
-TrialAnalyzer.analyze_completeness(trials)
+# Analyze and visualize data quality
+TrialVisualizer.print_trial_quality_summary(trials.trials)
+saved_plots = TrialVisualizer.analyze_and_plot_all_trials(trials.trials)
+print(f"\nSaved {len(saved_plots)} quality plots to output/quality_plots/")
 
 persistence.save(trials.trials, "results.csv")
 

@@ -4,3 +4,4 @@ domain classes should be bundled together in a domain module or class.
 use static classes to bundle functions.
 Annotate all functions with mypy standards of typing.
 never use comments. instead, use domain driven naming of functions and classes to show the intent.
+never annotate functions with comments

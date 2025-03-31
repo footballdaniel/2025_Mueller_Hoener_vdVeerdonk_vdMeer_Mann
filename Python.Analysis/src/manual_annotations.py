@@ -69,21 +69,21 @@ def ingest(csv_file: str, json_file: str) -> Trial:
         dominant_foot_side=Footedness.RIGHT if is_dominant_foot_right else Footedness.LEFT
     )
 
-    if not Interpolator.try_interpolate_missing_data(user_dominant_foot_positions):
-        trial.has_missing_data = True
-        print(f"{path}: Dominant foot has lots of missing data in trial: {path}")
+    # if not Interpolator.try_interpolate_missing_data(user_dominant_foot_positions):
+    #     trial.has_missing_data = True
+    #     print(f"{path}: Dominant foot has lots of missing data in trial: {path}")
 
-    if not Interpolator.try_interpolate_missing_data(user_non_dominant_foot_positions):
-        trial.has_missing_data = True
-        print(f"{path}: Non-dominant foot has lots of missing data in trial: {path}")
+    # if not Interpolator.try_interpolate_missing_data(user_non_dominant_foot_positions):
+    #     trial.has_missing_data = True
+    #     print(f"{path}: Non-dominant foot has lots of missing data in trial: {path}")
 
-    if not Interpolator.try_interpolate_missing_data(user_hip_positions):
-        trial.has_missing_data = True
-        print(f"{path}: User hip has lots of missing data in trial: {path}")
+    # if not Interpolator.try_interpolate_missing_data(user_hip_positions):
+    #     trial.has_missing_data = True
+    #     print(f"{path}: User hip has lots of missing data in trial: {path}")
 
-    if not Interpolator.try_interpolate_missing_data(opponent_hip_positions, ignore_start=True, ignore_end=True):
-        trial.has_missing_data = True
-        print(f"{path}: Opponent hip has lots of missing data in trial: {path}")
+    # if not Interpolator.try_interpolate_missing_data(opponent_hip_positions, ignore_start=True, ignore_end=True):
+    #     trial.has_missing_data = True
+    #     print(f"{path}: Opponent hip has lots of missing data in trial: {path}")
 
     with open(csv_file, "r") as csv_file_content:
         csv_reader = csv.reader(csv_file_content)
