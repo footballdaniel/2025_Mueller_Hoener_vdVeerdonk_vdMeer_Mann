@@ -12,7 +12,9 @@ from src.regression import (
     regression_touches, 
     predictive_figure_duration_and_touches, 
     table_duration_and_touches,
-    table_condition_differences
+    table_condition_differences,
+    ridge_plot_conditions_and_differences,
+    ridge_plot_differences
 )
 
 
@@ -35,7 +37,10 @@ if __name__ == '__main__':
     table_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
     predictive_figure_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
     table_condition_differences(Path("model_1.nc"), Path("model_2.nc"), Path("condition_differences.docx"), persistence)
-
+    
+    # Create ridge plots
+    ridge_plot_conditions_and_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_conditions.png"), persistence)
+    ridge_plot_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
 
     # TrialVisualizer.print_trial_quality_summary(trials.trials)
     # TrialVisualizer.analyze_and_plot_all_trials(trials.trials)

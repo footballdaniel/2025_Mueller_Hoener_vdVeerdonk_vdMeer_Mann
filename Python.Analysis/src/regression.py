@@ -373,4 +373,159 @@ def table_condition_differences(duration_model_path: Path, touches_model_path: P
                 else:
                     row[2] = f"{prob:.3f}"
     
-    persistence.save_table(table, file_name) 
+    persistence.save_table(table, file_name)
+
+
+def ridge_plot_conditions_and_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+    duration_results = az.from_netcdf(str(duration_model_path))
+    touches_results = az.from_netcdf(str(touches_model_path))
+    
+    # Get samples for both variables
+    duration_samples = duration_results.posterior["C(condition)"].values
+    touches_samples = touches_results.posterior["C(condition)"].values
+    
+    # Reshape samples
+    duration_samples = duration_samples.reshape(-1, duration_samples.shape[-1])
+    touches_samples = touches_samples.reshape(-1, touches_samples.shape[-1])
+    
+    # Get conditions in reverse order (to match our previous ordering)
+    conditions = [c.value for c in Condition]
+    conditions.reverse()
+    
+    # Create figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 5.5))
+    
+    # Plot duration conditions
+    for i, condition in enumerate(conditions):
+        samples = duration_samples[:, i]
+        
+        # Create KDE plot with extended range
+        sns.kdeplot(
+            data=samples,
+            ax=ax1,
+            label=re.sub(r'([a-z])([A-Z])', r'\1 \2', condition),
+            color='#4A90E2',
+            alpha=0.5,
+            cut=0,  # Extend the line beyond the data range
+            bw_adjust=1.5  # Adjust bandwidth for smoother curves
+        )
+    
+    ax1.set_title('Duration by Condition')
+    ax1.set_xlabel('Duration [s]')
+    ax1.legend()
+    
+    # Plot touches conditions
+    for i, condition in enumerate(conditions):
+        samples = touches_samples[:, i]
+        
+        # Create KDE plot with extended range
+        sns.kdeplot(
+            data=samples,
+            ax=ax2,
+            label=re.sub(r'([a-z])([A-Z])', r'\1 \2', condition),
+            color='#8B0000',
+            alpha=0.5,
+            cut=0,  # Extend the line beyond the data range
+            bw_adjust=1.5  # Adjust bandwidth for smoother curves
+        )
+    
+    ax2.set_title('Number of Touches by Condition')
+    ax2.set_xlabel('Number of Touches [n]')
+    ax2.legend()
+    
+    plt.tight_layout()
+    persistence.save_figure(fig, file_name)
+    plt.close(fig)
+
+
+def ridge_plot_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+    duration_results = az.from_netcdf(str(duration_model_path))
+    touches_results = az.from_netcdf(str(touches_model_path))
+    
+    # Get samples for both variables
+    duration_samples = duration_results.posterior["C(condition)"].values
+    touches_samples = touches_results.posterior["C(condition)"].values
+    
+    # Reshape samples
+    duration_samples = duration_samples.reshape(-1, duration_samples.shape[-1])
+    touches_samples = touches_samples.reshape(-1, touches_samples.shape[-1])
+    
+    # Get conditions in reverse order
+    conditions = [c.value for c in Condition]
+    conditions.reverse()
+    
+    # Create figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 3.5))
+    
+    # Calculate duration differences
+    duration_diffs = {}
+    for i in range(len(conditions)):
+        for j in range(i + 1, len(conditions)):
+            diff = duration_samples[:, j] - duration_samples[:, i]
+            condition_j = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[j])
+            condition_i = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[i])
+            comparison = f'{condition_j} vs {condition_i}'
+            duration_diffs[comparison] = diff
+    
+    # Calculate touches differences
+    touches_diffs = {}
+    for i in range(len(conditions)):
+        for j in range(i + 1, len(conditions)):
+            diff = touches_samples[:, j] - touches_samples[:, i]
+            condition_j = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[j])
+            condition_i = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[i])
+            comparison = f'{condition_j} vs {condition_i}'
+            touches_diffs[comparison] = diff
+    
+    # Sort differences by effect size (mean absolute difference)
+    duration_diffs = dict(sorted(
+        duration_diffs.items(),
+        key=lambda x: abs(np.mean(x[1]))
+    ))
+    touches_diffs = dict(sorted(
+        touches_diffs.items(),
+        key=lambda x: abs(np.mean(x[1]))
+    ))
+    
+    # Create ArviZ InferenceData objects for differences
+    duration_diff_data = az.convert_to_inference_data(
+        {k: v.reshape(1, -1) for k, v in duration_diffs.items()},
+        group="posterior"
+    )
+    touches_diff_data = az.convert_to_inference_data(
+        {k: v.reshape(1, -1) for k, v in touches_diffs.items()},
+        group="posterior"
+    )
+    
+    # Plot duration differences
+    az.plot_forest(
+        duration_diff_data,
+        kind="forestplot",
+        var_names=list(duration_diffs.keys()),
+        linewidth=1,
+        combined=True,
+        hdi_prob=0.95,
+        ax=ax1,
+        colors="#4A90E2"
+    )
+    ax1.set_title("Duration Differences Between Conditions", pad=20)
+    ax1.set_xlabel("")
+    
+    # Plot touches differences
+    az.plot_forest(
+        touches_diff_data,
+        kind="forestplot",
+        var_names=list(touches_diffs.keys()),
+        linewidth=1,
+        combined=True,
+        hdi_prob=0.95,
+        ax=ax2,
+        colors="#8B0000"
+    )
+    ax2.set_title("Differences in Number of Touches Between Conditions", pad=20)
+    ax2.set_xlabel("")
+    
+    # Ensure tight layout
+    plt.tight_layout()
+    persistence.save_figure(fig, file_name)
+    plt.close(fig) 
