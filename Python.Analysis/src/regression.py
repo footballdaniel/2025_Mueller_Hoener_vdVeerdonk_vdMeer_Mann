@@ -301,4 +301,76 @@ def table_duration_and_touches(duration_model_path: Path, touches_model_path: Pa
         table.rename_element(f"{metric}_condition_idx[3]", f"{metric} NoOpponent")
         table.rename_element(f"{metric}_1|participant_sigma", f"{metric} σ Participant")
     
+    persistence.save_table(table, file_name)
+
+
+def calculate_condition_differences(model_path: Path, variable_name: str) -> pd.DataFrame:
+    results = az.from_netcdf(str(model_path))
+    samples = results.posterior["C(condition)"].values
+    samples = samples.reshape(-1, samples.shape[-1])
+    
+    conditions = [c.value for c in Condition]
+    conditions.reverse()
+    
+    # Calculate all pairwise differences
+    differences = []
+    for i in range(len(conditions)):
+        for j in range(i + 1, len(conditions)):
+            diff = samples[:, j] - samples[:, i]
+            prob_greater = np.mean(diff > 0)
+            mean_diff = np.mean(diff)
+            hdi_low, hdi_high = az.hdi(diff, hdi_prob=0.95)
+            
+            differences.append({
+                'comparison': f'{conditions[j]} vs {conditions[i]}',
+                'probability_greater': prob_greater,
+                'mean_difference': mean_diff,
+                'hdi_low': hdi_low,
+                'hdi_high': hdi_high
+            })
+    
+    return pd.DataFrame(differences)
+
+
+def table_condition_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+    # Calculate differences for both variables
+    duration_diffs = calculate_condition_differences(duration_model_path, "duration")
+    touches_diffs = calculate_condition_differences(touches_model_path, "touches")
+    
+    # Format the differences
+    for df in [duration_diffs, touches_diffs]:
+        df['probability_greater'] = df['probability_greater'].round(3)
+        df['mean_difference'] = df['mean_difference'].round(2)
+        df['hdi_low'] = df['hdi_low'].round(2)
+        df['hdi_high'] = df['hdi_high'].round(2)
+        df['CI'] = df.apply(lambda row: f"{row['hdi_low']:.2f} – {row['hdi_high']:.2f}", axis=1)
+    
+    # Combine the differences
+    duration_diffs.insert(0, 'Metric', 'Duration')
+    touches_diffs.insert(0, 'Metric', 'Touches')
+    combined_diffs = pd.concat([duration_diffs, touches_diffs], axis=0)
+    
+    # Create table rows
+    rows = combined_diffs[["Metric", "comparison", "probability_greater", "mean_difference", "CI"]].astype(str).values.tolist()
+    
+    header = ["Metric", "Comparison", "P(diff > 0)", "Mean Difference", "95% HDI"]
+    
+    table = Table(
+        title="Condition differences in hierarchical regression models",
+        header=header,
+        rows=rows
+    )
+    
+    # Format the probability values
+    for metric in ["Duration", "Touches"]:
+        for row in rows:
+            if row[0] == metric:
+                prob = float(row[2])
+                if prob > 0.99:
+                    row[2] = ">0.99"
+                elif prob < 0.01:
+                    row[2] = "<0.01"
+                else:
+                    row[2] = f"{prob:.3f}"
+    
     persistence.save_table(table, file_name) 
