@@ -3,174 +3,173 @@ import re
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from src.domain import Condition, TrialCollection
+from src.domain import Condition, TrialCollection, TrialVisualizer
 from src.persistence import CSVPersistence
 from src.reader import TrialReader
-from src.visualizer import TrialVisualizer
 
 # Define the path to your data files
 data_path = "../Data/Experiment/**/*.csv"
 persistence = CSVPersistence()
 
 # Read trials using the reader
-trials = TrialReader.read_trials(data_path, persistence)
+trials = TrialCollection.from_files(data_path, persistence)
 
 # Analyze and visualize data quality
-TrialVisualizer.print_trial_quality_summary(trials.trials)
-saved_plots = TrialVisualizer.analyze_and_plot_all_trials(trials.trials)
-print(f"\nSaved {len(saved_plots)} quality plots to output/quality_plots/")
+# TrialVisualizer.print_trial_quality_summary(trials.trials)
+# TrialVisualizer.analyze_and_plot_all_trials(trials.trials)
+# print(f"\nSaved quality plots to output/quality_plots/")
 
 persistence.save(trials.trials, "results.csv")
 
-conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
+# conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
 
-# Function to convert condition enum to formatted string
-def format_condition(condition):
-    condition_str = condition.value
-    return " ".join([word.capitalize() for word in re.sub(r'([a-z])([A-Z])', r'\1 \2', condition_str).split()])
+# # Function to convert condition enum to formatted string
+# def format_condition(condition):
+#     condition_str = condition.value
+#     return " ".join([word.capitalize() for word in re.sub(r'([a-z])([A-Z])', r'\1 \2', condition_str).split()])
 
-# Variables to plot
-metrics = [
-    "number_of_touches",
-    "duration",
-    "timing_between_last_touch_and_pass",
-]
+# # Variables to plot
+# metrics = [
+#     "number_of_touches",
+#     "duration",
+#     "timing_between_last_touch_and_pass",
+# ]
 
-# Define colors
-blue = "#4A90E2"
-red = "#8B0000"
+# # Define colors
+# blue = "#4A90E2"
+# red = "#8B0000"
 
-# Aggregate data: compute mean per participant per condition for each metric
-aggregated_data = []
-for condition in conditions:
-    participant_data = {metric: {} for metric in metrics}  # Moved inside loop
-    for trial in trials.trials:
-        if trial.condition == condition:
-            for metric in metrics:
-                value = getattr(trial, metric)()
-                if trial.participant_id not in participant_data[metric]:
-                    participant_data[metric][trial.participant_id] = []
-                participant_data[metric][trial.participant_id].append(value)
+# # Aggregate data: compute mean per participant per condition for each metric
+# aggregated_data = []
+# for condition in conditions:
+#     participant_data = {metric: {} for metric in metrics}  # Moved inside loop
+#     for trial in trials.trials:
+#         if trial.condition == condition:
+#             for metric in metrics:
+#                 value = getattr(trial, metric)()
+#                 if trial.participant_id not in participant_data[metric]:
+#                     participant_data[metric][trial.participant_id] = []
+#                 participant_data[metric][trial.participant_id].append(value)
 
-    for metric in metrics:
-        for participant, values in participant_data[metric].items():
-            aggregated_data.append({
-                'Participant': participant,
-                'Condition': format_condition(condition),
-                'Metric': metric,
-                'Value': sum(values) / len(values)
-            })
+#     for metric in metrics:
+#         for participant, values in participant_data[metric].items():
+#             aggregated_data.append({
+#                 'Participant': participant,
+#                 'Condition': format_condition(condition),
+#                 'Metric': metric,
+#                 'Value': sum(values) / len(values)
+#             })
 
-df = pd.DataFrame(aggregated_data)  # Keep all aggregated data in df
+# df = pd.DataFrame(aggregated_data)  # Keep all aggregated data in df
 
-"""Only comparable conds"""
-# Filter data to only include INTERACTION and NO_INTERACTION conditions
-filtered_conditions = [format_condition(Condition.INTERACTION), format_condition(Condition.NO_INTERACTION)]
-df_filtered = df[df["Condition"].isin(filtered_conditions)]
+# """Only comparable conds"""
+# # Filter data to only include INTERACTION and NO_INTERACTION conditions
+# filtered_conditions = [format_condition(Condition.INTERACTION), format_condition(Condition.NO_INTERACTION)]
+# df_filtered = df[df["Condition"].isin(filtered_conditions)]
 
-# Create a single bar plot for the filtered conditions
-fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
+# # Create a single bar plot for the filtered conditions
+# fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
 
-for ax, metric in zip(axes, metrics):
-    sub_df = df_filtered[df_filtered["Metric"] == metric]
+# for ax, metric in zip(axes, metrics):
+#     sub_df = df_filtered[df_filtered["Metric"] == metric]
 
-    # Bar plot (red)
-    sns.barplot(
-        data=sub_df,
-        x="Condition",
-        y="Value",
-        color=red,
-        errorbar=None,
-        ax=ax
-    )
+#     # Bar plot (red)
+#     sns.barplot(
+#         data=sub_df,
+#         x="Condition",
+#         y="Value",
+#         color=red,
+#         errorbar=None,
+#         ax=ax
+#     )
 
-    # Connect points per participant across conditions
-    for participant in sub_df["Participant"].unique():
-        participant_data = sub_df[sub_df["Participant"] == participant]
-        ax.plot(participant_data["Condition"], participant_data["Value"], marker="o", linestyle="-", color=blue, alpha=0.8)
+#     # Connect points per participant across conditions
+#     for participant in sub_df["Participant"].unique():
+#         participant_data = sub_df[sub_df["Participant"] == participant]
+#         ax.plot(participant_data["Condition"], participant_data["Value"], marker="o", linestyle="-", color=blue, alpha=0.8)
 
-    ax.set_title(metric.replace("_", " ").capitalize())
+#     ax.set_title(metric.replace("_", " ").capitalize())
 
-plt.xticks()
-plt.tight_layout()
-plt.show()
+# plt.xticks()
+# plt.tight_layout()
+# plt.show()
 
-"""Violin plots"""
-fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
+# """Violin plots"""
+# fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
 
-for ax, metric in zip(axes, metrics):
-    sub_df = df[df["Metric"] == metric]
+# for ax, metric in zip(axes, metrics):
+#     sub_df = df[df["Metric"] == metric]
 
-    sns.violinplot(
-        data=sub_df,
-        x="Condition",
-        y="Value",
-        inner="quartile",
-        scale="width",
-        color=red,
-        ax=ax
-    )
+#     sns.violinplot(
+#         data=sub_df,
+#         x="Condition",
+#         y="Value",
+#         inner="quartile",
+#         scale="width",
+#         color=red,
+#         ax=ax
+#     )
 
-    ax.set_title(metric.replace("_", " ").capitalize())
+#     ax.set_title(metric.replace("_", " ").capitalize())
 
-plt.xticks()
-plt.tight_layout()
-plt.show()
+# plt.xticks()
+# plt.tight_layout()
+# plt.show()
 
-"""Box plot"""
-# per condition
-distances = []
-for condition in conditions:
-    distances.append([trial.number_of_touches() for trial in trials.trials if trial.condition == condition])
+# """Box plot"""
+# # per condition
+# distances = []
+# for condition in conditions:
+#     distances.append([trial.number_of_touches() for trial in trials.trials if trial.condition == condition])
 
-plt.boxplot(distances, labels=[format_condition(condition) for condition in conditions])
-plt.show()
+# plt.boxplot(distances, labels=[format_condition(condition) for condition in conditions])
+# plt.show()
 
-"""Bar plots"""
-# Aggregate data again for bar plots to avoid overwriting previous aggregation
-aggregated_data_bar = []
-for condition in conditions:
-    participant_data = {metric: {} for metric in metrics}
-    for trial in trials.trials:
-        if trial.condition == condition:
-            for metric in metrics:
-                value = getattr(trial, metric)()
-                if trial.participant_id not in participant_data[metric]:
-                    participant_data[metric][trial.participant_id] = []
-                participant_data[metric][trial.participant_id].append(value)
+# """Bar plots"""
+# # Aggregate data again for bar plots to avoid overwriting previous aggregation
+# aggregated_data_bar = []
+# for condition in conditions:
+#     participant_data = {metric: {} for metric in metrics}
+#     for trial in trials.trials:
+#         if trial.condition == condition:
+#             for metric in metrics:
+#                 value = getattr(trial, metric)()
+#                 if trial.participant_id not in participant_data[metric]:
+#                     participant_data[metric][trial.participant_id] = []
+#                 participant_data[metric][trial.participant_id].append(value)
 
-    for metric in metrics:
-        for participant, values in participant_data[metric].items():
-            aggregated_data_bar.append({
-                'Participant': participant,
-                'Condition': format_condition(condition),
-                'Metric': metric,
-                'Value': sum(values) / len(values)
-            })
+#     for metric in metrics:
+#         for participant, values in participant_data[metric].items():
+#             aggregated_data_bar.append({
+#                 'Participant': participant,
+#                 'Condition': format_condition(condition),
+#                 'Metric': metric,
+#                 'Value': sum(values) / len(values)
+#             })
 
-df_bar = pd.DataFrame(aggregated_data_bar)
+# df_bar = pd.DataFrame(aggregated_data_bar)
 
-# Create subplots for each metric
-fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
+# # Create subplots for each metric
+# fig, axes = plt.subplots(len(metrics), 1, figsize=(10, 3.5 * len(metrics)), sharex=True)
 
-for ax, metric in zip(axes, metrics):
-    sub_df = df_bar[df_bar["Metric"] == metric]
+# for ax, metric in zip(axes, metrics):
+#     sub_df = df_bar[df_bar["Metric"] == metric]
 
-    sns.barplot(
-        data=sub_df,
-        x="Condition",
-        y="Value",
-        color=red,
-        errorbar=None,
-        ax=ax
-    )
+#     sns.barplot(
+#         data=sub_df,
+#         x="Condition",
+#         y="Value",
+#         color=red,
+#         errorbar=None,
+#         ax=ax
+#     )
 
-    for participant in sub_df["Participant"].unique():
-        participant_data = sub_df[sub_df["Participant"] == participant]
-        ax.plot(participant_data["Condition"], participant_data["Value"], marker="o", linestyle="-", color=blue, alpha=0.8)
+#     for participant in sub_df["Participant"].unique():
+#         participant_data = sub_df[sub_df["Participant"] == participant]
+#         ax.plot(participant_data["Condition"], participant_data["Value"], marker="o", linestyle="-", color=blue, alpha=0.8)
 
-    ax.set_title(metric.replace("_", " ").capitalize())
+#     ax.set_title(metric.replace("_", " ").capitalize())
 
-plt.xticks()
-plt.tight_layout()
-plt.show()
+# plt.xticks()
+# plt.tight_layout()
+# plt.show()
