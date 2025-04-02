@@ -1,3 +1,4 @@
+*.nc
 output/
 # Custom defines
 .idea/

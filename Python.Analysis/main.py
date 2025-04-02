@@ -7,7 +7,7 @@ import seaborn as sns
 
 from src.persistence import ApaStyledPersistence
 from src.reader import TrialReader
-from src.regression import regression_1, predictive_figure_1, table_1
+from src.regression import regression_duration, regression_touches, predictive_figure_duration_and_touches, table_duration_and_touches
 
 
 if __name__ == '__main__':
@@ -23,9 +23,12 @@ if __name__ == '__main__':
 
     trials = TrialReader.read_trials(data_path)
 
-    regression_1(trials, Path("model_1.nc"), persistence)
-    table_1(Path("model_1.nc"), Path("model_predictions.docx"), persistence)
-    predictive_figure_1(Path("model_1.nc"), Path("predictions.png"), persistence)
+    regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
+    regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
+
+    table_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
+    predictive_figure_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
+
 
     # TrialVisualizer.print_trial_quality_summary(trials.trials)
     # TrialVisualizer.analyze_and_plot_all_trials(trials.trials)
