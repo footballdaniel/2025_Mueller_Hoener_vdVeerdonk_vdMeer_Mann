@@ -1,4 +1,4 @@
-       Formula: duration ~ 0 + C(condition) + (1|participant_id)
+       Formula: touches ~ 0 + C(condition) + (1|participant_id)
         Family: gaussian
           Link: mu = identity
   Observations: 787

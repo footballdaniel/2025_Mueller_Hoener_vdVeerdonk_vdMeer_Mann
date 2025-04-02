@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import List
+import re
 
 import arviz as az
 import bambi as bmb
@@ -10,7 +11,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 
 from .domain import TrialCollection, Condition
-from .persistence import Persistence, Table
+from .persistence import ColumnFormat, Persistence, Table
 
 
 def regression_duration(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence) -> None:
@@ -21,17 +22,30 @@ def regression_duration(trials: TrialCollection, model_path: Path, model_descrip
     })
     
     df["participant_id"] = pd.Categorical(df["participant_id"])
-    df["condition_idx"] = pd.Categorical(df["condition"]).codes
     
+    # Define conditions in desired order
+    condition_order = [c.value for c in Condition]
+    condition_order.reverse()
+    df["condition"] = pd.Categorical(df["condition"], categories=condition_order, ordered=True)
+    df["condition_idx"] = df["condition"].cat.codes
+    
+    # Priors for fixed effects
     numeric_prior = bmb.Prior("Uniform", lower=0, upper=10)
-    flat_prior = bmb.Prior("Uniform", lower=-3, upper=3)
-    normal_distribution = bmb.Prior("Normal", mu=0, sigma=2.5)
-    half_normal_distribution = bmb.Prior("HalfNormal", sigma=2.5)
+    
+    # Priors for random effects with partial pooling
+    participant_prior = bmb.Prior(
+        "Normal",
+        mu=0,
+        sigma=bmb.Prior("HalfNormal", sigma=1.0)
+    )
+    
+    # Prior for observation noise
+    observation_noise = bmb.Prior("HalfNormal", sigma=2.5)
 
     priors = {
         "C(condition)": numeric_prior,
-        "sigma": half_normal_distribution,
-        "1|participant_id": half_normal_distribution
+        "sigma": observation_noise,
+        "1|participant_id": participant_prior
     }
     formula = "duration ~ 0 + C(condition) + (1|participant_id)"
     
@@ -56,34 +70,6 @@ def regression_duration(trials: TrialCollection, model_path: Path, model_descrip
         
         az.to_netcdf(results, str(model_path))
 
-
-def predictive_figure_duration(inference_data: Path, file_name: Path, persistence: Persistence) -> None:
-    results = az.from_netcdf(str(inference_data))
-    samples = results.posterior["C(condition)"].values  # shape: (chains, draws, 4)
-    samples = samples.reshape(-1, samples.shape[-1])    # shape: (n_samples, 4)
-    samples = samples.T                                 # shape: (4, n_samples)
-
-    condition_means = samples.mean(axis=1)
-    condition_sems = samples.std(axis=1) / np.sqrt(samples.shape[1])
-
-    conditions = [c.value for c in Condition]
-    x_pos = np.arange(len(conditions))
-
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.bar(x_pos, condition_means, yerr=condition_sems, capsize=5)
-    ax.set_xticks(x_pos)
-    ax.set_xticklabels(conditions, rotation=45)
-    ax.set_ylabel('Duration (s)')
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-
-    for i in range(len(conditions)):
-        jitter = np.random.normal(0, 0.05, size=samples.shape[1])
-        ax.scatter(i + jitter, samples[i], alpha=0.1, color='black', s=10)
-
-    plt.tight_layout()
-    persistence.save_figure(fig, file_name)
-    plt.close(fig)
 
 
 def table_duration(inference_data: Path, file_name: Path, persistence: Persistence) -> None:
@@ -144,17 +130,30 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
     })
     
     df["participant_id"] = pd.Categorical(df["participant_id"])
-    df["condition_idx"] = pd.Categorical(df["condition"]).codes
     
+    # Define conditions in desired order
+    condition_order = [c.value for c in Condition]
+    condition_order.reverse()
+    df["condition"] = pd.Categorical(df["condition"], categories=condition_order, ordered=True)
+    df["condition_idx"] = df["condition"].cat.codes
+    
+    # Priors for fixed effects
     numeric_prior = bmb.Prior("Uniform", lower=0, upper=10)
-    flat_prior = bmb.Prior("Uniform", lower=-3, upper=3)
-    normal_distribution = bmb.Prior("Normal", mu=0, sigma=2.5)
-    half_normal_distribution = bmb.Prior("HalfNormal", sigma=2.5)
+    
+    # Priors for random effects with partial pooling
+    participant_prior = bmb.Prior(
+        "Normal",
+        mu=0,
+        sigma=bmb.Prior("HalfNormal", sigma=1.0)
+    )
+    
+    # Prior for observation noise
+    observation_noise = bmb.Prior("HalfNormal", sigma=2.5)
 
     priors = {
         "C(condition)": numeric_prior,
-        "sigma": half_normal_distribution,
-        "1|participant_id": half_normal_distribution
+        "sigma": observation_noise,
+        "1|participant_id": participant_prior
     }
     formula = "touches ~ 0 + C(condition) + (1|participant_id)"
     
@@ -177,7 +176,7 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
         
         model_bambi.predict(results, kind="response")
         
-        az.to_netcdf(results, str(model_path)) 
+        az.to_netcdf(results, str(model_path))
 
 
 def predictive_figure_duration_and_touches(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
@@ -194,45 +193,42 @@ def predictive_figure_duration_and_touches(duration_model_path: Path, touches_mo
     touches_samples = touches_samples.T
     
     duration_means = duration_samples.mean(axis=1)
-    duration_sems = duration_samples.std(axis=1) / np.sqrt(duration_samples.shape[1])
     touches_means = touches_samples.mean(axis=1)
-    touches_sems = touches_samples.std(axis=1) / np.sqrt(touches_samples.shape[1])
     
     conditions = [c.value for c in Condition]
     x_pos = np.arange(len(conditions))
     
-    fig, ax1 = plt.subplots(figsize=(8, 6))
+    fig, ax1 = plt.subplots(figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 2.75))
     ax2 = ax1.twinx()
     
-    # Plot duration on left y-axis
-    ax1.bar(x_pos - 0.2, duration_means, 0.4, yerr=duration_sems, capsize=5, color='#4A90E2', label='Duration')
-    ax1.set_ylabel('Duration (s)', color='#4A90E2')
-    ax1.tick_params(axis='y', labelcolor='#4A90E2')
+    # Plot duration on left y-axis (first)
+    ax1.bar(x_pos - 0.2, duration_means, 0.4, capsize=5, color='#4A90E2', label='Duration')
+    ax1.set_ylabel('Duration [s]')
     
-    # Plot touches on right y-axis
-    ax2.bar(x_pos + 0.2, touches_means, 0.4, yerr=touches_sems, capsize=5, color='#8B0000', label='Touches')
-    ax2.set_ylabel('Number of Touches', color='#8B0000')
-    ax2.tick_params(axis='y', labelcolor='#8B0000')
+    # Plot touches on right y-axis (second)
+    ax2.bar(x_pos + 0.2, touches_means, 0.4, capsize=5, color='#8B0000', label='Touches')
+    ax2.set_ylabel('Number of Touches [n]')
     
-    # Set x-axis
+    # Set x-axis with formatted labels
     ax1.set_xticks(x_pos)
-    ax1.set_xticklabels(conditions, rotation=45)
+    formatted_labels = [re.sub(r'([a-z])([A-Z])', r'\1 \2', label) for label in conditions]
+    ax1.set_xticklabels(formatted_labels, rotation=0)
     
-    # Add individual points
+    # Add individual points with black jitter
     for i in range(len(conditions)):
         duration_jitter = np.random.normal(0, 0.05, size=duration_samples.shape[1])
         touches_jitter = np.random.normal(0, 0.05, size=touches_samples.shape[1])
-        ax1.scatter(i - 0.2 + duration_jitter, duration_samples[i], alpha=0.1, color='#4A90E2', s=10)
-        ax2.scatter(i + 0.2 + touches_jitter, touches_samples[i], alpha=0.1, color='#8B0000', s=10)
+        ax1.scatter(i - 0.2 + duration_jitter, duration_samples[i], alpha=0.1, color='black', s=10)
+        ax2.scatter(i + 0.2 + touches_jitter, touches_samples[i], alpha=0.1, color='black', s=10)
     
-    # Add legend
+    # Add legend in top left
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+    ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
     
     plt.tight_layout()
     persistence.save_figure(fig, file_name)
-    plt.close(fig) 
+    plt.close(fig)
 
 
 def table_duration_and_touches(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:

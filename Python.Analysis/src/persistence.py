@@ -53,6 +53,10 @@ class ColumnFormat(Enum):
 class Persistence(ABC):
 
     @abstractmethod
+    def figure_width(self, column_format: ColumnFormat) -> float:
+        ...
+
+    @abstractmethod
     def save_table(self, table: Table, filename: Path, column_format: ColumnFormat = ColumnFormat.DOUBLE) -> None:
         ...
 
