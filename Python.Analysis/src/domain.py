@@ -118,9 +118,6 @@ class Trial:
     dominant_foot_side: Footedness
     has_missing_data: bool = False
 
-    def accept(self, persistence: Persistence):
-        persistence.add(self)
-
     def distance_between_last_touch_and_pass(self):
         last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
         distance = last_touch.position.distance_2d(self.pass_event.position)

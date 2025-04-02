@@ -7,7 +7,7 @@ from src.persistence import Persistence
 
 class TrialReader:
     @staticmethod
-    def read_trials(data_path: str, persistence: Persistence) -> TrialCollection:
+    def read_trials(data_path: str) -> TrialCollection:
         files = glob.glob(data_path, recursive=True)
         trials: List[Trial] = []
         
@@ -15,6 +15,5 @@ class TrialReader:
             json_file = csv_file.replace(".csv", ".json")
             trial = ingest(csv_file, json_file)
             trials.append(trial)
-            trial.accept(persistence)
             
         return TrialCollection(trials) 

@@ -5,24 +5,32 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from src.persistence import CSVPersistence
+from src.persistence import ApaStyledPersistence
 from src.reader import TrialReader
-from src.regression import regression_1
+from src.regression import regression_1, predictive_figure_1, table_1
 
 
 if __name__ == '__main__':
     data_path = "../Data/Experiment/**/*.csv"
-    persistence = CSVPersistence()
 
-    trials = TrialReader.read_trials(data_path, persistence)
+    persistence = ApaStyledPersistence(
+        font=Path("Calibri.ttf"),
+        font_size=11,
+        double_column_width_inches=6,
+        single_column_width_inches=3,
+        grayscale=False
+    )
+
+    trials = TrialReader.read_trials(data_path)
 
     regression_1(trials, Path("model_1.nc"), persistence)
+    table_1(Path("model_1.nc"), Path("model_predictions.docx"), persistence)
+    predictive_figure_1(Path("model_1.nc"), Path("predictions.png"), persistence)
 
     # TrialVisualizer.print_trial_quality_summary(trials.trials)
     # TrialVisualizer.analyze_and_plot_all_trials(trials.trials)
     # print(f"\nSaved quality plots to output/quality_plots/")
 
-    persistence.save(trials.trials, "results.csv")
 
     # conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
 
