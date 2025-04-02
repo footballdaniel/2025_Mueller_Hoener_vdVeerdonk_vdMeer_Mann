@@ -8,16 +8,6 @@ from src.persistence import Persistence
 class TrialReader:
     @staticmethod
     def read_trials(data_path: str, persistence: Persistence) -> TrialCollection:
-        """
-        Read trial data from CSV and JSON files and return a collection of trials.
-        
-        Args:
-            data_path: Glob pattern for CSV files
-            persistence: Persistence object to handle trial data storage
-            
-        Returns:
-            TrialCollection containing all read trials
-        """
         files = glob.glob(data_path, recursive=True)
         trials: List[Trial] = []
         

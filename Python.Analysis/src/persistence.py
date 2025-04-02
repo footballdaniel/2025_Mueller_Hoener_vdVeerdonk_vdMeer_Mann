@@ -1,7 +1,7 @@
 import csv
 from typing import List
 
-from src.domain import Trial, Persistence
+from .domain import Trial, Persistence
 
 
 class CSVPersistence(Persistence):

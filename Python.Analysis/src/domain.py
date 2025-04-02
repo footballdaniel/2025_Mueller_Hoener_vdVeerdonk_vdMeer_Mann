@@ -2,6 +2,7 @@ import abc
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
+import glob
 
 import numpy as np
 from scipy.interpolate import interp1d
@@ -195,15 +196,4 @@ class TrialCollection:
 
     def __len__(self) -> int:
         return len(self.trials)
-
-    def filter_by_condition(self, condition: Condition) -> "TrialCollection":
-        return TrialCollection([trial for trial in self.trials if trial.condition == condition])
-
-    def filter_by_participant(self, participant_id: int) -> "TrialCollection":
-        return TrialCollection([trial for trial in self.trials if trial.participant_id == participant_id])
-
-    def get_participant_ids(self) -> List[int]:
-        return list(set(trial.participant_id for trial in self.trials))
-
-    def get_conditions(self) -> List[Condition]:
-        return list(set(trial.condition for trial in self.trials))
+        
