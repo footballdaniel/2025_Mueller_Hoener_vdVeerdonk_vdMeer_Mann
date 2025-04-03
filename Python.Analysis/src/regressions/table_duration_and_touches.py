@@ -11,7 +11,7 @@ def probability_effect_is_zero(x):
     return 1 - rounded_prob
 
 
-def table_duration_and_touches(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+def duration_and_touches_table(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
     duration_results = az.from_netcdf(str(duration_model_path))
     touches_results = az.from_netcdf(str(touches_model_path))
     

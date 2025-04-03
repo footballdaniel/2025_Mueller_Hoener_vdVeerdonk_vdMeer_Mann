@@ -6,10 +6,11 @@ from src.reader import TrialReader
 from src.regressions import (
     regression_duration,
     regression_touches,
-    predictive_figure_duration_and_touches,
-    table_duration_and_touches,
-    ridge_plot_conditions_and_differences
+    duration_and_touches_predictive_figure,
+    duration_and_touches_table,
+    duration_and_touches_post_hoc
 )
+
 
 
 if __name__ == '__main__':
@@ -28,9 +29,9 @@ if __name__ == '__main__':
     regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
 
-    table_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
-    predictive_figure_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
-    ridge_plot_conditions_and_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+    duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
+    duration_and_touches_predictive_figure(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
+    duration_and_touches_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
 
 
 
