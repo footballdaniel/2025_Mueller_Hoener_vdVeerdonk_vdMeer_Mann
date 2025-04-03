@@ -183,6 +183,18 @@ class Trial:
         derivative = np.diff(filtered_z)
         return np.sum(derivative[1:] * derivative[:-1] < 0)
 
+    def time_between_last_change_of_direction_and_pass(self) -> float:
+        last_change_index = None
+        for i in range(len(self.actions) - 1, -1, -1):
+            if isinstance(self.actions[i], Touch):  # Assuming Touch indicates a change of direction
+                last_change_index = i
+                break
+        
+        if last_change_index is not None and self.pass_event.time_index > last_change_index:
+            time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_change_index]
+            return time_difference
+        return float('nan')  # Return NaN if no valid change of direction is found
+
 
 @dataclass
 class TrialCollection:
