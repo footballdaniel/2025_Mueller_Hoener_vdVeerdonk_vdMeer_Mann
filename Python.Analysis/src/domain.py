@@ -117,6 +117,7 @@ class Trial:
     pass_event: Pass
     dominant_foot_side: Footedness
     has_missing_data: bool = False
+    cluster_label: int = None
 
     def distance_between_last_touch_and_pass(self):
         last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
@@ -184,16 +185,29 @@ class Trial:
         return np.sum(derivative[1:] * derivative[:-1] < 0)
 
     def time_between_last_change_of_direction_and_pass(self) -> float:
+        # Get the Z positions of the head
+        z_positions = np.array([pos.z for pos in self.head_positions])
+        
+        # Apply Butterworth filter to the Z positions
+        filtered_z = self.butterworth_filter(z_positions)
+
+        # Compute the derivative of the filtered Z positions
+        derivative = np.diff(filtered_z)
+
         last_change_index = None
-        for i in range(len(self.actions) - 1, -1, -1):
-            if isinstance(self.actions[i], Touch):  # Assuming Touch indicates a change of direction
-                last_change_index = i
+
+        # Iterate through the derivative to find the last significant change
+        for i in range(len(derivative) - 1, 0, -1):
+            if derivative[i] * derivative[i - 1] < 0:  # Check for sign change
+                last_change_index = i + 1  # +1 because of the diff operation
                 break
         
         if last_change_index is not None and self.pass_event.time_index > last_change_index:
             time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_change_index]
             return time_difference
-        return float('nan')  # Return NaN if no valid change of direction is found
+        
+        # If no valid change of direction is found, return NaN
+        return self.duration() # Return NaN if no valid change of direction is found
 
 
 @dataclass
