@@ -188,26 +188,36 @@ class Trial:
         # Get the Z positions of the head
         z_positions = np.array([pos.z for pos in self.head_positions])
         
-        # Apply Butterworth filter to the Z positions
-        filtered_z = self.butterworth_filter(z_positions)
+        # Find the index of the first touch and the pass event
+        first_touch_index = None
+        for i, action in enumerate(self.actions):
+            if isinstance(action, Touch):
+                first_touch_index = i
+                break
+        
+        if first_touch_index is None or self.pass_event.time_index <= first_touch_index:
+            return float('nan')  # Return NaN if no valid first touch or pass event is found
 
-        # Compute the derivative of the filtered Z positions
+        # Restrict Z positions to the range between the first touch and the pass event
+        relevant_z_positions = z_positions[first_touch_index:self.pass_event.time_index + 1]
+
+        # Apply Butterworth filter to the relevant Z positions
+        filtered_z = self.butterworth_filter(relevant_z_positions)
+
         derivative = np.diff(filtered_z)
 
         last_change_index = None
 
-        # Iterate through the derivative to find the last significant change
         for i in range(len(derivative) - 1, 0, -1):
             if derivative[i] * derivative[i - 1] < 0:  # Check for sign change
                 last_change_index = i + 1  # +1 because of the diff operation
                 break
         
-        if last_change_index is not None and self.pass_event.time_index > last_change_index:
-            time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_change_index]
+        if last_change_index is not None and last_change_index + first_touch_index < self.pass_event.time_index:
+            time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_change_index + first_touch_index]
             return time_difference
         
-        # If no valid change of direction is found, return NaN
-        return self.duration() # Return NaN if no valid change of direction is found
+        return self.duration() 
 
 
 @dataclass
