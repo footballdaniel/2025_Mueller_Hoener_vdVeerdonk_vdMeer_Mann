@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pandas as pd
+
 
 from src.persistence import ApaStyledPersistence
 from src.reader import TrialReader
@@ -24,6 +26,9 @@ if __name__ == '__main__':
         single_column_width_inches=3,
         grayscale=False
     )
+
+    pd.set_option('display.max_columns', None)  # Show all columns
+    pd.set_option('display.width', 1000)  # Set a wider width
 
     trials = TrialReader.read_trials(data_path)
 
