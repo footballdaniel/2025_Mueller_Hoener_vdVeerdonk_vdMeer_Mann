@@ -1,7 +1,7 @@
        Formula: duration ~ 0 + C(condition) + (1|participant_id)
         Family: gaussian
           Link: mu = identity
-  Observations: 787
+  Observations: 757
         Priors: 
     target = mu
         Common-level effects

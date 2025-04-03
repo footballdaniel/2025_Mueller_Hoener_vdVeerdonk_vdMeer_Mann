@@ -1,18 +1,14 @@
-import glob
 from pathlib import Path
-import re
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+
 
 from src.persistence import ApaStyledPersistence
 from src.reader import TrialReader
-from src.regression import (
-    regression_duration, 
-    regression_touches, 
-    duration_and_touches_figure, 
+from src.regressions import (
+    regression_duration,
+    regression_touches,
+    predictive_figure_duration_and_touches,
     table_duration_and_touches,
-    duration_and_touches_figure_post_hoc
+    ridge_plot_conditions_and_differences
 )
 
 
@@ -33,8 +29,8 @@ if __name__ == '__main__':
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
 
     table_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
-    duration_and_touches_figure(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
-    duration_and_touches_figure_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+    predictive_figure_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
+    ridge_plot_conditions_and_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
 
 
 
