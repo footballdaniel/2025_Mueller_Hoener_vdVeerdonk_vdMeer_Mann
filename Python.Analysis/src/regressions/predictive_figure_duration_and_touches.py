@@ -21,27 +21,28 @@ def duration_and_touches_predictive_figure(duration_model_path: Path, touches_mo
     duration_means = duration_samples.mean(axis=1)
     touches_means = touches_samples.mean(axis=1)
 
+    # Calculate 95% density intervals
+    duration_lower = np.percentile(duration_samples, 2.5, axis=1)
+    duration_upper = np.percentile(duration_samples, 97.5, axis=1)
+    touches_lower = np.percentile(touches_samples, 2.5, axis=1)
+    touches_upper = np.percentile(touches_samples, 97.5, axis=1)
+
     conditions = [c.value for c in Condition]
     x_pos = np.arange(len(conditions))
 
     fig, ax1 = plt.subplots(figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 2.75))
     ax2 = ax1.twinx()
 
-    ax1.bar(x_pos - 0.2, duration_means, 0.4, capsize=5, color='#4A90E2', label='Duration')
+    # Bar plots with error bars for 95% density intervals
+    ax1.bar(x_pos - 0.2, duration_means, 0.4, yerr=[duration_means - duration_lower, duration_upper - duration_means], capsize=5, color='#4A90E2', label='Duration')
     ax1.set_ylabel('Duration [s]')
 
-    ax2.bar(x_pos + 0.2, touches_means, 0.4, capsize=5, color='#8B0000', label='Touches')
+    ax2.bar(x_pos + 0.2, touches_means, 0.4, yerr=[touches_means - touches_lower, touches_upper - touches_means], capsize=5, color='#8B0000', label='Touches')
     ax2.set_ylabel('Number of Touches [n]')
 
     ax1.set_xticks(x_pos)
     formatted_labels = [re.sub(r'([a-z])([A-Z])', r'\1 \2', label) for label in conditions]
     ax1.set_xticklabels(formatted_labels, rotation=0)
-
-    for i in range(len(conditions)):
-        duration_jitter = np.random.normal(0, 0.05, size=duration_samples.shape[1])
-        touches_jitter = np.random.normal(0, 0.05, size=touches_samples.shape[1])
-        ax1.scatter(i - 0.2 + duration_jitter, duration_samples[i], alpha=0.1, color='black', s=10)
-        ax2.scatter(i + 0.2 + touches_jitter, touches_samples[i], alpha=0.1, color='black', s=10)
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
