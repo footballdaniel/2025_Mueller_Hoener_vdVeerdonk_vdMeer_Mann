@@ -10,11 +10,9 @@ from src.reader import TrialReader
 from src.regression import (
     regression_duration, 
     regression_touches, 
-    predictive_figure_duration_and_touches, 
+    duration_and_touches_figure, 
     table_duration_and_touches,
-    table_condition_differences,
-    ridge_plot_conditions_and_differences,
-    ridge_plot_differences
+    duration_and_touches_figure_post_hoc
 )
 
 
@@ -35,12 +33,10 @@ if __name__ == '__main__':
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
 
     table_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
-    predictive_figure_duration_and_touches(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
-    table_condition_differences(Path("model_1.nc"), Path("model_2.nc"), Path("condition_differences.docx"), persistence)
-    
-    # Create ridge plots
-    ridge_plot_conditions_and_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_conditions.png"), persistence)
-    ridge_plot_differences(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+    duration_and_touches_figure(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
+    duration_and_touches_figure_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+
+
 
     # TrialVisualizer.print_trial_quality_summary(trials.trials)
     # TrialVisualizer.analyze_and_plot_all_trials(trials.trials)

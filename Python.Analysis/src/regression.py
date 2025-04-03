@@ -179,7 +179,7 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
         az.to_netcdf(results, str(model_path))
 
 
-def predictive_figure_duration_and_touches(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+def duration_and_touches_figure(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
     duration_results = az.from_netcdf(str(duration_model_path))
     touches_results = az.from_netcdf(str(touches_model_path))
     
@@ -230,6 +230,12 @@ def predictive_figure_duration_and_touches(duration_model_path: Path, touches_mo
     persistence.save_figure(fig, file_name)
     plt.close(fig)
 
+def probability_effect_is_zero(x):
+    prob = max((x > 0).mean(), (x < 0).mean())
+    rounded_prob = round(prob, 2)
+    return 1 - rounded_prob
+
+
 
 def table_duration_and_touches(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
     duration_results = az.from_netcdf(str(duration_model_path))
@@ -238,35 +244,42 @@ def table_duration_and_touches(duration_model_path: Path, touches_model_path: Pa
     duration_summary = az.summary(
         duration_results,
         hdi_prob=0.95,
-        var_names=["~^p$|participant|^mu"],
+        stat_funcs={"Zero effect probability": probability_effect_is_zero},
+        var_names=["~^mu"],
         filter_vars="regex"
     )
     
     touches_summary = az.summary(
         touches_results,
         hdi_prob=0.95,
-        var_names=["~^p$|participant|^mu"],
+        stat_funcs={"Zero effect probability": probability_effect_is_zero},
+        var_names=["~^mu"],
         filter_vars="regex"
     )
     
-    duration_sigma = az.summary(
-        duration_results,
-        hdi_prob=0.95,
-        var_names=["sigma"],
-        filter_vars="like"
-    )
+    duration_summary = duration_summary[~duration_summary.index.str.contains(r'1\|participant_id\[\d+\]')]
+    touches_summary = touches_summary[~touches_summary.index.str.contains(r'1\|participant_id\[\d+\]')]
     
-    touches_sigma = az.summary(
-        touches_results,
-        hdi_prob=0.95,
-        var_names=["sigma"],
-        filter_vars="like"
-    )
+    # Reorder variables for each metric
+    def reorder_summary(summary: pd.DataFrame) -> pd.DataFrame:
+        # Get the order of variables we want
+        desired_order = [
+            "sigma",
+            "1|participant_id_sigma",
+            "C(condition)[InSitu]",
+            "C(condition)[Interaction]",
+            "C(condition)[NoInteraction]",
+            "C(condition)[NoOpponent]",
+            "0.0"
+        ]
+        # Filter to only include variables that exist in the summary
+        existing_vars = [var for var in desired_order if var in summary.index]
+        # Reorder the summary
+        return summary.loc[existing_vars]
     
-    duration_summary = pd.concat([duration_summary, duration_sigma], axis=0)
-    touches_summary = pd.concat([touches_summary, touches_sigma], axis=0)
+    duration_summary = reorder_summary(duration_summary)
+    touches_summary = reorder_summary(touches_summary)
     
-    # Format both summaries
     for summary in [duration_summary, touches_summary]:
         summary[["mean", "sd", "hdi_2.5%", "hdi_97.5%", "ess_bulk"]] = summary[["mean", "sd", "hdi_2.5%", "hdi_97.5%", "ess_bulk"]].round(2)
         summary["ess_bulk"] = summary["ess_bulk"].astype(int)
@@ -274,16 +287,15 @@ def table_duration_and_touches(duration_model_path: Path, touches_model_path: Pa
             lambda row: f"{row['hdi_2.5%']:.2f} – {row['hdi_97.5%']:.2f}", axis=1
         )
     
-    # Combine summaries with metric labels
     duration_summary.insert(0, 'Metric', 'Duration')
     touches_summary.insert(0, 'Metric', 'Touches')
     
     combined_summary = pd.concat([duration_summary, touches_summary], axis=0)
     combined_summary.insert(0, 'Predictors', combined_summary.index)
     
-    rows = combined_summary[["Metric", "Predictors", "mean", "CI", "ess_bulk"]].astype(str).values.tolist()
+    rows = combined_summary[["Metric", "Predictors", "mean", "CI", "ess_bulk", "Zero effect probability"]].astype(str).values.tolist()
     
-    header = ["Metric", "Predictors", "Estimates", "CI (2.5%, 97.5%)", "ESS"]
+    header = ["Metric", "Predictors", "Estimates", "CI (2.5%, 97.5%)", "ESS", "Zero effect probability"]
     
     table = Table(
         title="Combined hierarchical regression model predictions per condition",
@@ -293,13 +305,13 @@ def table_duration_and_touches(duration_model_path: Path, touches_model_path: Pa
     
     # Rename elements for both metrics
     for metric in ["Duration", "Touches"]:
-        table.rename_element(f"{metric}_0.0", f"{metric} <0.01")
-        table.rename_element(f"{metric}_Intercept", f"{metric} Participant-specific intercept αj")
-        table.rename_element(f"{metric}_condition_idx[0]", f"{metric} InSitu")
-        table.rename_element(f"{metric}_condition_idx[1]", f"{metric} Interaction")
-        table.rename_element(f"{metric}_condition_idx[2]", f"{metric} NoInteraction")
-        table.rename_element(f"{metric}_condition_idx[3]", f"{metric} NoOpponent")
-        table.rename_element(f"{metric}_1|participant_sigma", f"{metric} σ Participant")
+        table.rename_element("0.0", "<0.01")
+        table.rename_element("C(condition)[NoOpponent]", "α[No Opponent]")
+        table.rename_element("C(condition)[NoInteraction]", "α[No Interaction]")
+        table.rename_element("C(condition)[Interaction]", "α[Interaction]")
+        table.rename_element("C(condition)[InSitu]", "α[In Situ]")
+        table.rename_element("1|participant_id_sigma", "σ Participant")
+        table.rename_element("sigma", "σ")
     
     persistence.save_table(table, file_name)
 
@@ -332,113 +344,7 @@ def calculate_condition_differences(model_path: Path, variable_name: str) -> pd.
     return pd.DataFrame(differences)
 
 
-def table_condition_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
-    # Calculate differences for both variables
-    duration_diffs = calculate_condition_differences(duration_model_path, "duration")
-    touches_diffs = calculate_condition_differences(touches_model_path, "touches")
-    
-    # Format the differences
-    for df in [duration_diffs, touches_diffs]:
-        df['probability_greater'] = df['probability_greater'].round(3)
-        df['mean_difference'] = df['mean_difference'].round(2)
-        df['hdi_low'] = df['hdi_low'].round(2)
-        df['hdi_high'] = df['hdi_high'].round(2)
-        df['CI'] = df.apply(lambda row: f"{row['hdi_low']:.2f} – {row['hdi_high']:.2f}", axis=1)
-    
-    # Combine the differences
-    duration_diffs.insert(0, 'Metric', 'Duration')
-    touches_diffs.insert(0, 'Metric', 'Touches')
-    combined_diffs = pd.concat([duration_diffs, touches_diffs], axis=0)
-    
-    # Create table rows
-    rows = combined_diffs[["Metric", "comparison", "probability_greater", "mean_difference", "CI"]].astype(str).values.tolist()
-    
-    header = ["Metric", "Comparison", "P(diff > 0)", "Mean Difference", "95% HDI"]
-    
-    table = Table(
-        title="Condition differences in hierarchical regression models",
-        header=header,
-        rows=rows
-    )
-    
-    # Format the probability values
-    for metric in ["Duration", "Touches"]:
-        for row in rows:
-            if row[0] == metric:
-                prob = float(row[2])
-                if prob > 0.99:
-                    row[2] = ">0.99"
-                elif prob < 0.01:
-                    row[2] = "<0.01"
-                else:
-                    row[2] = f"{prob:.3f}"
-    
-    persistence.save_table(table, file_name)
-
-
-def ridge_plot_conditions_and_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
-    duration_results = az.from_netcdf(str(duration_model_path))
-    touches_results = az.from_netcdf(str(touches_model_path))
-    
-    # Get samples for both variables
-    duration_samples = duration_results.posterior["C(condition)"].values
-    touches_samples = touches_results.posterior["C(condition)"].values
-    
-    # Reshape samples
-    duration_samples = duration_samples.reshape(-1, duration_samples.shape[-1])
-    touches_samples = touches_samples.reshape(-1, touches_samples.shape[-1])
-    
-    # Get conditions in reverse order (to match our previous ordering)
-    conditions = [c.value for c in Condition]
-    conditions.reverse()
-    
-    # Create figure with two subplots
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 5.5))
-    
-    # Plot duration conditions
-    for i, condition in enumerate(conditions):
-        samples = duration_samples[:, i]
-        
-        # Create KDE plot with extended range
-        sns.kdeplot(
-            data=samples,
-            ax=ax1,
-            label=re.sub(r'([a-z])([A-Z])', r'\1 \2', condition),
-            color='#4A90E2',
-            alpha=0.5,
-            cut=0,  # Extend the line beyond the data range
-            bw_adjust=1.5  # Adjust bandwidth for smoother curves
-        )
-    
-    ax1.set_title('Duration by Condition')
-    ax1.set_xlabel('Duration [s]')
-    ax1.legend()
-    
-    # Plot touches conditions
-    for i, condition in enumerate(conditions):
-        samples = touches_samples[:, i]
-        
-        # Create KDE plot with extended range
-        sns.kdeplot(
-            data=samples,
-            ax=ax2,
-            label=re.sub(r'([a-z])([A-Z])', r'\1 \2', condition),
-            color='#8B0000',
-            alpha=0.5,
-            cut=0,  # Extend the line beyond the data range
-            bw_adjust=1.5  # Adjust bandwidth for smoother curves
-        )
-    
-    ax2.set_title('Number of Touches by Condition')
-    ax2.set_xlabel('Number of Touches [n]')
-    ax2.legend()
-    
-    plt.tight_layout()
-    persistence.save_figure(fig, file_name)
-    plt.close(fig)
-
-
-def ridge_plot_differences(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
+def duration_and_touches_figure_post_hoc(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
     duration_results = az.from_netcdf(str(duration_model_path))
     touches_results = az.from_netcdf(str(touches_model_path))
     
