@@ -10,6 +10,7 @@ from src.regressions import (
     duration_and_touches_table,
     duration_and_touches_post_hoc
 )
+from src.cluster_analysis import perform_cluster_analysis, plot_elbow_method
 
 
 
@@ -29,9 +30,14 @@ if __name__ == '__main__':
     regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
 
+    plot_elbow_method(trials, max_clusters=10, persistence=persistence)
+    perform_cluster_analysis(trials, n_clusters=3)
+
     duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
     duration_and_touches_predictive_figure(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
     duration_and_touches_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+
+
 
 
 
