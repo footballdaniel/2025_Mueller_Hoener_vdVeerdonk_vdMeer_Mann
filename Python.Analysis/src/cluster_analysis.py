@@ -12,9 +12,7 @@ def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
         [
             trial.distance_between_last_touch_and_pass(),
             trial.timing_between_last_touch_and_pass(),
-            trial.average_interpersonal_distance(),
-            trial.interpersonal_distance_at_pass_time(),
-            trial.number_lateral_changes_of_direction()
+            trial.number_lateral_changes_of_direction()  # Keep only the relevant features
         ]
         for trial in trials
     ])
@@ -43,38 +41,23 @@ def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
             cluster_percentage = np.sum(np.array(condition_labels) == i) / len(condition_labels) * 100 if condition_labels else 0
             print(f'Cluster {i}: {cluster_percentage:.2f}%')
 
-        # Calculate averages for all features per condition
+        # Calculate averages for the remaining features per condition
         if condition_trials:
-            distances = np.array([trial.distance_between_last_touch_and_pass() for trial in condition_trials])
-            average_distance = np.mean(distances) if len(distances) > 0 else 0
-            
             timings = np.array([trial.timing_between_last_touch_and_pass() for trial in condition_trials])
             average_timing = np.mean(timings) if len(timings) > 0 else 0
-            
-            interpersonal_distances = np.array([trial.average_interpersonal_distance() for trial in condition_trials])
-            average_interpersonal_distance = np.mean(interpersonal_distances) if len(interpersonal_distances) > 0 else 0
-            
-            distances_at_pass_time = np.array([trial.interpersonal_distance_at_pass_time() for trial in condition_trials])
-            average_distance_at_pass_time = np.mean(distances_at_pass_time) if len(distances_at_pass_time) > 0 else 0
             
             lateral_changes = np.array([trial.number_lateral_changes_of_direction() for trial in condition_trials])
             average_lateral_changes = np.mean(lateral_changes) if len(lateral_changes) > 0 else 0
             
             # Store averages in the dictionary
             averages[condition.value] = [
-                average_distance,
                 average_timing,
-                average_interpersonal_distance,
-                average_distance_at_pass_time,
                 average_lateral_changes
             ]
 
     # Create a DataFrame to tabulate the averages with conditions as headers
     averages_df = pd.DataFrame(averages, index=[
-        'Average Distance Between Last Touch and Pass',
         'Average Timing Between Last Touch and Pass',
-        'Average Interpersonal Distance',
-        'Average Interpersonal Distance at Pass Time',
         'Average Number of Lateral Changes of Direction'
     ])
 
