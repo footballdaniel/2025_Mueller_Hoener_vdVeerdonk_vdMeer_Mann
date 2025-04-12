@@ -1,0 +1,10 @@
+Clusters: 1, WCSS: 2177.67, Explained Variability: 0.00%
+Clusters: 2, WCSS: 1213.76, Explained Variability: 44.26%
+Clusters: 3, WCSS: 766.86, Explained Variability: 64.79%
+Clusters: 4, WCSS: 633.82, Explained Variability: 70.89%
+Clusters: 5, WCSS: 535.07, Explained Variability: 75.43%
+Clusters: 6, WCSS: 474.48, Explained Variability: 78.21%
+Clusters: 7, WCSS: 397.51, Explained Variability: 81.75%
+Clusters: 8, WCSS: 360.45, Explained Variability: 83.45%
+Clusters: 9, WCSS: 334.51, Explained Variability: 84.64%
+Clusters: 10, WCSS: 310.62, Explained Variability: 85.74%

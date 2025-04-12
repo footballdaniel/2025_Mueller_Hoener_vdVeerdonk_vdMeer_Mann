@@ -56,7 +56,7 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
     
     if not os.path.exists(str(model_path)):
         results = model_bambi.fit(
-            draws=100,
+            draws=5000,
             chains=4,
             idata_kwargs={"log_likelihood": True},
             random_seed=1991
