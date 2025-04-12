@@ -1,52 +1,43 @@
-from src.domain import Persistence, TrialCollection
+from pathlib import Path
+from typing import List
 
-
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
+from src.domain import Trial
+from src.persistence import Persistence
+from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
 
-from pathlib import Path
 
-
-def plot_elbow_method(trials: TrialCollection, max_clusters: int, persistence: Persistence) -> None:
+def plot_elbow_method(trials: List[Trial], max_clusters: int, persistence: Persistence) -> None:
+    """
+    Plot the elbow method to determine the optimal number of clusters.
+    """
     wcss = []
     trial_features = np.array([
         [
-            trial.distance_between_last_touch_and_pass(),
-            trial.time_between_last_change_of_direction_and_pass(),
-            trial.number_lateral_changes_of_direction()
+            DistanceCalculator.distance_between_last_touch_and_pass(trial),
+            TimeCalculator.time_between_last_change_of_direction_and_pass(trial),
+            MovementCalculator.number_lateral_changes_of_direction(trial)
         ]
         for trial in trials
     ])
 
-    # Impute NaN values for time_between_last_change_of_direction_and_pass
-    time_between_changes = trial_features[:, 1]  # Extract the second feature
-    mean_time_between_changes = np.nanmean(time_between_changes)  # Calculate the mean, ignoring NaNs
-    time_between_changes[np.isnan(time_between_changes)] = mean_time_between_changes  # Impute NaN values
-
-    # Update trial_features with the imputed values
-    trial_features[:, 1] = time_between_changes
-
-    # Impute NaN values for other features if necessary
-    for i in range(trial_features.shape[1]):
-        mean_value = np.nanmean(trial_features[:, i])
-        trial_features[np.isnan(trial_features[:, i]), i] = mean_value  # Impute NaN values
+    # Remove NaN values
+    trial_features = trial_features[~np.isnan(trial_features).any(axis=1)]
 
     for i in range(1, max_clusters + 1):
-        kmeans = KMeans(n_clusters=i)
+        kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
         kmeans.fit(trial_features)
         wcss.append(kmeans.inertia_)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, max_clusters + 1), wcss, marker='o')
-    plt.title('Elbow Method for Optimal k')
+    plt.plot(range(1, max_clusters + 1), wcss)
+    plt.title('Elbow Method')
     plt.xlabel('Number of clusters')
     plt.ylabel('WCSS')
-    plt.xticks(range(1, max_clusters + 1))
-    plt.grid()
+    plt.grid(True)
 
-    # Save the plot using the persistence object
-    persistence.save_figure(plt, Path("elbow_method_plot.png"))  # Adjust the filename as needed
-    plt.savefig("elbow_method_plot.png")  # Save the plot locally
-    plt.close()  # Close the plot to free memory 
+    persistence.save_figure(plt.gcf(), Path("elbow_method.png"))
+    plt.close() 

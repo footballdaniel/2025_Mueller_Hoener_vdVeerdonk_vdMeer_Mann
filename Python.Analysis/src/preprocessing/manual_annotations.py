@@ -36,13 +36,13 @@ def ingest(csv_file: str, json_file: str) -> Trial:
     is_dominant_foot_right = dominant_foot_str == "Right"
     condition = json_data.get("Condition", "Unknown")
     if condition == "InSitu":
-        condition = Condition.IN_SITU
+        condition = Condition.InSitu
     elif condition == "LaboratoryInteractive":
-        condition = Condition.INTERACTION
+        condition = Condition.Interaction
     elif condition == "LaboratoryNonInteractive":
-        condition = Condition.NO_INTERACTION
+        condition = Condition.NoInteraction
     elif condition == "LaboratoryNoOpponent":
-        condition = Condition.NO_OPPONENT
+        condition = Condition.NoOpponent
 
     timestamps = json_data.get("Timestamps", [])
     user_head_positions = read_positions(json_data.get("UserHeadPositions"))
@@ -65,24 +65,8 @@ def ingest(csv_file: str, json_file: str) -> Trial:
         actions=[],
         start=NoAction(),
         pass_event=NoPass(),
-        dominant_foot_side=Footedness.RIGHT if is_dominant_foot_right else Footedness.LEFT
+        dominant_foot_side=Footedness.Right if is_dominant_foot_right else Footedness.Left
     )
-
-    # if not Interpolator.try_interpolate_missing_data(user_dominant_foot_positions):
-    #     trial.has_missing_data = True
-    #     print(f"{path}: Dominant foot has lots of missing data in trial: {path}")
-
-    # if not Interpolator.try_interpolate_missing_data(user_non_dominant_foot_positions):
-    #     trial.has_missing_data = True
-    #     print(f"{path}: Non-dominant foot has lots of missing data in trial: {path}")
-
-    # if not Interpolator.try_interpolate_missing_data(user_hip_positions):
-    #     trial.has_missing_data = True
-    #     print(f"{path}: User hip has lots of missing data in trial: {path}")
-
-    # if not Interpolator.try_interpolate_missing_data(opponent_hip_positions, ignore_start=True, ignore_end=True):
-    #     trial.has_missing_data = True
-    #     print(f"{path}: Opponent hip has lots of missing data in trial: {path}")
 
     with open(csv_file, "r") as csv_file_content:
         csv_reader = csv.reader(csv_file_content)
@@ -98,21 +82,21 @@ def ingest(csv_file: str, json_file: str) -> Trial:
 
             frame_number = int(frame_number_str)
 
-            side = Side.UNKNOWN
+            side = Side.Unknown
             if "Right" in event_tag:
-                side = Side.DOMINANT if is_dominant_foot_right else Side.NON_DOMINANT
+                side = Side.Dominant if is_dominant_foot_right else Side.NonDominant
             if "Left" in event_tag:
-                side = Side.NON_DOMINANT if is_dominant_foot_right else Side.DOMINANT
+                side = Side.NonDominant if is_dominant_foot_right else Side.Dominant
 
-            if side == Side.DOMINANT:
+            if side == Side.Dominant:
                 foot_position = user_dominant_foot_positions[frame_number]
-            if side == Side.NON_DOMINANT:
+            if side == Side.NonDominant:
                 foot_position = user_non_dominant_foot_positions[frame_number]
 
             if "Right" in event_tag:
-                foot = Foot(side=Side.DOMINANT if is_dominant_foot_right else Side.NON_DOMINANT)
+                foot = Foot(side=Side.Dominant if is_dominant_foot_right else Side.NonDominant)
             if "Left" in event_tag:
-                foot = Foot(side=Side.NON_DOMINANT if is_dominant_foot_right else Side.DOMINANT)
+                foot = Foot(side=Side.NonDominant if is_dominant_foot_right else Side.Dominant)
 
             if "Pass" in event_tag:
                 pass_action = Pass(
@@ -149,7 +133,7 @@ def ingest(csv_file: str, json_file: str) -> Trial:
             if "OffTarget" in event_tag:
                 pass_action.success = True  # !!! to keep all conditions comparable
 
-    if condition != Condition.IN_SITU:
+    if condition != Condition.InSitu:
         ball_events = json_data.get("BallEvents", [])
         for ball_event in ball_events:
             if ball_event["Name"] == "Intercepted":

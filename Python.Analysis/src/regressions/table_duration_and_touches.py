@@ -2,7 +2,8 @@ from pathlib import Path
 import pandas as pd
 import arviz as az
 
-from ..persistence import Persistence, Table
+from src.persistence.persistence import Persistence
+from src.persistence.apa_word_table_formatter import Table
 
 
 def probability_effect_is_zero(x):

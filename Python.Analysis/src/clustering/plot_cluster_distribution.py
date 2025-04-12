@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def plot_cluster_distribution(trials, persistence):
-    conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
+    conditions = [Condition.InSitu, Condition.Interaction, Condition.NoInteraction, Condition.NoOpponent]
     fig, axes = plt.subplots(1, 4, figsize=(20, 5))
     fig.suptitle('Cluster Distribution by Condition')
     colors = ['#FFFFFF', '#000000', '#808080']

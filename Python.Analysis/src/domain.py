@@ -5,11 +5,12 @@ from typing import List
 import numpy as np
 
 
+
 class Condition(Enum):
-    IN_SITU = 'InSitu'
-    INTERACTION = 'Interaction'
-    NO_INTERACTION = 'NoInteraction'
-    NO_OPPONENT = 'NoOpponent'
+    InSitu = "InSitu"
+    Interaction = "Interaction"
+    NoInteraction = "NoInteraction"
+    NoOpponent = "NoOpponent"
 
 
 @dataclass
@@ -18,8 +19,8 @@ class Position:
     y: float
     z: float
 
-    def distance_2d(self, other):
-        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
+    def distance_2d(self, other: 'Position') -> float:
+        return np.sqrt((self.x - other.x) ** 2 + (self.z - other.z) ** 2)
 
     def magnitude(self):
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
@@ -33,14 +34,14 @@ class Position:
 
 
 class Footedness(Enum):
-    RIGHT = 'Right'
-    LEFT = 'Left'
+    Left = "Left"
+    Right = "Right"
 
 
 class Side(Enum):
-    DOMINANT = 'Dominant'
-    NON_DOMINANT = 'NonDominant'
-    UNKNOWN = 'Unknown'
+    Dominant = 'Dominant'
+    NonDominant = 'NonDominant'
+    Unknown = 'Unknown'
 
 
 @dataclass
@@ -49,7 +50,7 @@ class Foot:
 
 
 @dataclass
-class Action(abc.ABC):
+class Action:
     position: Position
     time_index: int
 
@@ -67,17 +68,16 @@ class Touch(Action):
 
 @dataclass
 class Pass(Action):
-    foot: Foot
-    success: bool
+    success: bool = True
+    foot: Foot = None
 
 
 class NoPass(Pass):
-
     def __init__(
             self,
             position: Position = Position(0.0, 0.0, 0.0),
             time: int = 0,
-            foot: Foot = Foot(Side.UNKNOWN),
+            foot: Foot = Foot(Side.Unknown),
             success: bool = False
     ):
         self.position = position
@@ -114,73 +114,6 @@ class Trial:
     dominant_foot_side: Footedness
     has_missing_data: bool = False
     cluster_label: int = None
-
-    def distance_between_last_touch_and_pass(self):
-        last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
-        distance = last_touch.position.distance_2d(self.pass_event.position)
-        return distance
-
-    def timing_between_last_touch_and_pass(self):
-        last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
-        time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_touch.time_index]
-        return time_difference
-
-    def duration(self):
-        first_action_time = self.timestamps[self.start.time_index]
-        last_action_time = self.timestamps[self.pass_event.time_index]
-        return last_action_time - first_action_time
-
-    def number_of_touches(self):
-        return len(self.actions)
-
-    def average_interpersonal_distance(self):
-        if self.condition == Condition.NO_OPPONENT:
-            return 0
-
-        total_distance = 0
-        start_index = self.start.time_index
-        end_index = self.pass_event.time_index
-
-        for i in range(start_index, end_index):
-            total_distance += self.hip_positions[i].distance_2d(self.opponent_hip_positions[i])
-        return total_distance / (end_index - start_index)
-
-    def interpersonal_distance_at_pass_time(self):
-        if self.condition == Condition.NO_OPPONENT:
-            return 0
-
-        position_of_player = self.hip_positions[self.pass_event.time_index]
-        position_of_opponent = self.opponent_hip_positions[self.pass_event.time_index]
-
-        return position_of_player.distance_2d(position_of_opponent)
-
-    def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
-        z_positions = [pos.z for pos in self.hip_positions]
-        z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
-        raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
-        z_positions = Filter.low_pass_filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
-
-        derivative = np.diff(z_positions)
-        number_changes_direction = np.sum(derivative[1:] * derivative[:-1] < 0)
-
-        return number_changes_direction
-
-    def time_between_last_change_of_direction_and_pass(self) -> float:
-        z_positions = [pos.z for pos in self.hip_positions]
-        z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
-        raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
-        z_positions = Filter.low_pass_filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
-
-        derivative = np.diff(z_positions)
-        indices_of_change = np.where(derivative[1:] * derivative[:-1] < 0)[0]
-        last_change_index = indices_of_change[-1] if indices_of_change.size > 0 else None
-
-        if last_change_index is not None:
-            last_change_time = raw_timestamps[last_change_index]
-            pass_time = self.timestamps[self.pass_event.time_index]
-            return pass_time - last_change_time
-
-        return self.duration()
 
 
 @dataclass

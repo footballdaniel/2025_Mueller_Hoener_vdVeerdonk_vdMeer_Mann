@@ -1,17 +1,22 @@
-from src.domain import Condition, TrialCollection
-
-
+from pathlib import Path
+from typing import List
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from src.domain import Condition, TrialCollection
+import pandas as pd
+
+from src.persistence.persistence import Persistence
+
+from ..services import DistanceCalculator, TimeCalculator, MovementCalculator
 
 
 def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
     trial_features = np.array([
         [
-            trial.distance_between_last_touch_and_pass(),
-            trial.time_between_last_change_of_direction_and_pass(),
-            trial.number_lateral_changes_of_direction()
+            DistanceCalculator.distance_between_last_touch_and_pass(trial),
+            TimeCalculator.time_between_last_change_of_direction_and_pass(trial),
+            MovementCalculator.number_lateral_changes_of_direction(trial)
         ]
         for trial in trials
     ])
@@ -25,7 +30,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
         trial.cluster_label = label
 
     # Prepare to collect averages for each condition
-    conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
+    conditions = [Condition.InSitu, Condition.Interaction, Condition.NoInteraction, Condition.NoOpponent]
     averages = {condition.value: [] for condition in conditions}
 
     # Calculate and print percentage of trials in each cluster per condition
@@ -43,14 +48,14 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
 
         # Calculate averages for the remaining features per condition
         if condition_trials:
-            timings = np.array([trial.timing_between_last_touch_and_pass() for trial in condition_trials])
+            timings = np.array([TimeCalculator.timing_between_last_touch_and_pass(trial) for trial in condition_trials])
             average_timing = np.mean(timings) if len(timings) > 0 else 0
 
             time_between_changes = np.array(
-                [trial.time_between_last_change_of_direction_and_pass() for trial in condition_trials])
+                [TimeCalculator.time_between_last_change_of_direction_and_pass(trial) for trial in condition_trials])
             average_time_between_changes = np.mean(time_between_changes) if len(time_between_changes) > 0 else 0
 
-            lateral_changes = np.array([trial.number_lateral_changes_of_direction() for trial in condition_trials])
+            lateral_changes = np.array([MovementCalculator.number_lateral_changes_of_direction(trial) for trial in condition_trials])
             average_lateral_changes = np.mean(lateral_changes) if len(lateral_changes) > 0 else 0
 
             # Store averages in the dictionary
@@ -93,3 +98,46 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
         print(f"  Average Timing Between Last Touch and Pass: {cluster_averages[i][0]:.2f}")
         print(f"  Average Time Between Last Change of Direction and Pass: {cluster_averages[i][1]:.2f}")
         print(f"  Average Number of Lateral Changes of Direction: {cluster_averages[i][2]:.2f}")
+
+
+def plot_elbow_method(trials: TrialCollection, max_clusters: int, persistence: Persistence) -> None:
+    wcss = []
+    trial_features = np.array([
+        [
+            DistanceCalculator.distance_between_last_touch_and_pass(trial),
+            TimeCalculator.time_between_last_change_of_direction_and_pass(trial),
+            MovementCalculator.number_lateral_changes_of_direction(trial)
+        ]
+        for trial in trials
+    ])
+
+    # Impute NaN values for time_between_last_change_of_direction_and_pass
+    time_between_changes = trial_features[:, 1]  # Extract the second feature
+    mean_time_between_changes = np.nanmean(time_between_changes)  # Calculate the mean, ignoring NaNs
+    time_between_changes[np.isnan(time_between_changes)] = mean_time_between_changes  # Impute NaN values
+
+    # Update trial_features with the imputed values
+    trial_features[:, 1] = time_between_changes
+
+    # Impute NaN values for other features if necessary
+    for i in range(trial_features.shape[1]):
+        mean_value = np.nanmean(trial_features[:, i])
+        trial_features[np.isnan(trial_features[:, i]), i] = mean_value  # Impute NaN values
+
+    for i in range(1, max_clusters + 1):
+        kmeans = KMeans(n_clusters=i)
+        kmeans.fit(trial_features)
+        wcss.append(kmeans.inertia_)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, max_clusters + 1), wcss, marker='o')
+    plt.title('Elbow Method for Optimal k')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('WCSS')
+    plt.xticks(range(1, max_clusters + 1))
+    plt.grid()
+
+    # Save the plot using the persistence object
+    persistence.save_figure(plt, Path("elbow_method_plot.png"))  # Adjust the filename as needed
+    plt.savefig("elbow_method_plot.png")  # Save the plot locally
+    plt.close()  # Close the plot to free memory

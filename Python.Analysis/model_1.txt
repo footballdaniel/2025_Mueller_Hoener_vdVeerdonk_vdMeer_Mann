@@ -5,7 +5,7 @@
         Priors: 
     target = mu
         Common-level effects
-            C(condition) ~ Uniform(lower: 0.0, upper: 100.0)
+            C(condition) ~ Uniform(lower: 0.0, upper: 10.0)
         
         Group-level effects
             1|participant_id ~ Normal(mu: 0.0, sigma: HalfNormal(sigma: 1.0))

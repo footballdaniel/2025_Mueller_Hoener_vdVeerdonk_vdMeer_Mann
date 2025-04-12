@@ -1,17 +1,20 @@
 from pathlib import Path
 import numpy as np
 
-from .domain import TrialCollection, Persistence
-from .persistence import Table
+from src.domain import TrialCollection
+from src.persistence.persistence import Persistence
+from src.persistence.apa_word_table_formatter import Table
+
+from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
 
 
 def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persistence: Persistence) -> None:
     variables = {
-        "Number of touches [N]": lambda t: t.number_of_touches(),
-        "Duration [s]": lambda t: t.duration(),
-        "Distance between last touch and pass [m]": lambda t: t.distance_between_last_touch_and_pass(),
-        "Time between last change of direction and pass [s]": lambda t: t.time_between_last_change_of_direction_and_pass(),
-        "Number of lateral changes of direction [N]": lambda t: t.number_lateral_changes_of_direction()
+        "Number of touches [N]": MovementCalculator.number_of_touches,
+        "Duration [s]": TimeCalculator.duration,
+        "Distance between last touch and pass [m]": DistanceCalculator.distance_between_last_touch_and_pass,
+        "Time between last change of direction and pass [s]": TimeCalculator.time_between_last_change_of_direction_and_pass,
+        "Number of lateral changes of direction [N]": MovementCalculator.number_lateral_changes_of_direction
     }
 
     # Get unique participant count

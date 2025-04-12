@@ -7,13 +7,14 @@ import pandas as pd
 
 from ..domain import TrialCollection, Condition
 from ..persistence import Persistence
+from ..services import MovementCalculator
 
 
 def regression_touches(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence) -> None:
     df = pd.DataFrame({
-        "participant_id": [trial.participant_id for trial in trials.trials],
-        "touches": [trial.number_of_touches() for trial in trials.trials],
-        "condition": [trial.condition.value for trial in trials.trials]
+        "participant_id": [trial.participant_id for trial in trials],
+        "touches": [MovementCalculator.number_of_touches(trial) for trial in trials],
+        "condition": [trial.condition.value for trial in trials]
     })
     
     df["participant_id"] = pd.Categorical(df["participant_id"])
@@ -25,7 +26,7 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
     df["condition_idx"] = df["condition"].cat.codes
     
     # Priors for fixed effects
-    numeric_prior = bmb.Prior("Uniform", lower=0, upper=100)
+    numeric_prior = bmb.Prior("Uniform", lower=0, upper=10)
     
     # Priors for random effects with partial pooling
     participant_prior = bmb.Prior(
