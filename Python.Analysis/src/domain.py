@@ -2,7 +2,6 @@ import abc
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
-import glob
 
 import numpy as np
 from scipy.interpolate import interp1d
@@ -158,32 +157,23 @@ class Trial:
 
         return position_of_player.distance_2d(position_of_opponent)
 
-    def butterworth_filter(self, data, cutoff=10, fs=100, order=3):
-        nyquist = 0.5 * fs
-        normal_cutoff = cutoff / nyquist
-        b, a = butter(order, normal_cutoff, btype='low', analog=False)
-        return filtfilt(b, a, data)
-
-    def upsample(self, data, timestamps, target_fs=100):
+    def filter(self, signal, timestamps, cutoff=1, target_fs=100, order=3):
         target_times = np.arange(timestamps[0], timestamps[-1], 1 / target_fs)
-        interp_func = interp1d(timestamps, data, kind="linear", fill_value="extrapolate")
-        return target_times, interp_func(target_times)
+        interp_func = interp1d(timestamps, signal, kind="linear", fill_value="extrapolate")
+        up_sampled_signal = interp_func(target_times)
 
-    def filtered_like_original(self, signal, timestamps, cutoff=1, target_fs=100, order=3):
-        upsampled_times, upsampled_signal = self.upsample(signal, timestamps, target_fs=target_fs)
         b, a = butter(order, cutoff / (0.5 * target_fs), btype='low')
-        filtered_upsampled = filtfilt(b, a, upsampled_signal)
-        interpolated = np.interp(timestamps, upsampled_times, filtered_upsampled)
-        return interpolated
+        filtered_up_sampled = filtfilt(b, a, up_sampled_signal)
+
+        return np.interp(timestamps, target_times, filtered_up_sampled)
 
     def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
-        raw_timestamps = np.array(self.timestamps)  # Original timestamps (100ms interval)
         z_positions = np.array([pos.z for pos in self.hip_positions])  # Z positions of user's head
 
         z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
-        raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
+        raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
 
-        z_positions = self.filtered_like_original(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
+        z_positions = self.filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
         derivative = np.diff(z_positions)
         number_changes_direction = np.sum(derivative[1:] * derivative[:-1] < 0)
@@ -191,13 +181,12 @@ class Trial:
         return number_changes_direction
 
     def time_between_last_change_of_direction_and_pass(self) -> float:
-        raw_timestamps = np.array(self.timestamps)
         z_positions = np.array([pos.z for pos in self.hip_positions])
 
         z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
-        raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
+        raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
 
-        z_positions = self.filtered_like_original(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
+        z_positions = self.filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
         derivative = np.diff(z_positions)
         indices_of_change = np.where(derivative[1:] * derivative[:-1] < 0)[0]
@@ -220,4 +209,3 @@ class TrialCollection:
 
     def __len__(self) -> int:
         return len(self.trials)
-        
