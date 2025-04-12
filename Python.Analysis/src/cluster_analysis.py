@@ -9,13 +9,6 @@ import pandas as pd  # Import pandas for tabular data handling
 from collections import Counter
 
 def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
-    # Filter out trials with NaN values in the features
-    valid_trials = [trial for trial in trials if not np.isnan(trial.time_between_last_change_of_direction_and_pass())]
-    
-    # If no valid trials, return early
-    if not valid_trials:
-        print("No valid trials available for clustering.")
-        return
 
     trial_features = np.array([
         [
@@ -23,29 +16,28 @@ def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
             trial.time_between_last_change_of_direction_and_pass(),
             trial.number_lateral_changes_of_direction()
         ]
-        for trial in valid_trials
+        for trial in trials
     ])
     
-    # Impute NaN values for time_between_last_change_of_direction_and_pass
-    time_between_changes = trial_features[:, 1]  # Extract the second feature
-    mean_time_between_changes = np.nanmean(time_between_changes)  # Calculate the mean, ignoring NaNs
-    time_between_changes[np.isnan(time_between_changes)] = mean_time_between_changes  # Impute NaN values
+    # # Impute NaN values for time_between_last_change_of_direction_and_pass
+    # time_between_changes = trial_features[:, 1]  # Extract the second feature
+    # mean_time_between_changes = np.nanmean(time_between_changes)  # Calculate the mean, ignoring NaNs
+    # time_between_changes[np.isnan(time_between_changes)] = mean_time_between_changes  # Impute NaN values
+    #
+    # # Update trial_features with the imputed values
+    # trial_features[:, 1] = time_between_changes
+    #
+    # # Impute NaN values for other features if necessary
+    # for i in range(trial_features.shape[1]):
+    #     mean_value = np.nanmean(trial_features[:, i])
+    #     trial_features[np.isnan(trial_features[:, i]), i] = mean_value  # Impute NaN values
 
-    # Update trial_features with the imputed values
-    trial_features[:, 1] = time_between_changes
-
-    # Impute NaN values for other features if necessary
-    for i in range(trial_features.shape[1]):
-        mean_value = np.nanmean(trial_features[:, i])
-        trial_features[np.isnan(trial_features[:, i]), i] = mean_value  # Impute NaN values
-
-    # Perform KMeans clustering
-    kmeans = KMeans(n_clusters=n_clusters)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=1991)
     kmeans.fit(trial_features)
     labels = kmeans.labels_
 
     # Store the cluster label in the trial object
-    for trial, label in zip(valid_trials, labels):
+    for trial, label in zip(trials, labels):
         trial.cluster_label = label
 
     # Prepare to collect averages for each condition
@@ -56,7 +48,7 @@ def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
     print("\nPercentage of trials in each cluster by condition:")
     
     for condition in conditions:
-        condition_trials = [trial for trial in valid_trials if trial.condition == condition]
+        condition_trials = [trial for trial in trials if trial.condition == condition]
         condition_labels = [trial.cluster_label for trial in condition_trials]
         
         print(f"\nCondition: {condition.value}")
@@ -103,7 +95,7 @@ def perform_cluster_analysis(trials: List[Trial], n_clusters: int) -> None:
     cluster_averages = {i: [] for i in range(n_clusters)}
     
     for i in range(n_clusters):
-        cluster_trials = [trial_features[j] for j in range(len(valid_trials)) if labels[j] == i]
+        cluster_trials = [trial_features[j] for j in range(len(trials)) if labels[j] == i]
         if cluster_trials:
             cluster_averages[i] = np.mean(cluster_trials, axis=0)
         else:

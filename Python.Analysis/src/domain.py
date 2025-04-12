@@ -169,55 +169,46 @@ class Trial:
         interp_func = interp1d(timestamps, data, kind="linear", fill_value="extrapolate")
         return target_times, interp_func(target_times)
 
+    def filtered_like_original(self, signal, timestamps, cutoff=1, target_fs=100, order=3):
+        upsampled_times, upsampled_signal = self.upsample(signal, timestamps, target_fs=target_fs)
+        b, a = butter(order, cutoff / (0.5 * target_fs), btype='low')
+        filtered_upsampled = filtfilt(b, a, upsampled_signal)
+        interpolated = np.interp(timestamps, upsampled_times, filtered_upsampled)
+        return interpolated
+
     def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
         raw_timestamps = np.array(self.timestamps)  # Original timestamps (100ms interval)
-        z_positions = np.array([pos.z for pos in self.head_positions])  # Z positions of user's head
+        z_positions = np.array([pos.z for pos in self.hip_positions])  # Z positions of user's head
 
-        # Filter timestamps and z positions to match the start and end of the trial
         z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
         raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
 
-        upsampled_times, upsampled_z = self.upsample(z_positions, raw_timestamps, target_fs=target_fs)
-        filtered_z = self.butterworth_filter(upsampled_z, cutoff=cutoff, fs=target_fs, order=order)
+        z_positions = self.filtered_like_original(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
-        # Compute sign changes in derivative
-        derivative = np.diff(filtered_z)
-        return np.sum(derivative[1:] * derivative[:-1] < 0)
+        derivative = np.diff(z_positions)
+        number_changes_direction = np.sum(derivative[1:] * derivative[:-1] < 0)
+
+        return number_changes_direction
 
     def time_between_last_change_of_direction_and_pass(self) -> float:
-        # Get the Z positions of the head
-        z_positions = np.array([pos.z for pos in self.head_positions])
-        
-        # Find the index of the first touch and the pass event
-        first_touch_index = None
-        for i, action in enumerate(self.actions):
-            if isinstance(action, Touch):
-                first_touch_index = i
-                break
-        
-        if first_touch_index is None or self.pass_event.time_index <= first_touch_index:
-            return float('nan')  # Return NaN if no valid first touch or pass event is found
+        raw_timestamps = np.array(self.timestamps)
+        z_positions = np.array([pos.z for pos in self.hip_positions])
 
-        # Restrict Z positions to the range between the first touch and the pass event
-        relevant_z_positions = z_positions[first_touch_index:self.pass_event.time_index + 1]
+        z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
+        raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
 
-        # Apply Butterworth filter to the relevant Z positions
-        filtered_z = self.butterworth_filter(relevant_z_positions)
+        z_positions = self.filtered_like_original(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
-        derivative = np.diff(filtered_z)
+        derivative = np.diff(z_positions)
+        indices_of_change = np.where(derivative[1:] * derivative[:-1] < 0)[0]
+        last_change_index = indices_of_change[-1] if indices_of_change.size > 0 else None
 
-        last_change_index = None
+        if last_change_index is not None:
+            last_change_time = raw_timestamps[last_change_index]
+            pass_time = self.timestamps[self.pass_event.time_index]
+            return pass_time - last_change_time
 
-        for i in range(len(derivative) - 1, 0, -1):
-            if derivative[i] * derivative[i - 1] < 0:  # Check for sign change
-                last_change_index = i + 1  # +1 because of the diff operation
-                break
-        
-        if last_change_index is not None and last_change_index + first_touch_index < self.pass_event.time_index:
-            time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_change_index + first_touch_index]
-            return time_difference
-        
-        return self.duration() 
+        return self.duration()
 
 
 @dataclass
