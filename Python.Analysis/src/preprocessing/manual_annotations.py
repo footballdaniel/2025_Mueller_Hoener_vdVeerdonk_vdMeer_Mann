@@ -5,7 +5,6 @@ from typing import List
 
 from src.domain import Position, Footedness, Foot, Pass, Touch, Trial, NoAction, Side, \
     NoPass, Condition
-from src.interpolation import Interpolator
 
 
 def read_positions(json_positions_data: List[dict]) -> List[Position]:

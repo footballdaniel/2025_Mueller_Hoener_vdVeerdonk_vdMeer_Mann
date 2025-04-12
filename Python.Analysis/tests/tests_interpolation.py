@@ -1,7 +1,7 @@
 import unittest
 
 from src.domain import Position
-from src.interpolation import Interpolator
+from src.preprocessing.interpolation import Interpolator
 
 
 class TestInterpolator(unittest.TestCase):

@@ -4,7 +4,7 @@ import pandas as pd
 
 from src.cluster_analysis import perform_cluster_analysis, plot_elbow_method, plot_cluster_distribution
 from src.persistence import ApaStyledPersistence
-from src.reader import TrialReader
+from src.preprocessing.reader import TrialReader
 from src.regressions import (
     regression_duration,
     regression_touches,

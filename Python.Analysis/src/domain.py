@@ -4,8 +4,8 @@ from enum import Enum
 from typing import List
 
 import numpy as np
-from scipy.interpolate import interp1d
-from scipy.signal import butter, filtfilt
+
+from src.preprocessing.filtering import Filter
 
 
 class Condition(Enum):
@@ -157,23 +157,11 @@ class Trial:
 
         return position_of_player.distance_2d(position_of_opponent)
 
-    def filter(self, signal, timestamps, cutoff=1, target_fs=100, order=3):
-        target_times = np.arange(timestamps[0], timestamps[-1], 1 / target_fs)
-        interp_func = interp1d(timestamps, signal, kind="linear", fill_value="extrapolate")
-        up_sampled_signal = interp_func(target_times)
-
-        b, a = butter(order, cutoff / (0.5 * target_fs), btype='low')
-        filtered_up_sampled = filtfilt(b, a, up_sampled_signal)
-
-        return np.interp(timestamps, target_times, filtered_up_sampled)
-
     def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
-        z_positions = np.array([pos.z for pos in self.hip_positions])  # Z positions of user's head
-
+        z_positions = [pos.z for pos in self.hip_positions]
         z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
         raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
-
-        z_positions = self.filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
+        z_positions = Filter.low_pass_filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
         derivative = np.diff(z_positions)
         number_changes_direction = np.sum(derivative[1:] * derivative[:-1] < 0)
@@ -181,12 +169,10 @@ class Trial:
         return number_changes_direction
 
     def time_between_last_change_of_direction_and_pass(self) -> float:
-        z_positions = np.array([pos.z for pos in self.hip_positions])
-
+        z_positions = [pos.z for pos in self.hip_positions]
         z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
         raw_timestamps = self.timestamps[self.start.time_index:self.pass_event.time_index]
-
-        z_positions = self.filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
+        z_positions = Filter.low_pass_filter(z_positions, raw_timestamps, cutoff=1, target_fs=100, order=3)
 
         derivative = np.diff(z_positions)
         indices_of_change = np.where(derivative[1:] * derivative[:-1] < 0)[0]

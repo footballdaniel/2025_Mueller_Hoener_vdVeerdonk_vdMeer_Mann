@@ -1,8 +1,7 @@
 from typing import List
 import glob
 from src.domain import Trial, TrialCollection
-from src.manual_annotations import ingest
-from src.persistence import Persistence
+from src.preprocessing.manual_annotations import ingest
 
 
 class TrialReader:
