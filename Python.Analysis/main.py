@@ -12,6 +12,7 @@ from src.regressions import (
     duration_and_touches_table,
     duration_and_touches_post_hoc
 )
+from src.descriptive_statistics import table_descriptive_statistics
 
 if __name__ == '__main__':
     data_path = "../Data/Experiment/**/*.csv"
@@ -28,6 +29,8 @@ if __name__ == '__main__':
     pd.set_option('display.width', 1000)  # Set a wider width
 
     trials = TrialReader.read_trials(data_path)
+
+    table_descriptive_statistics(trials, Path("descriptive_statistics.docx"), persistence)
 
     regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
