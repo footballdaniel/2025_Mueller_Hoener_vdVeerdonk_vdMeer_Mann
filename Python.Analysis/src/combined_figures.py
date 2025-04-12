@@ -104,7 +104,7 @@ def combined_predictive_and_cluster_figure(
         pie_x = x_positions[condition.value]
         pie_y = 0.5
 
-        ax3.pie(
+        wedges, _ = ax3.pie(
             sizes,
             labels=None,
             autopct=None,
@@ -114,6 +114,13 @@ def combined_predictive_and_cluster_figure(
             center=(pie_x, pie_y),
             radius=0.4
         )
+
+        # Add percentage labels as full integers
+        for i, wedge in enumerate(wedges):
+            angle = (wedge.theta2 - wedge.theta1) / 2. + wedge.theta1
+            x = pie_x + 0.3 * np.cos(np.deg2rad(angle))
+            y = pie_y + 0.3 * np.sin(np.deg2rad(angle))
+            ax3.text(x, y, f"{int(round(sizes[i]))}%", ha='center', va='center', fontsize=8)
 
         formatted_label = re.sub(r'([a-z])([A-Z])', r'\1 \2', condition.value)
         ax3.text(pie_x, -0.2, formatted_label, ha='center', va='center')

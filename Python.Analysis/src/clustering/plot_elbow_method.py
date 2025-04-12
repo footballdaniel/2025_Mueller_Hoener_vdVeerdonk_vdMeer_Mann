@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
 from src.domain import Trial
@@ -10,7 +9,7 @@ from src.persistence import Persistence
 from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
 
 
-def plot_elbow_method(trials: List[Trial], max_clusters: int, persistence: Persistence, path: Path) -> None:
+def analyze_number_clusters(trials: List[Trial], max_clusters: int, persistence: Persistence, path: Path) -> None:
     """
     Plot the elbow method to determine the optimal number of clusters.
     """
@@ -43,13 +42,3 @@ def plot_elbow_method(trials: List[Trial], max_clusters: int, persistence: Persi
 
     # Save results to text file
     persistence.save_model("\n".join(results), path)
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, max_clusters + 1), wcss)
-    plt.title('Elbow Method')
-    plt.xlabel('Number of clusters')
-    plt.ylabel('WCSS')
-    plt.grid(True)
-
-    persistence.save_figure(plt.gcf(), Path("elbow_method.png"))
-    plt.close() 

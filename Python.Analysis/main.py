@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.clustering import plot_cluster_distribution, perform_cluster_analysis, plot_elbow_method
+from src.clustering import plot_cluster_distribution, perform_cluster_analysis, analyze_number_clusters
 from src.persistence import ApaStyledPersistence
 from src.preprocessing import TrialReader
 from src.regressions import (
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
     regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
 
-    plot_elbow_method(trials, max_clusters=10, persistence=persistence, path=Path("elbow_method_results.txt"))
-    perform_cluster_analysis(trials, n_clusters=3)
+    analyze_number_clusters(trials, max_clusters=10, persistence=persistence, path=Path("elbow_method_results.txt"))
+    perform_cluster_analysis(trials, n_clusters=3, persistence=persistence, file_name=Path("cluster_features.docx"))
     plot_cluster_distribution(trials, persistence=persistence)
 
     duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
