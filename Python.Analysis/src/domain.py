@@ -2,10 +2,7 @@ import abc
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
-
 import numpy as np
-
-from src.preprocessing.filtering import Filter
 
 
 class Condition(Enum):

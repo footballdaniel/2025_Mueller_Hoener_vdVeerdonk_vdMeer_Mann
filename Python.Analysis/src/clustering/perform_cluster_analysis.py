@@ -1,12 +1,9 @@
-from pathlib import Path
-from typing import List
+from src.domain import Condition, TrialCollection
+
+
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
+import pandas as pd
 from sklearn.cluster import KMeans
-from src.domain import Persistence, Trial, Condition, TrialCollection
-import pandas as pd  # Import pandas for tabular data handling
-from collections import Counter
 
 
 def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
@@ -96,83 +93,3 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int) -> None:
         print(f"  Average Timing Between Last Touch and Pass: {cluster_averages[i][0]:.2f}")
         print(f"  Average Time Between Last Change of Direction and Pass: {cluster_averages[i][1]:.2f}")
         print(f"  Average Number of Lateral Changes of Direction: {cluster_averages[i][2]:.2f}")
-
-
-def plot_elbow_method(trials: TrialCollection, max_clusters: int, persistence: Persistence) -> None:
-    wcss = []
-    trial_features = np.array([
-        [
-            trial.distance_between_last_touch_and_pass(),
-            trial.time_between_last_change_of_direction_and_pass(),
-            trial.number_lateral_changes_of_direction()
-        ]
-        for trial in trials
-    ])
-
-    # Impute NaN values for time_between_last_change_of_direction_and_pass
-    time_between_changes = trial_features[:, 1]  # Extract the second feature
-    mean_time_between_changes = np.nanmean(time_between_changes)  # Calculate the mean, ignoring NaNs
-    time_between_changes[np.isnan(time_between_changes)] = mean_time_between_changes  # Impute NaN values
-
-    # Update trial_features with the imputed values
-    trial_features[:, 1] = time_between_changes
-
-    # Impute NaN values for other features if necessary
-    for i in range(trial_features.shape[1]):
-        mean_value = np.nanmean(trial_features[:, i])
-        trial_features[np.isnan(trial_features[:, i]), i] = mean_value  # Impute NaN values
-
-    for i in range(1, max_clusters + 1):
-        kmeans = KMeans(n_clusters=i)
-        kmeans.fit(trial_features)
-        wcss.append(kmeans.inertia_)
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, max_clusters + 1), wcss, marker='o')
-    plt.title('Elbow Method for Optimal k')
-    plt.xlabel('Number of clusters')
-    plt.ylabel('WCSS')
-    plt.xticks(range(1, max_clusters + 1))
-    plt.grid()
-
-    # Save the plot using the persistence object
-    persistence.save_figure(plt, Path("elbow_method_plot.png"))  # Adjust the filename as needed
-    plt.savefig("elbow_method_plot.png")  # Save the plot locally
-    plt.close()  # Close the plot to free memory 
-
-
-def plot_cluster_distribution(trials, persistence):
-    conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
-    fig, axes = plt.subplots(1, 4, figsize=(20, 5))
-    fig.suptitle('Cluster Distribution by Condition')
-    colors = ['#FFFFFF', '#000000', '#808080']
-
-    for ax, condition in zip(axes, conditions):
-        labels = [trial.cluster_label for trial in trials if
-                  trial.condition == condition and trial.cluster_label is not None]
-        label_set = set(labels)
-        counts = [labels.count(label) for label in label_set]
-        total = sum(counts)
-        sizes = [count / total * 100 for count in counts]
-        cluster_colors = [colors[label % len(colors)] for label in label_set]
-
-        ax.pie(
-            sizes,
-            labels=[f'Cluster {label}' for label in label_set],
-            autopct='%1.1f%%',
-            startangle=90,
-            colors=cluster_colors,
-            wedgeprops=dict(linewidth=2, edgecolor='black')
-        )
-
-        centre_circle = plt.Circle((0, 0), 0.50, fc='white')
-        ax.add_artist(centre_circle)
-        ax.axis('equal')
-        ax.set_title(condition.value)
-
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.85)
-
-    persistence.save_figure(plt, Path("cluster_distribution_plot.png"))
-    plt.savefig("cluster_distribution_plot.png")
-    plt.close()

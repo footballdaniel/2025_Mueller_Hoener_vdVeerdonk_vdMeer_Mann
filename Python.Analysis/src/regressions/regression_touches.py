@@ -25,7 +25,7 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
     df["condition_idx"] = df["condition"].cat.codes
     
     # Priors for fixed effects
-    numeric_prior = bmb.Prior("Uniform", lower=0, upper=10)
+    numeric_prior = bmb.Prior("Uniform", lower=0, upper=100)
     
     # Priors for random effects with partial pooling
     participant_prior = bmb.Prior(

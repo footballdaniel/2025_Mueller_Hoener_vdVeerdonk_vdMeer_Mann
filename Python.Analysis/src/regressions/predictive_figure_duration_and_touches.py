@@ -27,7 +27,7 @@ def duration_and_touches_predictive_figure(duration_model_path: Path, touches_mo
     touches_lower = np.percentile(touches_samples, 2.5, axis=1)
     touches_upper = np.percentile(touches_samples, 97.5, axis=1)
 
-    conditions = [c.value for c in Condition]
+    conditions = [c.value for c in reversed(Condition)]
     x_pos = np.arange(len(conditions))
 
     fig, ax1 = plt.subplots(figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 2.75))

@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.cluster_analysis import perform_cluster_analysis, plot_elbow_method, plot_cluster_distribution
+from src.clustering import plot_cluster_distribution, perform_cluster_analysis, plot_elbow_method
 from src.persistence import ApaStyledPersistence
-from src.preprocessing.reader import TrialReader
+from src.preprocessing import TrialReader
 from src.regressions import (
     regression_duration,
     regression_touches,
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     persistence = ApaStyledPersistence(
         font=Path("Calibri.ttf"),
         font_size=11,
-        double_column_width_inches=6,
+        double_column_width_inches=6.5,
         single_column_width_inches=3,
         grayscale=False
     )
