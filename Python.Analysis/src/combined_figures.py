@@ -63,7 +63,7 @@ def combined_predictive_and_cluster_figure(
     ax2.bar(x_pos + 0.2, touches_means, 0.4,
             yerr=[touches_means - touches_lower, touches_upper - touches_means],
             capsize=5, color='#8B0000', label='Touches')
-    ax2.set_ylabel('Number of Touches [n]')
+    ax2.set_ylabel('Number of Touches [N]')
 
     ax1.set_xticks(x_pos)
     formatted_labels = [re.sub(r'([a-z])([A-Z])', r'\1 \2', label) for label in conditions]
@@ -115,11 +115,17 @@ def combined_predictive_and_cluster_figure(
             radius=0.4
         )
 
-        # Add percentage labels as full integers
+        # Add percentage labels outside the pie slices
         for i, wedge in enumerate(wedges):
             angle = (wedge.theta2 - wedge.theta1) / 2. + wedge.theta1
-            x = pie_x + 0.3 * np.cos(np.deg2rad(angle))
-            y = pie_y + 0.3 * np.sin(np.deg2rad(angle))
+            # Position labels outside the pie (radius > 0.4)
+            x = pie_x + 0.45 * np.cos(np.deg2rad(angle))
+            y = pie_y + 0.45 * np.sin(np.deg2rad(angle))
+            # Add a small offset to prevent overlap
+            if angle > 90 and angle < 270:  # Left side of pie
+                x -= 0.1
+            else:  # Right side of pie
+                x += 0.1
             ax3.text(x, y, f"{int(round(sizes[i]))}%", ha='center', va='center', fontsize=8)
 
         formatted_label = re.sub(r'([a-z])([A-Z])', r'\1 \2', condition.value)
