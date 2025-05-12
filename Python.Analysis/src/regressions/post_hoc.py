@@ -3,11 +3,13 @@ import numpy as np
 import arviz as az
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.font_manager import FontProperties
 
 from ..domain import Condition
 import re
 
 from ..persistence import ColumnFormat, Persistence
+
 def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path: Path, file_name: Path, persistence: Persistence) -> None:
     duration_results = az.from_netcdf(str(duration_model_path))
     touches_results = az.from_netcdf(str(touches_model_path))
@@ -80,6 +82,7 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
     )
     ax1.set_title("")
     ax1.set_xlabel("95% Difference Interval in Duration [s]")
+    ax1.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
     
     # Plot touches differences
     az.plot_forest(
@@ -93,7 +96,14 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         colors="#8B0000"
     )
     ax2.set_title("")
-    ax2.set_xlabel("95% Difference Interval in Number of Touches [n]")
+    ax2.set_xlabel("95% Difference Interval in Number of Touches [N]")
+    ax2.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
+    
+    # Update font for all text elements
+    font_prop = FontProperties(family=plt.rcParams['font.family'][0] if isinstance(plt.rcParams['font.family'], list) else plt.rcParams['font.family'])
+    for ax in [ax1, ax2]:
+        for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels()):
+            item.set_fontproperties(font_prop)
     
     # Ensure tight layout
     plt.tight_layout()
