@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import arviz as az
@@ -33,14 +32,15 @@ def combined_predictive_and_cluster_figure(
     touches_lower = np.percentile(touches_samples, 2.5, axis=1)
     touches_upper = np.percentile(touches_samples, 97.5, axis=1)
 
-    conditions = [c.value for c in reversed(Condition)]
+    # Get conditions in reversed order
+    conditions = list(reversed(Condition))
     x_positions = {
-        "NoOpponent": 1.0,
-        "NoInteraction": 2.5,
-        "Interaction": 4.0,
-        "InSitu": 5.5
+        str(Condition.NoOpponent): 1.0,
+        str(Condition.NoInteraction): 2.5, 
+        str(Condition.Interaction): 4.0,
+        str(Condition.InSitu): 5.5
     }
-    x_pos = np.array([x_positions[cond] for cond in conditions])
+    x_pos = np.array([x_positions[str(cond)] for cond in conditions])
 
     fig = plt.figure(figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 4.5))
     fig.subplots_adjust(hspace=0.02, top=0.96, bottom=0.08)
@@ -66,7 +66,7 @@ def combined_predictive_and_cluster_figure(
     ax2.set_ylabel('Number of Touches [N]')
 
     ax1.set_xticks(x_pos)
-    formatted_labels = [re.sub(r'([a-z])([A-Z])', r'\1 \2', label) for label in conditions]
+    formatted_labels = [str(cond) for cond in conditions]
     ax1.set_xticklabels(formatted_labels, rotation=0)
 
     legend_labels_top = ['Duration', 'Touches']
@@ -90,18 +90,17 @@ def combined_predictive_and_cluster_figure(
     ax3 = fig.add_subplot(gs[1])
     ax3.set_anchor('N')
 
-    colors = ['#E0E0E0','#808080', '#000000']
+    colors = ['#E0E0E0', '#808080', '#000000']
 
     for condition in reversed(Condition):
-        labels = [trial.cluster_label for trial in trials
-                  if trial.condition == condition and trial.cluster_label is not None]
+        labels = [trial.cluster_label for trial in trials if trial.condition == condition]
         label_set = sorted(set(labels))
         counts = [labels.count(label) for label in label_set]
         total = sum(counts)
         sizes = [count / total * 100 for count in counts]
         cluster_colors = [colors[label % len(colors)] for label in label_set]
 
-        pie_x = x_positions[condition.value]
+        pie_x = x_positions[str(condition)]
         pie_y = 0.5
 
         wedges, _ = ax3.pie(
@@ -128,10 +127,9 @@ def combined_predictive_and_cluster_figure(
                 x += 0.1
             ax3.text(x, y, f"{int(round(sizes[i]))}%", ha='center', va='center', fontsize=8)
 
-        formatted_label = re.sub(r'([a-z])([A-Z])', r'\1 \2', condition.value)
-        ax3.text(pie_x, -0.2, formatted_label, ha='center', va='center')
 
     legend_labels = [f'Cluster {i}' for i in range(3)]
+    legend_labels_override = ["Weak interactions", "Moderate interactions", "Strong interactions"]
     legend_colors = [colors[i] for i in range(3)]
     legend_handles = [
         plt.Line2D([0], [0], marker='s', linestyle='None', color='none',
@@ -140,9 +138,9 @@ def combined_predictive_and_cluster_figure(
     ]
     ax3.legend(
         legend_handles,
-        legend_labels,
+        legend_labels_override,
         loc='upper center',
-        bbox_to_anchor=(0.5, 0.0),
+        bbox_to_anchor=(0.5, +0.2),
         ncol=3,
         frameon=False
     )

@@ -2,8 +2,8 @@ import abc
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
-import numpy as np
 
+import numpy as np
 
 
 class Condition(Enum):
@@ -11,6 +11,17 @@ class Condition(Enum):
     Interaction = "Interaction"
     NoInteraction = "NoInteraction"
     NoOpponent = "NoOpponent"
+
+    def __str__(self) -> str:
+        if self == Condition.InSitu:
+            return "In Situ"
+        elif self == Condition.Interaction:
+            return "VR Interactive"
+        elif self == Condition.NoInteraction:
+            return "VR Non-interactive"
+        elif self == Condition.NoOpponent:
+            return "VR No opponent"
+        return self.__repr__()
 
 
 @dataclass

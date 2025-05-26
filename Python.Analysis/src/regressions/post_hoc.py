@@ -29,25 +29,19 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
     # Create figure with two subplots
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(persistence.figure_width(ColumnFormat.DOUBLE), 3.5))
     
-    # Calculate duration differences
+    # Calculate duration and touches differences in a single loop
     duration_diffs = {}
-    for i in range(len(conditions)):
-        for j in range(i + 1, len(conditions)):
-            diff = duration_samples[:, j] - duration_samples[:, i]
-            condition_j = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[j])
-            condition_i = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[i])
-            comparison = f'{condition_j} vs {condition_i}'
-            duration_diffs[comparison] = diff
-    
-    # Calculate touches differences
     touches_diffs = {}
     for i in range(len(conditions)):
         for j in range(i + 1, len(conditions)):
-            diff = touches_samples[:, j] - touches_samples[:, i]
-            condition_j = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[j])
-            condition_i = re.sub(r'([a-z])([A-Z])', r'\1 \2', conditions[i])
+            # Get formatted condition names using the __str__ method
+            condition_j = str(Condition(conditions[j]))
+            condition_i = str(Condition(conditions[i]))
             comparison = f'{condition_j} vs {condition_i}'
-            touches_diffs[comparison] = diff
+            
+            # Calculate differences for both duration and touches
+            duration_diffs[comparison] = duration_samples[:, j] - duration_samples[:, i]
+            touches_diffs[comparison] = touches_samples[:, j] - touches_samples[:, i]
     
     # Sort differences by effect size (mean absolute difference)
     duration_diffs = dict(sorted(
