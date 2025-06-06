@@ -129,7 +129,7 @@ def combined_predictive_and_cluster_figure(
 
 
     legend_labels = [f'Cluster {i}' for i in range(3)]
-    legend_labels_override = ["Weak interactions", "Moderate interactions", "Strong interactions"]
+    legend_labels_override = ["Minimal interactions", "Moderate interactions", "Strong interactions"]
     legend_colors = [colors[1], colors[2], colors[0]]
     legend_handles = [
         plt.Line2D([0], [0], marker='s', linestyle='None', color='none',

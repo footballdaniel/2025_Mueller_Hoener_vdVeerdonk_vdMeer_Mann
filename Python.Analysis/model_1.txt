@@ -8,7 +8,7 @@
             C(condition) ~ Uniform(lower: 0.0, upper: 10.0)
         
         Group-level effects
-            1|participant_id ~ Normal(mu: 0.0, sigma: HalfNormal(sigma: 1.0))
+            1|participant_id ~ Normal(mu: 0.0, sigma: HalfNormal(sigma: 2.5))
         
         Auxiliary parameters
             sigma ~ HalfNormal(sigma: 2.5)

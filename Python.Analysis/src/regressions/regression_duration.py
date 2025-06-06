@@ -32,7 +32,7 @@ def regression_duration(trials: TrialCollection, model_path: Path, model_descrip
     participant_prior = bmb.Prior(
         "Normal",
         mu=0,
-        sigma=bmb.Prior("HalfNormal", sigma=1.0)
+        sigma=bmb.Prior("HalfNormal", sigma=2.5)
     )
     
     # Prior for observation noise
