@@ -2,11 +2,9 @@ from pathlib import Path
 import numpy as np
 import arviz as az
 import matplotlib.pyplot as plt
-import seaborn as sns
 from matplotlib.font_manager import FontProperties
 
 from ..domain import Condition
-import re
 
 from ..persistence import ColumnFormat, Persistence
 
@@ -71,11 +69,12 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         linewidth=1,
         combined=True,
         hdi_prob=0.95,
+        quartiles=False,
         ax=ax1,
         colors="#4A90E2"
     )
     ax1.set_title("")
-    ax1.set_xlabel("95% Difference Interval in Duration [s]")
+    ax1.set_xlabel("95% Difference interval in trial duration [s]")
     ax1.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
     
     # Plot touches differences
@@ -86,11 +85,12 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         linewidth=1,
         combined=True,
         hdi_prob=0.95,
+        quartiles=False,
         ax=ax2,
         colors="#8B0000"
     )
     ax2.set_title("")
-    ax2.set_xlabel("95% Difference Interval in Number of Touches [N]")
+    ax2.set_xlabel("95% Difference Interval in number of touches [N]")
     ax2.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
     
     # Update font for all text elements

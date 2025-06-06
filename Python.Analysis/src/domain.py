@@ -14,13 +14,13 @@ class Condition(Enum):
 
     def __str__(self) -> str:
         if self == Condition.InSitu:
-            return "In Situ"
+            return "In situ"
         elif self == Condition.Interaction:
-            return "VR Interactive"
+            return "Virtual interactive"
         elif self == Condition.NoInteraction:
-            return "VR Non-interactive"
+            return "Virtual non-interactive"
         elif self == Condition.NoOpponent:
-            return "VR No opponent"
+            return "Virtual no-opponent"
         return self.__repr__()
 
 
