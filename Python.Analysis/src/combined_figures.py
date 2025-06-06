@@ -90,7 +90,7 @@ def combined_predictive_and_cluster_figure(
     ax3 = fig.add_subplot(gs[1])
     ax3.set_anchor('N')
 
-    colors = ['#E0E0E0', '#808080', '#000000']
+    colors = ['#000000', '#E0E0E0', '#808080']
 
     for condition in reversed(Condition):
         labels = [trial.cluster_label for trial in trials if trial.condition == condition]
@@ -130,7 +130,7 @@ def combined_predictive_and_cluster_figure(
 
     legend_labels = [f'Cluster {i}' for i in range(3)]
     legend_labels_override = ["Weak interactions", "Moderate interactions", "Strong interactions"]
-    legend_colors = [colors[i] for i in range(3)]
+    legend_colors = [colors[1], colors[2], colors[0]]
     legend_handles = [
         plt.Line2D([0], [0], marker='s', linestyle='None', color='none',
                    markerfacecolor=color, markeredgewidth=0, markersize=8)

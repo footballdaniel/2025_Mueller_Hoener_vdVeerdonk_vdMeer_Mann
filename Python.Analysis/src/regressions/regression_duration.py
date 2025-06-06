@@ -10,7 +10,7 @@ from ..persistence import Persistence
 from ..services import TimeCalculator
 
 
-def duration(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence, n_draws: int = 100, n_tune: int = 100) -> None:
+def regression_duration(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence, n_draws: int = 100, n_tune: int = 100) -> None:
     df = pd.DataFrame({
         "participant_id": [trial.participant_id for trial in trials],
         "duration": [TimeCalculator.duration(trial) for trial in trials],

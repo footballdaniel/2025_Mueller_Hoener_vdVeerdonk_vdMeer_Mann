@@ -2,22 +2,22 @@ Cluster Distribution by Condition
 ===============================
 
 InSitu (N = 188):
-  Cluster 0: 95 trials (50.5%)
-  Cluster 1: 71 trials (37.8%)
-  Cluster 2: 22 trials (11.7%)
+  Cluster 1: 95 trials (50.5%)
+  Cluster 2: 71 trials (37.8%)
+  Cluster 3: 22 trials (11.7%)
 
 Interaction (N = 190):
-  Cluster 0: 101 trials (53.2%)
-  Cluster 1: 84 trials (44.2%)
-  Cluster 2: 5 trials (2.6%)
+  Cluster 1: 101 trials (53.2%)
+  Cluster 2: 84 trials (44.2%)
+  Cluster 3: 5 trials (2.6%)
 
 NoInteraction (N = 189):
-  Cluster 0: 157 trials (83.1%)
-  Cluster 1: 32 trials (16.9%)
-  Cluster 2: 0 trials (0.0%)
+  Cluster 1: 157 trials (83.1%)
+  Cluster 2: 32 trials (16.9%)
+  Cluster 3: 0 trials (0.0%)
 
 NoOpponent (N = 190):
-  Cluster 0: 177 trials (93.2%)
-  Cluster 1: 13 trials (6.8%)
-  Cluster 2: 0 trials (0.0%)
+  Cluster 1: 177 trials (93.2%)
+  Cluster 2: 13 trials (6.8%)
+  Cluster 3: 0 trials (0.0%)
 

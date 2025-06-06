@@ -10,7 +10,7 @@ from ..persistence import Persistence
 from ..services import MovementCalculator
 
 
-def touches(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence, n_draws: int = 100, n_tune: int = 100) -> None:
+def regression_touches(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence, n_draws: int = 100, n_tune: int = 100) -> None:
     df = pd.DataFrame({
         "participant_id": [trial.participant_id for trial in trials],
         "touches": [MovementCalculator.number_of_touches(trial) for trial in trials],

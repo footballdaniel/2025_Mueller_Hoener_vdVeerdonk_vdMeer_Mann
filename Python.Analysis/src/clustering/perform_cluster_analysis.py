@@ -24,9 +24,9 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
     kmeans.fit(trial_features)
     labels = kmeans.labels_
 
-    # Store the cluster label in the trial object
+    # Store the cluster label in the trial object, adding 1 to make clusters start from 1
     for trial, label in zip(trials, labels):
-        trial.cluster_label = label
+        trial.cluster_label = label + 1
 
     # Calculate cluster distribution per condition
     conditions = [Condition.InSitu, Condition.Interaction, Condition.NoInteraction, Condition.NoOpponent]
@@ -37,7 +37,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
         condition_labels = [trial.cluster_label for trial in condition_trials]
         total_trials = len(condition_labels)
         
-        cluster_counts = [condition_labels.count(i) for i in range(n_clusters)]
+        cluster_counts = [condition_labels.count(i) for i in range(1, n_clusters + 1)]
         cluster_percentages = [(count / total_trials * 100) if total_trials > 0 else 0 for count in cluster_counts]
         
         condition_distributions[condition.value] = {
@@ -56,7 +56,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
             f.write(f"{condition.value} (N = {dist['total']}):\n")
             
             for i in range(n_clusters):
-                f.write(f"  Cluster {i}: {dist['counts'][i]} trials ({dist['percentages'][i]:.1f}%)\n")
+                f.write(f"  Cluster {i + 1}: {dist['counts'][i]} trials ({dist['percentages'][i]:.1f}%)\n")
             
             f.write("\n")
 
@@ -66,7 +66,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
     cluster_percentages = (cluster_counts / total_trials * 100).round(2)
 
     # Calculate average feature values per cluster
-    cluster_averages = {i: [] for i in range(n_clusters)}
+    cluster_averages = {i + 1: [] for i in range(n_clusters)}
     feature_names = [
         "Distance between last touch and pass [m]",
         "Time between last change of direction and pass [s]",
@@ -76,13 +76,13 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
     for i in range(n_clusters):
         cluster_trials = [trial_features[j] for j in range(len(trials)) if labels[j] == i]
         if cluster_trials:
-            cluster_averages[i] = np.mean(cluster_trials, axis=0)
+            cluster_averages[i + 1] = np.mean(cluster_trials, axis=0)
         else:
-            cluster_averages[i] = [float('nan')] * trial_features.shape[1]
+            cluster_averages[i + 1] = [float('nan')] * trial_features.shape[1]
 
     # Create table rows
     rows = []
-    for cluster in range(n_clusters):
+    for cluster in range(1, n_clusters + 1):
         # Add first row with cluster number and first feature
         rows.append([
             f"Cluster {cluster}",
@@ -92,7 +92,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
         
         # Add second row with percentage and count
         rows.append([
-            f"({cluster_percentages[cluster]}%, N = {cluster_counts[cluster]})",
+            f"({cluster_percentages[cluster-1]}%, N = {cluster_counts[cluster-1]})",
             feature_names[1],
             f"{cluster_averages[cluster][1]:.2f}"
         ])

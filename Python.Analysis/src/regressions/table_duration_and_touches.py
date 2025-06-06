@@ -81,11 +81,11 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
     # Rename elements for both metrics
     for metric in ["Duration", "Touches"]:
         table.rename_element("0.0", "<0.01")
-        table.rename_element("C(condition)[NoOpponent]", "α[No Opponent]")
-        table.rename_element("C(condition)[NoInteraction]", "α[No Interaction]")
-        table.rename_element("C(condition)[Interaction]", "α[Interaction]")
-        table.rename_element("C(condition)[InSitu]", "α[In Situ]")
-        table.rename_element("1|participant_id_sigma", "σ Participant")
+        table.rename_element("C(condition)[NoOpponent]", "Interactiveness[No-opponent]")
+        table.rename_element("C(condition)[NoInteraction]", "Interactiveness[Non-interactive]")
+        table.rename_element("C(condition)[Interaction]", "Interactiveness[Interactive]")
+        table.rename_element("C(condition)[InSitu]", "Interactiveness[In situ]")
+        table.rename_element("1|participant_id_sigma", "σj Participant")
         table.rename_element("sigma", "σ")
     
     persistence.save_table(table, file_name) 
