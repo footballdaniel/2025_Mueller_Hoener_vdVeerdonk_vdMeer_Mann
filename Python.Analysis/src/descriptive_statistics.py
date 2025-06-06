@@ -11,10 +11,10 @@ from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
 def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persistence: Persistence) -> None:
     variables = {
         "Number of touches [N]": MovementCalculator.number_of_touches,
-        "Duration [s]": TimeCalculator.duration,
+        "Trial duration [s]": TimeCalculator.duration,
         "Distance between last touch and pass [m]": DistanceCalculator.distance_between_last_touch_and_pass,
         "Time between last change of direction and pass [s]": TimeCalculator.time_between_last_change_of_direction_and_pass,
-        "Number of lateral changes of direction [N]": MovementCalculator.number_lateral_changes_of_direction
+        "Number of changes of direction [N]": MovementCalculator.number_lateral_changes_of_direction
     }
 
     # Get unique participant count
@@ -34,10 +34,10 @@ def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persi
         
         rows.append([
             var_name,
-            f"{mean:.2f}",
-            f"{std:.2f}",
-            f"{min_val:.2f}",
-            f"{max_val:.2f}"
+            f"{mean:.1f}",
+            f"{std:.1f}",
+            f"{min_val:.1f}",
+            f"{max_val:.1f}"
         ])
     
     table = Table(
