@@ -87,7 +87,7 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         hdi_prob=0.95,
         quartiles=False,
         ax=ax2,
-        colors="#8B0000"
+        colors="#8B0000",
     )
     ax2.set_title("")
     ax2.set_xlabel("95% Difference Interval in number of touches [N]")

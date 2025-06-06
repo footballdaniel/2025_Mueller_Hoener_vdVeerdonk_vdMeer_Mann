@@ -33,13 +33,14 @@ class ApaStyledPersistence(Persistence):
             fm.fontManager.addfont(font_path)
             font_name = fm.FontProperties(fname=str(font_path)).get_name()
             plt.rcParams['font.family'] = font_name
+            plt.rcParams['font.size'] = font_size
+
 
         """COLORS AND STYLE"""
         red = "#8B0000"
         blue = "#4A90E2"
         plt.rcParams['axes.prop_cycle'] = cycler(color=[blue, red])  # Red and Dark Blue
         plt.rcParams['lines.linewidth'] = 2
-        plt.rcParams['font.size'] = font_size
         plt.rcParams['figure.dpi'] = 300
 
         if grayscale:
