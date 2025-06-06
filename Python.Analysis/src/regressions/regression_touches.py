@@ -10,7 +10,7 @@ from ..persistence import Persistence
 from ..services import MovementCalculator
 
 
-def regression_touches(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence) -> None:
+def touches(trials: TrialCollection, model_path: Path, model_description_path: Path, persistence: Persistence, n_draws: int = 100, n_tune: int = 100) -> None:
     df = pd.DataFrame({
         "participant_id": [trial.participant_id for trial in trials],
         "touches": [MovementCalculator.number_of_touches(trial) for trial in trials],
@@ -56,7 +56,8 @@ def regression_touches(trials: TrialCollection, model_path: Path, model_descript
     
     if not os.path.exists(str(model_path)):
         results = model_bambi.fit(
-            draws=5000,
+            draws=n_draws,
+            tune=n_tune,
             chains=4,
             idata_kwargs={"log_likelihood": True},
             random_seed=1991

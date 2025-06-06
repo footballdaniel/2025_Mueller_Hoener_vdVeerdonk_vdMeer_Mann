@@ -2,16 +2,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.clustering import plot_cluster_distribution, perform_cluster_analysis, analyze_number_clusters
+import src.regressions as regressions
+import src.clustering as clustering
 from src.persistence import ApaStyledPersistence
 from src.preprocessing import TrialReader
-from src.regressions import (
-    regression_duration,
-    regression_touches,
-    duration_and_touches_predictive_figure,
-    duration_and_touches_table,
-    duration_and_touches_post_hoc
-)
 from src.descriptive_statistics import table_descriptive_statistics
 from src.combined_figures import combined_predictive_and_cluster_figure
 
@@ -34,16 +28,15 @@ if __name__ == '__main__':
 
     table_descriptive_statistics(trials, Path("descriptive_statistics.docx"), persistence)
 
-    regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence)
-    regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence)
+    regressions.regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence, n_draws=5000, n_tune=1000)
+    regressions.regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence, n_draws=5000, n_tune=1000)
 
-    analyze_number_clusters(trials, max_clusters=10, persistence=persistence, path=Path("elbow_method_results.txt"))
-    perform_cluster_analysis(trials, n_clusters=3, persistence=persistence, file_name=Path("cluster_features.docx"))
-    plot_cluster_distribution(trials, persistence=persistence)
+    regressions.duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
+    regressions.duration_and_touches_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
 
-    duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
-    duration_and_touches_predictive_figure(Path("model_1.nc"), Path("model_2.nc"), Path("predictions.png"), persistence)
-    duration_and_touches_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+    clustering.analyze_number_clusters(trials, max_clusters=10, persistence=persistence, path=Path("elbow_method_results.txt"))
+    clustering.perform_cluster_analysis(trials, n_clusters=3, persistence=persistence, file_name=Path("cluster_features.docx"))
+    clustering.plot_cluster_distribution(trials, persistence=persistence)
 
     combined_predictive_and_cluster_figure(
         Path("model_1.nc"),

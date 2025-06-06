@@ -10,9 +10,6 @@ from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
 
 
 def analyze_number_clusters(trials: List[Trial], max_clusters: int, persistence: Persistence, path: Path) -> None:
-    """
-    Plot the elbow method to determine the optimal number of clusters.
-    """
     wcss = []
     trial_features = np.array([
         [
@@ -23,22 +20,16 @@ def analyze_number_clusters(trials: List[Trial], max_clusters: int, persistence:
         for trial in trials
     ])
 
-    # Remove NaN values
     trial_features = trial_features[~np.isnan(trial_features).any(axis=1)]
-
-    # Calculate total sum of squares
     total_ss = np.sum((trial_features - np.mean(trial_features, axis=0)) ** 2)
     
-    # Calculate WCSS and explained variability for each number of clusters
     results = []
     for i in range(1, max_clusters + 1):
         kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
         kmeans.fit(trial_features)
         wcss.append(kmeans.inertia_)
         
-        # Calculate explained variability
         explained_var = 1 - (kmeans.inertia_ / total_ss)
         results.append(f"Clusters: {i}, WCSS: {kmeans.inertia_:.2f}, Explained Variability: {explained_var:.2%}")
 
-    # Save results to text file
     persistence.save_model("\n".join(results), path)

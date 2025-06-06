@@ -16,11 +16,11 @@ class Condition(Enum):
         if self == Condition.InSitu:
             return "In situ"
         elif self == Condition.Interaction:
-            return "Virtual interactive"
+            return "Interactive"
         elif self == Condition.NoInteraction:
-            return "Virtual non-interactive"
+            return "Non-interactive"
         elif self == Condition.NoOpponent:
-            return "Virtual no-opponent"
+            return "No-opponent"
         return self.__repr__()
 
 
