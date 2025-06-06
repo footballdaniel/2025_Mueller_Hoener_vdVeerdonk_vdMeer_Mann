@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 23618d155e976ff4789661d31baa110c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/FootballPitch03WhiteLinesShader.mat
+  uploadId: 607427

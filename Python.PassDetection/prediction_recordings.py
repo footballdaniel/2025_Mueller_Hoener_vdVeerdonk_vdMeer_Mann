@@ -15,8 +15,8 @@ onnx_session = ort.InferenceSession(onnx_model_path)
 feature_names = json.loads(onnx_session.get_modelmeta().custom_metadata_map['features'])
 
 """LOAD RECORDING"""
-timeseries_file = Path('../Data/Pilot_4/trial_3_2024-10-29_15-58-40.json')
-events_file = Path('../Data/Pilot_4/trial_3_2024-10-29_15-58-40.csv')
+timeseries_file = Path('../Data/PassDetection/trial_3_2024-10-29_15-58-40.json')
+events_file = Path('../Data/PassDetection/trial_3_2024-10-29_15-58-40.csv')
 recording = RecordingParser.parse_recording(timeseries_file, events_file)
 
 """FEATURE ENGINEER"""

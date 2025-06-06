@@ -4,7 +4,7 @@ from src.infra.tiny_db.tiny_db_repository import RepositoryWithInMemoryCache
 from src.services.ingester import DataIngester
 from src.services.sampling.sample_generator import SampleGenerator
 
-recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
+recordings = DataIngester.ingest(Path("../Data/PassDetection"))
 samples_iterator = SampleGenerator.generate(recordings)
 repo = RepositoryWithInMemoryCache(samples_iterator)
 

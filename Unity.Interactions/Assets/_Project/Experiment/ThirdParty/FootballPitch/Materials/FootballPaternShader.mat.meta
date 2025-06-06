@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0b52d9d41a4b26f4ea8baa718817f566
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/FootballPaternShader.mat
+  uploadId: 607427

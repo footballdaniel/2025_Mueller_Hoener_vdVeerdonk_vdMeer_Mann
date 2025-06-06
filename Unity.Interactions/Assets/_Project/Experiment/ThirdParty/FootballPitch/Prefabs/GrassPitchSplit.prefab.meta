@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6fc9ba90845c04846a37bc767a751cdb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Prefabs/GrassPitchSplit.prefab
+  uploadId: 607427

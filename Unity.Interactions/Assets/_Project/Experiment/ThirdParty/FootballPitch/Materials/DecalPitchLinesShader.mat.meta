@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 51dc13c8272066447901cd1812d647d6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/DecalPitchLinesShader.mat
+  uploadId: 607427

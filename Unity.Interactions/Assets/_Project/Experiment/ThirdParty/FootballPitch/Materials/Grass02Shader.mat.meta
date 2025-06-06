@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: efe60ea1352d28947a6feef5554d88d7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 113290
+  packageName: Football Pitch
+  packageVersion: 4.0
+  assetPath: Assets/FootballPitch/Materials/Grass02Shader.mat
+  uploadId: 607427

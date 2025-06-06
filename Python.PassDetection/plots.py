@@ -8,7 +8,7 @@ from src.services.plotter import TimeSeriesPlot
 from src.services.sampling.sample_generator import SampleGenerator
 
 """CONFIGURATION"""
-data_path = Path("../Data/Pilot_4")
+data_path = Path("../Data/PassDetection")
 plot_dir = Path("plots")
 features_to_plot = ['VelocityMagnitudeDominantFoot', 'VelocityMagnitudeNonDominantFoot']
 

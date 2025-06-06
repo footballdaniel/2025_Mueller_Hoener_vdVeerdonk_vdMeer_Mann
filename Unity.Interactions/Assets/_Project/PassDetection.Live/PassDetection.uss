@@ -1,0 +1,14 @@
+#MySlider Label {
+    display: none;
+}
+
+#MySlider #unity-tracker {
+    color: rgb(0, 8, 255);
+    display: flex;
+    top: 0;
+    min-height: 30px;
+}
+
+#MySlider #unity-dragger {
+    min-width: 30px;
+}

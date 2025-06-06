@@ -1,0 +1,22 @@
+{
+  "name": "Interactions",
+  "rootNamespace": "",
+  "references": [
+    "GUID:75469ad4d38634e559750d17036d5f7c",
+    "GUID:e40ba710768534012815d3193fa296cb",
+    "GUID:6055be8ebefd69e48b49212b09b47b2f",
+    "GUID:44cba267781211e48a432a2b6ab15ff2",
+    "GUID:8e674e8499285184d9dbfbbd325f1b14",
+    "GUID:07693a3360755bf46a692d33f6e2092f",
+    "GUID:c98377141161c7746a178fb5cb1af075"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

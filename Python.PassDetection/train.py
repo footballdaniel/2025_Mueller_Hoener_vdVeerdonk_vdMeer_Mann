@@ -42,14 +42,14 @@ max_samples = 1_000_000
 train_percentage = 0.7
 validation_percentage = 0.2
 test_percentage = 0.1
-output_dir_model = Path("../VUInteractions/Assets/Resources")
+output_dir_model = Path("../Unity.Interactions/Assets/Resources")
 torch.manual_seed(0)
 
 """PIPELINE"""
 with mlflow.start_run(run_name=architecture):
 
     """CREATING SAMPLES"""
-    recordings = DataIngester.ingest(Path("../Data/Pilot_4"))
+    recordings = DataIngester.ingest(Path("../Data/PassDetection"))
     samples_iterator = SampleGenerator.generate(recordings)
     repo = RepositoryWithInMemoryCache(samples_iterator)
 
