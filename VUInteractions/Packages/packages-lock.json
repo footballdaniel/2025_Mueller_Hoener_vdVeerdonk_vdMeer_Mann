@@ -347,12 +347,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.vu.passdetection": {
-      "version": "file:com.vu.passdetection",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.vu.powerwall": {
       "version": "file:com.vu.powerwall",
       "depth": 0,
