@@ -28,7 +28,7 @@ class Persistence(ABC):
         ...
 
     @abstractmethod
-    def save_model(self, model: str, file_name: Path) -> None:
+    def save_text(self, model: str, file_name: Path) -> None:
         ...
 
     @abstractmethod

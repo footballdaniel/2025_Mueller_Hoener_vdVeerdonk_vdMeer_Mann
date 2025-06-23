@@ -1,6 +1,6 @@
 from typing import List
 import numpy as np
-from .domain import Trial, Touch, Position, Condition
+from .domain import Trial, Touch, Position, Condition, TrialCollection
 from .preprocessing import Filter
 
 
@@ -81,4 +81,23 @@ class MovementCalculator:
 
         derivative = np.diff(z_positions)
         number_changes_direction = np.sum(derivative[1:] * derivative[:-1] < 0)
-        return number_changes_direction 
+        return number_changes_direction
+
+
+class OutlierCalculator:
+
+    @staticmethod
+    def number_of_touches_greater_than(trials: TrialCollection, threshold: int) -> int:
+        count = 0
+        for trial in trials:
+            if MovementCalculator.number_of_touches(trial) > threshold:
+                count += 1
+        return count
+
+    @staticmethod
+    def duration_greater_than(trials: TrialCollection, threshold: float) -> int:
+        count = 0
+        for trial in trials:
+            if TimeCalculator.duration(trial) > threshold:
+                count += 1
+        return count

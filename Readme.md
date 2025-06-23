@@ -2,7 +2,9 @@
 
 Mueller, Hoener, van der Veerdonk, van der Meer, Mann
 
-![](Data/vr_setup.png)
+<p align="center">
+    <img src="Data/vr_setup.png" alt="VR Setup" style="max-width:50%;">
+</p>
 
 ## Requirements (Unity)
 - Unity 6000.0.19f1

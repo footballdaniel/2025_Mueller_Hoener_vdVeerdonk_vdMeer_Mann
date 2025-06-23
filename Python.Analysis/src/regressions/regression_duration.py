@@ -52,7 +52,7 @@ def regression_duration(trials: TrialCollection, model_path: Path, model_descrip
         priors=priors,
     )
     
-    persistence.save_model(model_bambi.__str__(), model_description_path)
+    persistence.save_text(model_bambi.__str__(), model_description_path)
     
     if not os.path.exists(str(model_path)):
         results = model_bambi.fit(

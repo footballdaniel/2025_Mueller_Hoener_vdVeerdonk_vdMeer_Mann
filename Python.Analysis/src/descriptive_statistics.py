@@ -5,7 +5,7 @@ from src.domain import TrialCollection
 from src.persistence.persistence import Persistence
 from src.persistence.apa_word_table_formatter import Table
 
-from src.services import DistanceCalculator, TimeCalculator, MovementCalculator
+from src.services import DistanceCalculator, TimeCalculator, MovementCalculator, OutlierCalculator
 
 
 def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persistence: Persistence) -> None:
@@ -45,5 +45,15 @@ def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persi
         header=header,
         rows=rows
     )
+
+    duration_threshold = 10
+    touches_threshold = 10
+    outliers_duration = OutlierCalculator.duration_greater_than(trials, duration_threshold)
+    outliers_touches = OutlierCalculator.number_of_touches_greater_than(trials, touches_threshold)
+
+    persistence.save_text(f"Outliers: {outliers_duration} trials with duration > {duration_threshold}s, "
+                          f"{outliers_touches} trials with touches > {touches_threshold}.\n\n", file_name)
+
+
     
     persistence.save_table(table, file_name) 

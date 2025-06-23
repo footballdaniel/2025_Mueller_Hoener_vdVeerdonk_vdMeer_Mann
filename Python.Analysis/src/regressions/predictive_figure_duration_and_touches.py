@@ -49,7 +49,7 @@ def duration_and_touches_predictive_figure(duration_model_path: Path, touches_mo
         interval_results += f"  Width: {width:.3f} touches\n\n"
 
     if isinstance(persistence, ApaStyledPersistence):
-        persistence.save_model(interval_results, file_name.with_suffix('.txt'))
+        persistence.save_text(interval_results, file_name.with_suffix('.txt'))
     else:
         print(interval_results)
 

@@ -32,4 +32,4 @@ def analyze_number_clusters(trials: List[Trial], max_clusters: int, persistence:
         explained_var = 1 - (kmeans.inertia_ / total_ss)
         results.append(f"Clusters: {i}, WCSS: {kmeans.inertia_:.2f}, Explained Variability: {explained_var:.2%}")
 
-    persistence.save_model("\n".join(results), path)
+    persistence.save_text("\n".join(results), path)

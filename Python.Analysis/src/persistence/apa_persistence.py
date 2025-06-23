@@ -70,7 +70,7 @@ class ApaStyledPersistence(Persistence):
 
         self.formatter.create(table, file_name, column_format)
 
-    def save_model(self, model: str, file_name: Path):
+    def save_text(self, model: str, file_name: Path):
         if not file_name.parent.exists():
             file_name.parent.mkdir(parents=True)
 

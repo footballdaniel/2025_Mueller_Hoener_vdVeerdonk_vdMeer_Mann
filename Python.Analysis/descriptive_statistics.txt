@@ -1,0 +1,2 @@
+Outliers: 10 trials with duration > 10s, 21 trials with touches > 10.
+
