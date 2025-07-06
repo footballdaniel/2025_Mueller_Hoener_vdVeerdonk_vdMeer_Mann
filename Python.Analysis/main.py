@@ -25,7 +25,6 @@ if __name__ == '__main__':
 
     trials = TrialReader.read_trials(data_path)
 
-
     table_descriptive_statistics(trials, Path("descriptive_statistics.docx"), persistence)
 
     regressions.regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence, n_draws=5000, n_tune=1000)

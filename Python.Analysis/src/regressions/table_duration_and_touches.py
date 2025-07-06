@@ -19,7 +19,7 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
     duration_summary = az.summary(
         duration_results,
         hdi_prob=0.95,
-        stat_funcs={"Zero effect probability": probability_effect_is_zero},
+        stat_funcs={"Null effect probability": probability_effect_is_zero},
         var_names=["~^mu"],
         filter_vars="regex"
     )
@@ -27,7 +27,7 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
     touches_summary = az.summary(
         touches_results,
         hdi_prob=0.95,
-        stat_funcs={"Zero effect probability": probability_effect_is_zero},
+        stat_funcs={"Null effect probability": probability_effect_is_zero},
         var_names=["~^mu"],
         filter_vars="regex"
     )
@@ -61,6 +61,8 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
         summary["CI"] = summary.apply(
             lambda row: f"{row['hdi_2.5%']:.2f} – {row['hdi_97.5%']:.2f}", axis=1
         )
+        summary["Estimates"] = summary["mean"].apply(lambda x: f"{x:.2f}")
+
     
     duration_summary.insert(0, 'Metric', 'Duration')
     touches_summary.insert(0, 'Metric', 'Touches')
@@ -68,9 +70,9 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
     combined_summary = pd.concat([duration_summary, touches_summary], axis=0)
     combined_summary.insert(0, 'Predictors', combined_summary.index)
     
-    rows = combined_summary[["Metric", "Predictors", "mean", "CI", "ess_bulk", "Zero effect probability"]].astype(str).values.tolist()
-    
-    header = ["Metric", "Predictors", "Estimates", "CI (2.5%, 97.5%)", "ESS", "Zero effect probability"]
+    rows = combined_summary[["Metric", "Predictors", "Estimates", "CI", "ess_bulk", "Null effect probability"]].astype(str).values.tolist()
+
+    header = ["Metric", "Predictors", "Estimates", "CI (2.5%, 97.5%)", "ESS", "Null effect probability"]
     
     table = Table(
         title="Combined hierarchical regression model predictions per condition",
@@ -88,4 +90,4 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
         table.rename_element("1|participant_id_sigma", "σj Participant")
         table.rename_element("sigma", "σ")
     
-    persistence.save_table(table, file_name) 
+    persistence.save_table(table, file_name)

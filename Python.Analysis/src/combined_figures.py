@@ -32,8 +32,7 @@ def combined_predictive_and_cluster_figure(
     touches_lower = np.percentile(touches_samples, 2.5, axis=1)
     touches_upper = np.percentile(touches_samples, 97.5, axis=1)
 
-    # Get conditions in reversed order
-    conditions = list(reversed(Condition))
+    conditions = list(Condition)
     x_positions = {
         str(Condition.NoOpponent): 1.0,
         str(Condition.NoInteraction): 2.5, 
@@ -57,19 +56,19 @@ def combined_predictive_and_cluster_figure(
 
     ax1.bar(x_pos - 0.2, duration_means, 0.4,
             yerr=[duration_means - duration_lower, duration_upper - duration_means],
-            capsize=5, color='#4A90E2', label='Duration')
-    ax1.set_ylabel('Duration [s]')
+            capsize=5, color='#4A90E2', label='Trial duration')
+    ax1.set_ylabel('Trial duration [s]')
 
     ax2.bar(x_pos + 0.2, touches_means, 0.4,
             yerr=[touches_means - touches_lower, touches_upper - touches_means],
-            capsize=5, color='#8B0000', label='Touches')
-    ax2.set_ylabel('Number of Touches [N]')
+            capsize=5, color='#8B0000', label='Number of touches')
+    ax2.set_ylabel('Number of touches [N]')
 
     ax1.set_xticks(x_pos)
     formatted_labels = [str(cond) for cond in conditions]
     ax1.set_xticklabels(formatted_labels, rotation=0)
 
-    legend_labels_top = ['Duration', 'Touches']
+    legend_labels_top = ['Trial duration', 'Number of touches']
     legend_colors_top = ['#4A90E2', '#8B0000']
     legend_handles_top = [
         plt.Line2D([0], [0], marker='s', linestyle='None', color='none',
@@ -79,8 +78,8 @@ def combined_predictive_and_cluster_figure(
     ax1.legend(
         legend_handles_top,
         legend_labels_top,
-        loc='upper left',
-        ncol=2,
+        loc='upper right',
+        ncol=1,
         frameon=False
     )
 
@@ -92,7 +91,7 @@ def combined_predictive_and_cluster_figure(
 
     colors = ['#000000', '#E0E0E0', '#808080']
 
-    for condition in reversed(Condition):
+    for condition in conditions:
         labels = [trial.cluster_label for trial in trials if trial.condition == condition]
         label_set = sorted(set(labels))
         counts = [labels.count(label) for label in label_set]

@@ -74,7 +74,7 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         colors="#4A90E2"
     )
     ax1.set_title("")
-    ax1.set_xlabel("95% Difference interval in trial duration [s]")
+    ax1.set_xlabel("95% Difference of probability density interval in trial duration [s]")
     ax1.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
     
     # Plot touches differences
@@ -90,7 +90,7 @@ def duration_and_touches_post_hoc(duration_model_path: Path, touches_model_path:
         colors="#8B0000",
     )
     ax2.set_title("")
-    ax2.set_xlabel("95% Difference Interval in number of touches [N]")
+    ax2.set_xlabel("95% Difference of probability density interval in number of touches [N]")
     ax2.tick_params(axis='both', which='major', labelsize=plt.rcParams['font.size'])
     
     # Update font for all text elements
