@@ -64,8 +64,8 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
         summary["Estimates"] = summary["mean"].apply(lambda x: f"{x:.2f}")
 
     
-    duration_summary.insert(0, 'Metric', 'Duration')
-    touches_summary.insert(0, 'Metric', 'Touches')
+    duration_summary.insert(0, 'Metric', 'Trial duration')
+    touches_summary.insert(0, 'Metric', 'Number of touches')
     
     combined_summary = pd.concat([duration_summary, touches_summary], axis=0)
     combined_summary.insert(0, 'Predictors', combined_summary.index)
@@ -83,10 +83,10 @@ def duration_and_touches_table(duration_model_path: Path, touches_model_path: Pa
     # Rename elements for both metrics
     for metric in ["Duration", "Touches"]:
         table.rename_element("0.0", "<0.01")
-        table.rename_element("C(condition)[NoOpponent]", "Interactiveness[No-opponent]")
-        table.rename_element("C(condition)[NoInteraction]", "Interactiveness[Non-interactive]")
-        table.rename_element("C(condition)[Interaction]", "Interactiveness[Interactive]")
-        table.rename_element("C(condition)[InSitu]", "Interactiveness[In situ]")
+        table.rename_element("C(condition)[NoOpponent]", "Interaction[No-opponent]")
+        table.rename_element("C(condition)[NoInteraction]", "Interaction[Non-interactive]")
+        table.rename_element("C(condition)[Interaction]", "Interaction[Interactive]")
+        table.rename_element("C(condition)[InSitu]", "Interaction[In situ]")
         table.rename_element("1|participant_id_sigma", "σj Participant")
         table.rename_element("sigma", "σ")
     

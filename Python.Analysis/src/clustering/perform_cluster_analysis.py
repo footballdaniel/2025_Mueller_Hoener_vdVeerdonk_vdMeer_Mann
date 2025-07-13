@@ -92,7 +92,7 @@ def perform_cluster_analysis(trials: TrialCollection, n_clusters: int, persisten
         
         # Add second row with percentage and count
         rows.append([
-            f"({cluster_percentages[cluster-1]}%, N = {cluster_counts[cluster-1]})",
+            f"({cluster_percentages[cluster-1]}% of trials, N = {cluster_counts[cluster-1]})",
             feature_names[1],
             f"{cluster_averages[cluster][1]:.2f}"
         ])

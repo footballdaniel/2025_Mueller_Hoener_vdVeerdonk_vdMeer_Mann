@@ -1,3 +1,4 @@
+import textwrap
 from pathlib import Path
 
 import arviz as az
@@ -65,7 +66,8 @@ def combined_predictive_and_cluster_figure(
     ax2.set_ylabel('Number of touches [N]')
 
     ax1.set_xticks(x_pos)
-    formatted_labels = [str(cond) for cond in conditions]
+    formatted_labels = ['\n'.join(textwrap.wrap(str(cond), width=20)) for cond in conditions]
+    ax1.set_xticklabels(formatted_labels, rotation=0)
     ax1.set_xticklabels(formatted_labels, rotation=0)
 
     legend_labels_top = ['Trial duration', 'Number of touches']
