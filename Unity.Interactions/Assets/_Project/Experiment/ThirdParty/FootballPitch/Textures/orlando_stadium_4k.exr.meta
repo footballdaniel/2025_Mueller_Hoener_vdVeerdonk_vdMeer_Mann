@@ -1,12 +1,5 @@
 fileFormatVersion: 2
 guid: 34fcfd9904e9bcd4581edbae55f47c94
-AssetOrigin:
-  serializedVersion: 1
-  productId: 113290
-  packageName: Football Pitch
-  packageVersion: 4.0
-  assetPath: Assets/FootballPitch/Textures/orlando_stadium_4k.exr
-  uploadId: 607427
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
