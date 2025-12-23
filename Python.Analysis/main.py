@@ -85,8 +85,9 @@ for metric in metrics:
     n1 = len(interaction_values)
     n2 = len(no_interaction_values)
     pooled_sd = (((n1 - 1) * (std1 ** 2) + (n2 - 1) * (std2 ** 2)) / (n1 + n2 - 2)) ** 0.5
+    pooled_variance = pooled_sd ** 2
     effect_size = (mean1 - mean2) / pooled_sd
     required_per_condition = math.ceil(power_analysis.solve_power(effect_size=abs(effect_size), alpha=0.05, power=0.8, alternative="two-sided"))
-    power_results.append((metric, effect_size, required_per_condition))
-for metric, effect_size, required_per_condition in power_results:
-    print(f"{metric}: effect_size={effect_size:.3f}, participants_per_condition_needed={required_per_condition}, total_needed={required_per_condition * 2}")
+    power_results.append((metric, effect_size, required_per_condition, pooled_variance))
+for metric, effect_size, required_per_condition, pooled_variance in power_results:
+    print(f"{metric}: pooled_variance={pooled_variance:.4f}, effect_size={effect_size:.3f}, participants_per_condition_needed={required_per_condition}, total_needed={required_per_condition * 2}")
