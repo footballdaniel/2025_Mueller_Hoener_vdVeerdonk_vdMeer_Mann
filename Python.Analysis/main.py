@@ -1,46 +1,92 @@
-from pathlib import Path
-
+import glob
+import re
+import matplotlib.pyplot as plt
+import math
 import pandas as pd
+import seaborn as sns
+from statsmodels.stats.power import TTestIndPower
+from src.domain import Condition
+from src.manual_annotations import ingest
+from src.persistence import CSVPersistence
 
-import src.regressions as regressions
-import src.clustering as clustering
-from src.persistence import ApaStyledPersistence
-from src.preprocessing import TrialReader
-from src.descriptive_statistics import table_descriptive_statistics
-from src.combined_figures import combined_predictive_and_cluster_figure
+# Define the path to your data files
+data_path = "../Data/Experiment/**/*.csv"
+persistence = CSVPersistence()
 
-if __name__ == '__main__':
-    data_path = "../Data/Experiment/**/*.csv"
+files = glob.glob(data_path, recursive=True)
+trials = []
+for csv_file in files:
+    json_file = csv_file.replace(".csv", ".json")
+    trial = ingest(csv_file, json_file)
+    trials.append(trial)
+    trial.accept(persistence)
 
-    persistence = ApaStyledPersistence(
-        font=Path("Calibri.ttf"),
-        font_size=11,
-        double_column_width_inches=6.5,
-        single_column_width_inches=3,
-        grayscale=False
-    )
+persistence.save(trials, "results.csv")
 
-    pd.set_option('display.max_columns', None)  # Show all columns
-    pd.set_option('display.width', 1000)  # Set a wider width
+conditions = [Condition.IN_SITU, Condition.INTERACTION, Condition.NO_INTERACTION, Condition.NO_OPPONENT]
 
-    trials = TrialReader.read_trials(data_path)
+# Function to convert condition enum to formatted string
+def format_condition(condition):
+    condition_str = condition.value
+    return " ".join([word.capitalize() for word in re.sub(r'([a-z])([A-Z])', r'\1 \2', condition_str).split()])
 
-    table_descriptive_statistics(trials, Path("descriptive_statistics.docx"), persistence)
+# Variables to plot
+metrics = [
+    "number_of_touches",
+    "duration",
+    "timing_between_last_touch_and_pass",
+]
 
-    regressions.regression_duration(trials, Path("model_1.nc"), Path("model_1.txt"), persistence, n_draws=5000, n_tune=1000)
-    regressions.regression_touches(trials, Path("model_2.nc"), Path("model_2.txt"), persistence, n_draws=5000, n_tune=1000)
+# Define colors
+blue = "#4A90E2"
+red = "#8B0000"
 
-    regressions.duration_and_touches_table(Path("model_1.nc"), Path("model_2.nc"), Path("model_predictions.docx"), persistence)
-    regressions.duration_and_touches_post_hoc(Path("model_1.nc"), Path("model_2.nc"), Path("ridge_differences.png"), persistence)
+# Aggregate data: compute mean per participant per condition for each metric
+aggregated_data = []
+selected_trials = [trial for trial in trials if trial.participant_id in {1, 2, 3, 4, 5, 6}]
+for condition in conditions:
+    participant_data = {metric: {} for metric in metrics}
+    for trial in selected_trials:
+        if trial.condition == condition:
+            for metric in metrics:
+                value = getattr(trial, metric)()
+                if trial.participant_id not in participant_data[metric]:
+                    participant_data[metric][trial.participant_id] = []
+                participant_data[metric][trial.participant_id].append(value)
 
-    clustering.analyze_number_clusters(trials, max_clusters=10, persistence=persistence, path=Path("elbow_method_results.txt"))
-    clustering.perform_cluster_analysis(trials, n_clusters=3, persistence=persistence, file_name=Path("cluster_features.docx"))
-    clustering.plot_cluster_distribution(trials, persistence=persistence)
+    for metric in metrics:
+        for participant, values in participant_data[metric].items():
+            aggregated_data.append({
+                'Participant': participant,
+                'Condition': format_condition(condition),
+                'Metric': metric,
+                'Value': sum(values) / len(values)
+            })
 
-    combined_predictive_and_cluster_figure(
-        Path("model_1.nc"),
-        Path("model_2.nc"),
-        trials,
-        Path("combined_figure.png"),
-        persistence
-    )
+df = pd.DataFrame(aggregated_data)  # Keep all aggregated data in df
+
+"""Only comparable conds"""
+# Filter data to only include INTERACTION and NO_INTERACTION conditions
+filtered_conditions = [format_condition(Condition.INTERACTION), format_condition(Condition.NO_INTERACTION)]
+df_filtered = df[df["Condition"].isin(filtered_conditions)]
+participants_in_dataset = len({trial.participant_id for trial in selected_trials})
+print(f"Participants in dataset: {participants_in_dataset}")
+print("Effect size uses Cohen's d; unitless, in pooled SD units.")
+power_analysis = TTestIndPower()
+power_results = []
+for metric in metrics:
+    sub_df = df_filtered[df_filtered["Metric"] == metric]
+    interaction_values = sub_df[sub_df["Condition"] == format_condition(Condition.INTERACTION)]["Value"]
+    no_interaction_values = sub_df[sub_df["Condition"] == format_condition(Condition.NO_INTERACTION)]["Value"]
+    mean1 = interaction_values.mean()
+    mean2 = no_interaction_values.mean()
+    std1 = interaction_values.std()
+    std2 = no_interaction_values.std()
+    n1 = len(interaction_values)
+    n2 = len(no_interaction_values)
+    pooled_sd = (((n1 - 1) * (std1 ** 2) + (n2 - 1) * (std2 ** 2)) / (n1 + n2 - 2)) ** 0.5
+    effect_size = (mean1 - mean2) / pooled_sd
+    required_per_condition = math.ceil(power_analysis.solve_power(effect_size=abs(effect_size), alpha=0.05, power=0.8, alternative="two-sided"))
+    power_results.append((metric, effect_size, required_per_condition))
+for metric, effect_size, required_per_condition in power_results:
+    print(f"{metric}: effect_size={effect_size:.3f}, participants_per_condition_needed={required_per_condition}, total_needed={required_per_condition * 2}")

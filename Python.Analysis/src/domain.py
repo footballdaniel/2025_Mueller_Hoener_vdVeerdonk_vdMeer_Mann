@@ -4,24 +4,15 @@ from enum import Enum
 from typing import List
 
 import numpy as np
+from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
 
 
 class Condition(Enum):
-    InSitu = "InSitu"
-    Interaction = "Interaction"
-    NoInteraction = "NoInteraction"
-    NoOpponent = "NoOpponent"
-
-    def __str__(self) -> str:
-        if self == Condition.InSitu:
-            return "In situ opponent"
-        elif self == Condition.Interaction:
-            return "Interactive opponent"
-        elif self == Condition.NoInteraction:
-            return "Non-interactive opponent"
-        elif self == Condition.NoOpponent:
-            return "No-opponent"
-        return self.__repr__()
+    IN_SITU = 'InSitu'
+    INTERACTION = 'Interaction'
+    NO_INTERACTION = 'NoInteraction'
+    NO_OPPONENT = 'NoOpponent'
 
 
 @dataclass
@@ -30,8 +21,8 @@ class Position:
     y: float
     z: float
 
-    def distance_2d(self, other: 'Position') -> float:
-        return np.sqrt((self.x - other.x) ** 2 + (self.z - other.z) ** 2)
+    def distance_2d(self, other):
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
 
     def magnitude(self):
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
@@ -45,14 +36,14 @@ class Position:
 
 
 class Footedness(Enum):
-    Left = "Left"
-    Right = "Right"
+    RIGHT = 'Right'
+    LEFT = 'Left'
 
 
 class Side(Enum):
-    Dominant = 'Dominant'
-    NonDominant = 'NonDominant'
-    Unknown = 'Unknown'
+    DOMINANT = 'Dominant'
+    NON_DOMINANT = 'NonDominant'
+    UNKNOWN = 'Unknown'
 
 
 @dataclass
@@ -61,7 +52,7 @@ class Foot:
 
 
 @dataclass
-class Action:
+class Action(abc.ABC):
     position: Position
     time_index: int
 
@@ -79,16 +70,17 @@ class Touch(Action):
 
 @dataclass
 class Pass(Action):
-    success: bool = True
-    foot: Foot = None
+    foot: Foot
+    success: bool
 
 
 class NoPass(Pass):
+
     def __init__(
             self,
             position: Position = Position(0.0, 0.0, 0.0),
             time: int = 0,
-            foot: Foot = Foot(Side.Unknown),
+            foot: Foot = Foot(Side.UNKNOWN),
             success: bool = False
     ):
         self.position = position
@@ -124,15 +116,71 @@ class Trial:
     pass_event: Pass
     dominant_foot_side: Footedness
     has_missing_data: bool = False
-    cluster_label: int = None
 
+    def accept(self, persistence: Persistence):
+        persistence.add(self)
 
-@dataclass
-class TrialCollection:
-    trials: List[Trial]
+    def distance_between_last_touch_and_pass(self):
+        last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
+        distance = last_touch.position.distance_2d(self.pass_event.position)
+        return distance
 
-    def __iter__(self):
-        return iter(self.trials)
+    def timing_between_last_touch_and_pass(self):
+        last_touch = next((action for action in reversed(self.actions) if isinstance(action, Touch)), None)
+        time_difference = self.timestamps[self.pass_event.time_index] - self.timestamps[last_touch.time_index]
+        return time_difference
 
-    def __len__(self) -> int:
-        return len(self.trials)
+    def duration(self):
+        first_action_time = self.timestamps[self.start.time_index]
+        last_action_time = self.timestamps[self.pass_event.time_index]
+        return last_action_time - first_action_time
+
+    def number_of_touches(self):
+        return len(self.actions)
+
+    def average_interpersonal_distance(self):
+        if self.condition == Condition.NO_OPPONENT:
+            return 0
+
+        total_distance = 0
+        start_index = self.start.time_index
+        end_index = self.pass_event.time_index
+
+        for i in range(start_index, end_index):
+            total_distance += self.hip_positions[i].distance_2d(self.opponent_hip_positions[i])
+        return total_distance / (end_index - start_index)
+
+    def interpersonal_distance_at_pass_time(self):
+        if self.condition == Condition.NO_OPPONENT:
+            return 0
+
+        position_of_player = self.hip_positions[self.pass_event.time_index]
+        position_of_opponent = self.opponent_hip_positions[self.pass_event.time_index]
+
+        return position_of_player.distance_2d(position_of_opponent)
+
+    def butterworth_filter(self, data, cutoff=10, fs=100, order=3):
+        nyquist = 0.5 * fs
+        normal_cutoff = cutoff / nyquist
+        b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        return filtfilt(b, a, data)
+
+    def upsample(self, data, timestamps, target_fs=100):
+        target_times = np.arange(timestamps[0], timestamps[-1], 1 / target_fs)
+        interp_func = interp1d(timestamps, data, kind="linear", fill_value="extrapolate")
+        return target_times, interp_func(target_times)
+
+    def number_lateral_changes_of_direction(self, cutoff=1, target_fs=100, order=3):
+        raw_timestamps = np.array(self.timestamps)  # Original timestamps (100ms interval)
+        z_positions = np.array([pos.z for pos in self.head_positions])  # Z positions of user's head
+
+        # Filter timestamps and z positions to match the start and end of the trial
+        z_positions = z_positions[self.start.time_index:self.pass_event.time_index]
+        raw_timestamps = raw_timestamps[self.start.time_index:self.pass_event.time_index]
+
+        upsampled_times, upsampled_z = self.upsample(z_positions, raw_timestamps, target_fs=target_fs)
+        filtered_z = self.butterworth_filter(upsampled_z, cutoff=cutoff, fs=target_fs, order=order)
+
+        # Compute sign changes in derivative
+        derivative = np.diff(filtered_z)
+        return np.sum(derivative[1:] * derivative[:-1] < 0)

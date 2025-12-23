@@ -1,6 +1,6 @@
 {
   "Condition": "LaboratoryNoOpponent",
-  "DominantFoot": "Left",
+  "DominantFoot": "Right",
   "FrameRateHz": 10,
   "NumberOfFrames": 113,
   "ContainsError": true,

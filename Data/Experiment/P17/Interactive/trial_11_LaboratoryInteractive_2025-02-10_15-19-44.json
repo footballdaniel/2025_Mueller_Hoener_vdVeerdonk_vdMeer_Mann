@@ -1,9 +1,9 @@
 {
   "Condition": "LaboratoryInteractive",
-  "DominantFoot": "Left",
+  "DominantFoot": "Right",
   "FrameRateHz": 10,
   "NumberOfFrames": 72,
-  "ContainsError": false,
+  "ContainsError": true,
   "Timestamps": [
     0.1,
     0.2,
