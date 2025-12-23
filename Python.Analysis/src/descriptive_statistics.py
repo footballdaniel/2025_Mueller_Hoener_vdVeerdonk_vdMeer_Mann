@@ -39,11 +39,11 @@ def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persi
         
         rows.append([
             var_name,
-            "Across conditions",
-            f"{overall_mean:.1f}",
-            f"{overall_std:.1f}",
-            f"{overall_min:.1f}",
-            f"{overall_max:.1f}"
+            "",
+            "",
+            "",
+            "",
+            ""
         ])
         
         for condition in condition_order:
@@ -63,6 +63,15 @@ def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persi
                     f"{condition_min:.1f}",
                     f"{condition_max:.1f}"
                 ])
+        
+        rows.append([
+            "",
+            "Across conditions",
+            f"{overall_mean:.1f}",
+            f"{overall_std:.1f}",
+            f"{overall_min:.1f}",
+            f"{overall_max:.1f}"
+        ])
     
     table = Table(
         title=f"Descriptive Statistics (N = {n_participants})",
