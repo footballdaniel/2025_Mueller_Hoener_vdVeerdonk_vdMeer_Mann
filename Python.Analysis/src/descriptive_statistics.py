@@ -58,19 +58,19 @@ def table_descriptive_statistics(trials: TrialCollection, file_name: Path, persi
                 rows.append([
                     "",
                     str(condition),
-                    f"{condition_mean:.1f}",
-                    f"{condition_std:.1f}",
-                    f"{condition_min:.1f}",
-                    f"{condition_max:.1f}"
+                    f"{condition_mean:.2f}",
+                    f"{condition_std:.2f}",
+                    f"{condition_min:.2f}",
+                    f"{condition_max:.2f}"
                 ])
         
         rows.append([
             "",
             "Across conditions",
-            f"{overall_mean:.1f}",
-            f"{overall_std:.1f}",
-            f"{overall_min:.1f}",
-            f"{overall_max:.1f}"
+            f"{overall_mean:.2f}",
+            f"{overall_std:.2f}",
+            f"{overall_min:.2f}",
+            f"{overall_max:.2f}"
         ])
     
     table = Table(
