@@ -55,6 +55,13 @@ def combined_predictive_and_cluster_figure(
     ax2.spines['top'].set_visible(False)
     ax2.spines['right'].set_visible(False)
 
+    duration_means = duration_means[::-1]
+    duration_lower = duration_lower[::-1]
+    duration_upper = duration_upper[::-1]
+    touches_means = touches_means[::-1]
+    touches_lower = touches_lower[::-1]
+    touches_upper = touches_upper[::-1]
+
     ax1.bar(x_pos - 0.2, duration_means, 0.4,
             yerr=[duration_means - duration_lower, duration_upper - duration_means],
             capsize=5, color='#4A90E2', label='Trial duration')
@@ -80,13 +87,15 @@ def combined_predictive_and_cluster_figure(
     ax1.legend(
         legend_handles_top,
         legend_labels_top,
-        loc='upper right',
+        loc='upper left',
         ncol=1,
         frameon=False
     )
 
     common_xlim = (0.5, 6.0)
     ax1.set_xlim(common_xlim)
+
+    fig.text(0.02, 0.98, 'A', fontsize=12, ha='left', va='top')
 
     ax3 = fig.add_subplot(gs[1])
     ax3.set_anchor('N')
@@ -115,16 +124,13 @@ def combined_predictive_and_cluster_figure(
             radius=0.4
         )
 
-        # Add percentage labels outside the pie slices
         for i, wedge in enumerate(wedges):
             angle = (wedge.theta2 - wedge.theta1) / 2. + wedge.theta1
-            # Position labels outside the pie (radius > 0.4)
             x = pie_x + 0.45 * np.cos(np.deg2rad(angle))
             y = pie_y + 0.45 * np.sin(np.deg2rad(angle))
-            # Add a small offset to prevent overlap
-            if angle > 90 and angle < 270:  # Left side of pie
+            if angle > 90 and angle < 270:
                 x -= 0.1
-            else:  # Right side of pie
+            else:
                 x += 0.1
             ax3.text(x, y, f"{int(round(sizes[i]))}%", ha='center', va='center', fontsize=8)
 
@@ -147,6 +153,7 @@ def combined_predictive_and_cluster_figure(
     )
 
     ax3.set_xlim(common_xlim)
+    fig.text(0.02, 0.44, 'B', fontsize=12, ha='left', va='center')
     ax3.set_ylim(-0.5, 1.5)
     ax3.axis('off')
 
