@@ -6,16 +6,10 @@ using ConfigFile = global::Interactions.Config.Entities.Config;
 
 namespace Interactions.Apps
 {
-    /// <summary>
-    /// Typed view over the Bronze config (persistentDataPath/config.json) for all experiment
-    /// settings that are otherwise hard-coded on startup. Holds the default values (which mirror
-    /// the previous hard-coded defaults) and seeds any missing key to disk on construction.
-    /// </summary>
     public class ExperimentConfig
     {
         public const string FileName = "config.json";
 
-        // Proactive-interactive opponent target offset.
         public const string LateralOffsetMinKey = "lateralOffsetMin";
         public const string LateralOffsetMaxKey = "lateralOffsetMax";
         public const string ProbabilityMovementToRightPctKey = "ProbabilityMovementToRightPct";
@@ -23,7 +17,6 @@ namespace Interactions.Apps
         public const string LateralDelayEndKey = "lateralDelayEnd";
         public const string BodyOrientationDegreesPerMeterKey = "bodyOrientationDegreesPerMeter";
 
-        // Opponent / experiment settings (mirror the OpponentSettings + pass UI sliders).
         public const string InterPersonalDistanceKey = "interPersonalDistance";
         public const string BodyInformationWeightKey = "bodyInformationWeight";
         public const string FootInformationWeightKey = "footInformationWeight";
@@ -48,7 +41,6 @@ namespace Interactions.Apps
         public const float DefaultDistanceBetweenGoals = 2.5f;
         public const float DefaultPassDetectionThreshold = 0.9f;
 
-        /// <summary>Loads (and seeds) the config from persistentDataPath/config.json.</summary>
         public static ExperimentConfig Load()
         {
             var path = Path.Combine(Application.persistentDataPath, FileName);
@@ -61,7 +53,6 @@ namespace Interactions.Apps
             SeedDefaults();
         }
 
-        // Getters fall back to defaults; setters write through to config.json immediately.
         public float LateralOffsetMin { get => GetFloat(LateralOffsetMinKey, DefaultLateralOffsetMin); set => SetFloat(LateralOffsetMinKey, value); }
         public float LateralOffsetMax { get => GetFloat(LateralOffsetMaxKey, DefaultLateralOffsetMax); set => SetFloat(LateralOffsetMaxKey, value); }
         public int ProbabilityMovementToRightPct { get => GetInt(ProbabilityMovementToRightPctKey, DefaultProbabilityMovementToRightPct); set => SetInt(ProbabilityMovementToRightPctKey, value); }

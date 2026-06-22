@@ -2,10 +2,6 @@ using System;
 
 namespace Interactions.Apps.ViewModels
 {
-	/// <summary>
-	/// Describes one tunable setting (label, current value, range, and a write-back callback) so the
-	/// settings UI can be generated dynamically per condition rather than wired slider-by-slider.
-	/// </summary>
 	public class SettingDescriptor
 	{
 		public SettingDescriptor(string label, float value, float min, float max, Action<float> onChanged)

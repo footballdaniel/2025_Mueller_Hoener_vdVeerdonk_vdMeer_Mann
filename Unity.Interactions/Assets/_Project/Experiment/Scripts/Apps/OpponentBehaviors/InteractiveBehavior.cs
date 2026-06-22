@@ -5,7 +5,6 @@ using Interactions.Domain.Opponents;
 
 namespace Interactions.Apps
 {
-    /// <summary>Reactive opponent: picks its pressure spot and intercepts passes.</summary>
     public class InteractiveBehavior : IOpponentBehavior
     {
         public virtual void Configure(Opponent opponent, App app)

@@ -69,21 +69,24 @@ namespace Interactions.Apps.ViewModels
 		public void ChangeAcceleration(float newAcceleration)
 		{
 			_app.Experiment.OpponentAcceleration = newAcceleration;
-			_app.Experiment.Opponent.ChangeAcceleration(newAcceleration);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeAcceleration(newAcceleration);
 			_app.Config.OpponentAcceleration = newAcceleration;
 		}
 
 		public void ChangeBodyInformationWeight(float arg0)
 		{
 			_app.Experiment.BodyInformationWeight = arg0;
-			_app.Experiment.Opponent.ChangeBodyInformationWeight(arg0);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeBodyInformationWeight(arg0);
 			_app.Config.BodyInformationWeight = arg0;
 		}
 
 		public void ChangeFootInformation(float arg0)
 		{
 			_app.Experiment.FootInformationWeight = arg0;
-			_app.Experiment.Opponent.ChangeFootInformation(arg0);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeFootInformation(arg0);
 			_app.Config.FootInformationWeight = arg0;
 		}
 
@@ -98,14 +101,16 @@ namespace Interactions.Apps.ViewModels
 		public void ChangeInterpersonalDistance(float newDistance)
 		{
 			_app.Experiment.InterPersonalDistance = newDistance;
-			_app.Experiment.Opponent.ChangeInterpersonalDistance(newDistance);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeInterpersonalDistance(newDistance);
 			_app.Config.InterPersonalDistance = newDistance;
 		}
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
 			_app.Experiment.OpponentReactionTimeBody = newReactionTime;
-			_app.Experiment.Opponent.ChangeReactionTimeBody(newReactionTime);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeReactionTimeBody(newReactionTime);
 			_app.Config.OpponentReactionTimeBody = newReactionTime;
 		}
 
@@ -114,7 +119,8 @@ namespace Interactions.Apps.ViewModels
 		public void ChangeReactionTimeFoot(float arg0)
 		{
 			_app.Experiment.OpponentReactionTimeFoot = arg0;
-			_app.Experiment.Opponent.ChangeReactionTimeFoot(arg0);
+			if (_app.Experiment.Opponent != null)
+				_app.Experiment.Opponent.ChangeReactionTimeFoot(arg0);
 			_app.Config.OpponentReactionTimeFoot = arg0;
 		}
 	}

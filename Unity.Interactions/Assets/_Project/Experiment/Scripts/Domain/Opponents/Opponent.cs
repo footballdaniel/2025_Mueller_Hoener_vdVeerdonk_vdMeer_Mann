@@ -69,7 +69,6 @@ namespace Interactions.Domain.Opponents
 
 			_footSource = new FootInformationSource(_footPerception);
 			_attackerSource = new PutPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, _attackerPerception, _distanceFromAttacker);
-			// _attackerSource = new MirroredPressureOnAttackerSource(_goalLeft.transform, _goalRight.transform, this, _attackerPerception, _distanceFromAttacker);
 			_motorController = new MotorController(_maxSpeed, _maxAcceleration, _maxRotationSpeedDegreesY, transform.position, transform.rotation);
 			_animations = new Animations(_animator);
 			_interceptionSource = new NoInterceptionInformationSource();
@@ -83,12 +82,6 @@ namespace Interactions.Domain.Opponents
 			_motorController.ChangeAcceleration(newAcceleration);
 		}
 
-		/// <summary>
-		/// Schedules a lateral position offset (the spot the opponent runs to) together with a coupled
-		/// body-orientation offset in degrees. Both are applied <paramref name="delaySeconds"/> after the
-		/// trial starts (i.e. after the user has started), not from the start. Call after
-		/// <see cref="Bind"/>, which creates the underlying source.
-		/// </summary>
 		public void ScheduleLateralOffset(Vector3 positionOffset, float bodyRotationOffsetDegrees, float delaySeconds)
 		{
 			_pendingTargetOffset = positionOffset;

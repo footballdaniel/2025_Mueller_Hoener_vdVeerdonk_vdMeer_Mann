@@ -2,10 +2,6 @@ using System.Collections.Generic;
 
 namespace Interactions.Apps.ViewModels
 {
-	/// <summary>
-	/// Exposes the proactive-condition config values to the UI. Setters write straight through to
-	/// <see cref="App.Config"/>, which persists to config.json.
-	/// </summary>
 	public class ProactiveSettingsViewModel
 	{
 		public ProactiveSettingsViewModel(App app)

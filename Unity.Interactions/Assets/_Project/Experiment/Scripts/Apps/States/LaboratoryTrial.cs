@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace Interactions.Apps.States
 {
-	/// <summary>
-	/// Single laboratory-with-opponent trial. All per-condition variation lives in the injected
-	/// <see cref="IOpponentBehavior"/> (how the opponent is configured on spawn and whether it
-	/// reacts to a pass), so this class has no condition branching.
-	/// </summary>
 	internal class LaboratoryTrial : State
 	{
 		public LaboratoryTrial(App app, IOpponentBehavior behavior) : base(app)

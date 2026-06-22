@@ -79,21 +79,25 @@ namespace Interactions.Apps.ViewModels
 		public void SelectInteractiveCondition()
 		{
 			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryInteractive);
+			_app.ShowSettingsFor(ExperimentalCondition.LaboratoryInteractive);
 		}
 		
 		public void SelectNonInteractiveCondition()
 		{
 			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryNonInteractive);
+			_app.ShowSettingsFor(ExperimentalCondition.LaboratoryNonInteractive);
 		}
 
 		public void SelectProactiveInteractiveCondition()
 		{
 			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryProactiveInteractive);
+			_app.ShowSettingsFor(ExperimentalCondition.LaboratoryProactiveInteractive);
 		}
 		
 		public void SelectNoOpponentCondition()
 		{
 			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryNoOpponent);
+			_app.ShowSettingsFor(ExperimentalCondition.LaboratoryNoOpponent);
 		}
 	}
 

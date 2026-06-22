@@ -25,9 +25,6 @@ namespace Tactive.MachineLearning.Models
 
 					var metadataPath = Path.Combine(Path.GetDirectoryName(assetPath), stem + "_with_metadata.asset");
 
-					var assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
-					assetWithMetadata.name = stem + "_with_metadata";
-
 					var featureNames = new List<string>();
 
 					if (metadata.MetadataProps.TryGetValue("features", out var featureNamesJson))
@@ -48,10 +45,21 @@ namespace Tactive.MachineLearning.Models
 					if (metadata.MetadataProps.TryGetValue("sample_output", out var sampleOutputJson))
 						sampleOutput = JsonConvert.DeserializeObject<float>(sampleOutputJson);
 
+					var assetWithMetadata = AssetDatabase.LoadAssetAtPath<ModelAssetWithMetadata>(metadataPath);
+					var isNew = assetWithMetadata == null;
+					if (isNew)
+					{
+						assetWithMetadata = ScriptableObject.CreateInstance<ModelAssetWithMetadata>();
+						assetWithMetadata.name = stem + "_with_metadata";
+					}
+
 					assetWithMetadata.Initialize(featureNames, inputShape, sampleInput, sampleOutput, stem);
 
-					// add as asset
-					AssetDatabase.CreateAsset(assetWithMetadata, metadataPath);
+					if (isNew)
+						AssetDatabase.CreateAsset(assetWithMetadata, metadataPath);
+					else
+						EditorUtility.SetDirty(assetWithMetadata);
+
 					AssetDatabase.SaveAssets();
 				}
 		}

@@ -34,6 +34,7 @@ namespace Interactions.Apps
 		public Side DominantFootSide { get; set; }
 		public Transitions Transitions { get; private set; }
 		public Dictionary<ExperimentalCondition, Transition> TrialTransitions { get; private set; }
+		Dictionary<ExperimentalCondition, IOpponentBehavior> _opponentBehaviors;
 		public StateMachine StateMachine { get; private set; }
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
 		public XRStatusViewModel XRStatusViewModel { get; private set; }
@@ -51,7 +52,6 @@ namespace Interactions.Apps
 
 		void Start()
 		{
-			// MonoBehaviours
 			UI = ServiceLocator.Get<MainUI>();
 			User = ServiceLocator.Get<User>();
 			WebCamRecorders = ServiceLocator.Get<IRepository<IWebcamRecorder>>();
@@ -61,12 +61,10 @@ namespace Interactions.Apps
 			Trackers = ServiceLocator.Get<XRTrackers>();
 			LabEnvironment = ServiceLocator.Get<LabEnvironment>();
 
-			// Prefabs
 			OpponentPrefab = ServiceLocator.Get<Opponent>();
 			InSituOpponentPrefab = ServiceLocator.Get<InSituOpponent>();
 			BallPrefab = ServiceLocator.Get<Ball>();
 
-			// Other Dependencies
 			var lstmModelAsset = ServiceLocator.Get<ModelAssetWithMetadata>();
 			Experiment.Bind(DominantFootSide, LeftGoal, RightGoal);
 			ApplyExperimentConfig();
@@ -75,35 +73,36 @@ namespace Interactions.Apps
 			PassCorrector = new PassCorrector(User, Experiment.RightGoal, Experiment.LeftGoal);
 			PassDetector = new PassDetector(this);
 
-			// View models for showing data on the UI
 			WebcamSelectionViewModel = new WebcamSelectionViewModel(this);
 			XRStatusViewModel = new XRStatusViewModel(this);
 			ExperimentViewModel = new ExperimentViewModel(this);
 			OpponentSettingsViewModel = new OpponentSettingsViewModel(this);
 			ProactiveSettingsViewModel = new ProactiveSettingsViewModel(this);
 
-			// State machine
 			StateMachine = new StateMachine();
 			Transitions = new Transitions();
 
-			// States
 			var startupXr = new StartupXr(this);
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
 			var waitForNextTrial = new WaitForNextTrial(this);
 
-			// One state per experimental condition. The three lab-with-opponent variants share
-			// LaboratoryTrial and differ only by their injected IOpponentBehavior strategy.
+			_opponentBehaviors = new Dictionary<ExperimentalCondition, IOpponentBehavior>
+			{
+				[ExperimentalCondition.LaboratoryInteractive] = new InteractiveBehavior(),
+				[ExperimentalCondition.LaboratoryNonInteractive] = new NonInteractiveBehavior(),
+				[ExperimentalCondition.LaboratoryProactiveInteractive] = new ProactiveBehavior(),
+			};
+
 			var trialStates = new Dictionary<ExperimentalCondition, State>
 			{
-				[ExperimentalCondition.LaboratoryInteractive] = new LaboratoryTrial(this, new InteractiveBehavior()),
-				[ExperimentalCondition.LaboratoryNonInteractive] = new LaboratoryTrial(this, new NonInteractiveBehavior()),
-				[ExperimentalCondition.LaboratoryProactiveInteractive] = new LaboratoryTrial(this, new ProactiveBehavior()),
+				[ExperimentalCondition.LaboratoryInteractive] = new LaboratoryTrial(this, _opponentBehaviors[ExperimentalCondition.LaboratoryInteractive]),
+				[ExperimentalCondition.LaboratoryNonInteractive] = new LaboratoryTrial(this, _opponentBehaviors[ExperimentalCondition.LaboratoryNonInteractive]),
+				[ExperimentalCondition.LaboratoryProactiveInteractive] = new LaboratoryTrial(this, _opponentBehaviors[ExperimentalCondition.LaboratoryProactiveInteractive]),
 				[ExperimentalCondition.LaboratoryNoOpponent] = new LaboratoryTrialNoOpponent(this),
 				[ExperimentalCondition.InSitu] = new InSituTrial(this),
 			};
 
-			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
 
@@ -111,14 +110,12 @@ namespace Interactions.Apps
 			waitForNextTrialSources.AddRange(trialStates.Values);
 			Transitions.WaitForNextTrial = new Transition(this, waitForNextTrialSources.ToArray(), waitForNextTrial);
 
-			// condition -> transition (waitForNextTrial -> that trial). Replaces the NextTrial switch.
 			TrialTransitions = new Dictionary<ExperimentalCondition, Transition>();
 			foreach (var entry in trialStates)
 				TrialTransitions[entry.Key] = new Transition(this, waitForNextTrial, entry.Value);
 
 			Transitions.Quit = new ImmediateTransition(this);
 
-			// Start app
 			StateMachine.SetState(startupXr);
 		}
 
@@ -143,6 +140,19 @@ namespace Interactions.Apps
 				transition.Execute();
 			else
 				Debug.Log($"No trial registered for condition {condition}");
+		}
+
+		public void ShowSettingsFor(ExperimentalCondition condition)
+		{
+			if (_opponentBehaviors.TryGetValue(condition, out var behavior))
+			{
+				UI.OpponentSettingsUI.Bind(behavior.GetSettings(this));
+				UI.OpponentSettingsUI.Show();
+			}
+			else
+			{
+				UI.OpponentSettingsUI.Hide();
+			}
 		}
 
 		void Update()

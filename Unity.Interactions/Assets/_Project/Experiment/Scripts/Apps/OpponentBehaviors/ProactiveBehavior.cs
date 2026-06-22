@@ -6,10 +6,6 @@ using UnityEngine;
 
 namespace Interactions.Apps
 {
-    /// <summary>
-    /// Like <see cref="InteractiveBehavior"/> (same spot-picking and pass interception), but shifts
-    /// the pressure target laterally by a config-driven offset read when the opponent is spawned.
-    /// </summary>
     public class ProactiveBehavior : InteractiveBehavior
     {
         public override void Configure(Opponent opponent, App app)
@@ -23,7 +19,6 @@ namespace Interactions.Apps
             var offsetMeters = Random.Range(config.LateralOffsetMin, config.LateralOffsetMax);
 
             var positionOffset = LateralDirection(app) * (offsetMeters * sign);
-            // Body turns the opposite way to the lateral offset: e.g. 1m right -> degreesPerMeter degrees left.
             var bodyRotationOffset = -sign * offsetMeters * config.BodyOrientationDegreesPerMeter;
             var delay = Random.Range(config.LateralDelayStart, config.LateralDelayEnd);
 
@@ -33,11 +28,9 @@ namespace Interactions.Apps
 
         public override IEnumerable<SettingDescriptor> GetSettings(App app)
         {
-            // The common opponent settings, plus the proactive-specific ones.
             return base.GetSettings(app).Concat(app.ProactiveSettingsViewModel.GetDescriptors());
         }
 
-        // Lateral axis = goal-to-goal direction; "right" points toward the right goal.
         static Vector3 LateralDirection(App app)
         {
             var direction = app.RightGoal.transform.position - app.LeftGoal.transform.position;
