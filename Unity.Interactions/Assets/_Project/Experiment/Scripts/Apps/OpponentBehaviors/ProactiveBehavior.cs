@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Interactions.Apps.ViewModels;
 using Interactions.Domain.Opponents;
 using UnityEngine;
 
@@ -26,6 +29,12 @@ namespace Interactions.Apps
 
             opponent.ScheduleLateralOffset(positionOffset, bodyRotationOffset, delay);
             Debug.Log($"[Proactive] offset {positionOffset} (mag {offsetMeters:0.00}m), body {bodyRotationOffset:0.#}deg, after {delay:0.00}s");
+        }
+
+        public override IEnumerable<SettingDescriptor> GetSettings(App app)
+        {
+            // The common opponent settings, plus the proactive-specific ones.
+            return base.GetSettings(app).Concat(app.ProactiveSettingsViewModel.GetDescriptors());
         }
 
         // Lateral axis = goal-to-goal direction; "right" points toward the right goal.

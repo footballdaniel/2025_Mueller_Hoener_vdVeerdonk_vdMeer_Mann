@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Interactions.Apps.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.Opponents;
 
@@ -14,6 +16,11 @@ namespace Interactions.Apps
         public void OnPassDetected(Opponent opponent, Ball ball)
         {
             opponent.Intercept(ball);
+        }
+
+        public virtual IEnumerable<SettingDescriptor> GetSettings(App app)
+        {
+            return app.OpponentSettingsViewModel.GetDescriptors();
         }
     }
 }

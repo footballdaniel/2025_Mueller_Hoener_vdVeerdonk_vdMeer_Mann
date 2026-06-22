@@ -1,52 +1,40 @@
-using System;
+using System.Collections.Generic;
 using Interactions.Apps.ViewModels;
 using UnityEngine;
 
 namespace Interactions.UI
 {
+	/// <summary>
+	/// Settings panel generated dynamically from a list of <see cref="SettingDescriptor"/>, so each
+	/// condition shows exactly the sliders that apply to its opponent (e.g. proactive adds its own).
+	/// </summary>
 	public class OpponentSettingsUI : UIScreen
 	{
-		[SerializeField] SettingSlider _interPersonalDistanceSlider;
-		[SerializeField] SettingSlider _bodyInformationSlider;
-		[SerializeField] SettingSlider _footInformationSlider;
-		[SerializeField] SettingSlider _reactionTimeBodySlider;
-		[SerializeField] SettingSlider _reactionTimeFootSlider;
-		[SerializeField] SettingSlider _accelerationSlider;
-		[SerializeField] SettingSlider _goalDistanceSlider;
+		[SerializeField] SettingSlider _sliderPrefab;
+		[SerializeField] Transform _container;
 
-		public void Bind(OpponentSettingsViewModel settingsViewModel)
+		public void Bind(IEnumerable<SettingDescriptor> settings)
 		{
-			_interPersonalDistanceSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeInterpersonalDistance);
-			_interPersonalDistanceSlider.Bind("Weight IPD", settingsViewModel.InterpersonalDistance, 0, 10);
+			Clear();
 
-			_bodyInformationSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeBodyInformationWeight);
-			_bodyInformationSlider.Bind("Weight Body Info", settingsViewModel.BodyInformation, 0.01f, 1);
-
-			_footInformationSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeFootInformation);
-			_footInformationSlider.Bind("Weight Foot Info", settingsViewModel.FootInformation, 0.01f, 1);
-
-			_reactionTimeBodySlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeReactionTime);
-			_reactionTimeBodySlider.Bind("Reaction Time", settingsViewModel.ReactionTime, 0f, 2);
-
-			_reactionTimeFootSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeReactionTimeFoot);
-			_reactionTimeFootSlider.Bind("Reaction Time Foot", settingsViewModel.ReactionTimeFoot, 0f, 2);
-
-			_accelerationSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeAcceleration);
-			_accelerationSlider.Bind("Acceleration", settingsViewModel.Acceleration, 0f, 20f);
-
-			_goalDistanceSlider.Slider.onValueChanged.AddListener(settingsViewModel.ChangeGoalDistance);
-			_goalDistanceSlider.Bind("Goal Distance", settingsViewModel.GoalDistance, 0, 5);
+			foreach (var setting in settings)
+			{
+				var descriptor = setting;
+				var slider = Instantiate(_sliderPrefab, _container);
+				slider.Slider.onValueChanged.AddListener(value => descriptor.OnChanged(value));
+				slider.Bind(descriptor.Label, descriptor.Value, descriptor.Min, descriptor.Max);
+			}
 		}
 
-		public void OnDisable()
+		void Clear()
 		{
-			_interPersonalDistanceSlider.Slider.onValueChanged.RemoveAllListeners();
-			_bodyInformationSlider.Slider.onValueChanged.RemoveAllListeners();
-			_footInformationSlider.Slider.onValueChanged.RemoveAllListeners();
-			_reactionTimeBodySlider.Slider.onValueChanged.RemoveAllListeners();
-			_reactionTimeFootSlider.Slider.onValueChanged.RemoveAllListeners();
-			_accelerationSlider.Slider.onValueChanged.RemoveAllListeners();
-			_goalDistanceSlider.Slider.onValueChanged.RemoveAllListeners();
+			foreach (Transform child in _container)
+				Destroy(child.gameObject);
+		}
+
+		void OnDisable()
+		{
+			Clear();
 		}
 	}
 }

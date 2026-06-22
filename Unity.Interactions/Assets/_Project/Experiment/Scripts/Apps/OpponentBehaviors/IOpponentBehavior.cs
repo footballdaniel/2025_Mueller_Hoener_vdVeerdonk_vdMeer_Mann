@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Interactions.Apps.ViewModels;
 using Interactions.Domain;
 using Interactions.Domain.Opponents;
 
@@ -12,5 +14,8 @@ namespace Interactions.Apps
     {
         void Configure(Opponent opponent, App app);
         void OnPassDetected(Opponent opponent, Ball ball);
+
+        // The settings sliders that apply to this opponent; shown in the dynamic settings panel.
+        IEnumerable<SettingDescriptor> GetSettings(App app);
     }
 }

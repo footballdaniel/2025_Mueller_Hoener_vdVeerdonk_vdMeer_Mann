@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Interactions.Apps.ViewModels
 {
 	public class OpponentSettingsViewModel
@@ -6,6 +8,20 @@ namespace Interactions.Apps.ViewModels
 		public OpponentSettingsViewModel(App app)
 		{
 			_app = app;
+		}
+
+		public IEnumerable<SettingDescriptor> GetDescriptors()
+		{
+			return new[]
+			{
+				new SettingDescriptor("Weight IPD", InterpersonalDistance, 0f, 10f, ChangeInterpersonalDistance),
+				new SettingDescriptor("Weight Body Info", BodyInformation, 0.01f, 1f, ChangeBodyInformationWeight),
+				new SettingDescriptor("Weight Foot Info", FootInformation, 0.01f, 1f, ChangeFootInformation),
+				new SettingDescriptor("Reaction Time", ReactionTime, 0f, 2f, ChangeReactionTime),
+				new SettingDescriptor("Reaction Time Foot", ReactionTimeFoot, 0f, 2f, ChangeReactionTimeFoot),
+				new SettingDescriptor("Acceleration", Acceleration, 0f, 20f, ChangeAcceleration),
+				new SettingDescriptor("Goal Distance", GoalDistance, 0f, 5f, ChangeGoalDistance),
+			};
 		}
 
 		public float InterpersonalDistance

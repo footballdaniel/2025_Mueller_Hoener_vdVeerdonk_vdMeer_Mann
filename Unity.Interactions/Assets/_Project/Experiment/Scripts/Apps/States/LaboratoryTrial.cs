@@ -23,7 +23,7 @@ namespace Interactions.Apps.States
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
 			_behavior.Configure(_app.Experiment.Opponent, _app);
 
-			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
+			_app.UI.OpponentSettingsUI.Bind(_behavior.GetSettings(_app));
 			_app.UI.OpponentSettingsUI.Show();
 
 			_app.Experiment.Opponent.Legs.BallIntercepted += OnBallIntercepted;

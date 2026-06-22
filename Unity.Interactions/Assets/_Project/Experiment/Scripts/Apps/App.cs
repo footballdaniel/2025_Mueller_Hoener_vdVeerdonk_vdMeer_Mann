@@ -42,6 +42,7 @@ namespace Interactions.Apps
 		public ExperimentViewModel ExperimentViewModel { get; private set; }
 		public XRTrackers Trackers { get; set; }
 		public OpponentSettingsViewModel OpponentSettingsViewModel { get; private set; }
+		public ProactiveSettingsViewModel ProactiveSettingsViewModel { get; private set; }
 		public IPassCorrector PassCorrector { get; set; }
 		public OpponentMaximalPositionConstraint OpponentMaximalPositionConstraint { get; set; }
 		public PassDetector PassDetector { get; set; }
@@ -79,6 +80,7 @@ namespace Interactions.Apps
 			XRStatusViewModel = new XRStatusViewModel(this);
 			ExperimentViewModel = new ExperimentViewModel(this);
 			OpponentSettingsViewModel = new OpponentSettingsViewModel(this);
+			ProactiveSettingsViewModel = new ProactiveSettingsViewModel(this);
 
 			// State machine
 			StateMachine = new StateMachine();
