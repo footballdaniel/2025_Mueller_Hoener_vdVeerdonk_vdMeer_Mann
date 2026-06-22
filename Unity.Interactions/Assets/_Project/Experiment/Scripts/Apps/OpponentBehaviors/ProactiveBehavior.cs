@@ -14,22 +14,26 @@ namespace Interactions.Apps
             base.Configure(opponent, app);
 
             var config = ExperimentConfig.Load();
-            opponent.SetPressureTargetOffset(ComputeTargetOffset(config, app));
-        }
-
-        static Vector3 ComputeTargetOffset(ExperimentConfig config, App app)
-        {
-            // Lateral axis = goal-to-goal direction; "right" points toward the right goal.
-            var lateralDirection = app.RightGoal.transform.position - app.LeftGoal.transform.position;
-            lateralDirection.y = 0f;
-            lateralDirection = lateralDirection.sqrMagnitude > 0.0001f ? lateralDirection.normalized : Vector3.right;
 
             var movesToRight = Random.Range(0f, 100f) < config.ProbabilityMovementToRightPct;
             var sign = movesToRight ? 1f : -1f;
-            var offset = lateralDirection * (config.LateralOffsetMeter * sign);
+            var offsetMeters = Random.Range(config.LateralOffsetMin, config.LateralOffsetMax);
 
-            Debug.Log($"[Proactive] Target offset {offset} (movesToRight={movesToRight}, magnitude={config.LateralOffsetMeter}m)");
-            return offset;
+            var positionOffset = LateralDirection(app) * (offsetMeters * sign);
+            // Body turns the opposite way to the lateral offset: e.g. 1m right -> degreesPerMeter degrees left.
+            var bodyRotationOffset = -sign * offsetMeters * config.BodyOrientationDegreesPerMeter;
+            var delay = Random.Range(config.LateralDelayStart, config.LateralDelayEnd);
+
+            opponent.ScheduleLateralOffset(positionOffset, bodyRotationOffset, delay);
+            Debug.Log($"[Proactive] offset {positionOffset} (mag {offsetMeters:0.00}m), body {bodyRotationOffset:0.#}deg, after {delay:0.00}s");
+        }
+
+        // Lateral axis = goal-to-goal direction; "right" points toward the right goal.
+        static Vector3 LateralDirection(App app)
+        {
+            var direction = app.RightGoal.transform.position - app.LeftGoal.transform.position;
+            direction.y = 0f;
+            return direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.right;
         }
     }
 }

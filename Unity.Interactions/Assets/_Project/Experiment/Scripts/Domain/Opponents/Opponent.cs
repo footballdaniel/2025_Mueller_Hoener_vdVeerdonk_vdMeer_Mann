@@ -29,6 +29,8 @@ namespace Interactions.Domain.Opponents
 			if (!HasUserStartedTrial())
 				return;
 
+			ApplyPendingTargetOffset();
+
 			_attackerPerception.Tick(Time.time);
 			_footPerception.Tick(Time.time);
 
@@ -82,13 +84,32 @@ namespace Interactions.Domain.Opponents
 		}
 
 		/// <summary>
-		/// Adds a constant world-space offset to the spot the opponent runs to while putting
-		/// pressure on the attacker. Used by the proactive variant to shift the target laterally.
-		/// Call after <see cref="Bind"/>, which creates the underlying source.
+		/// Schedules a lateral position offset (the spot the opponent runs to) together with a coupled
+		/// body-orientation offset in degrees. Both are applied <paramref name="delaySeconds"/> after the
+		/// trial starts (i.e. after the user has started), not from the start. Call after
+		/// <see cref="Bind"/>, which creates the underlying source.
 		/// </summary>
-		public void SetPressureTargetOffset(Vector3 offset)
+		public void ScheduleLateralOffset(Vector3 positionOffset, float bodyRotationOffsetDegrees, float delaySeconds)
 		{
-			_attackerSource.SetTargetOffset(offset);
+			_pendingTargetOffset = positionOffset;
+			_pendingBodyRotationOffset = bodyRotationOffsetDegrees;
+			_targetOffsetDelay = delaySeconds;
+			_hasPendingTargetOffset = true;
+			_trialElapsed = 0f;
+		}
+
+		void ApplyPendingTargetOffset()
+		{
+			if (!_hasPendingTargetOffset)
+				return;
+
+			_trialElapsed += Time.deltaTime;
+			if (_trialElapsed < _targetOffsetDelay)
+				return;
+
+			_attackerSource.SetTargetOffset(_pendingTargetOffset);
+			_attackerSource.SetBodyRotationOffset(_pendingBodyRotationOffset);
+			_hasPendingTargetOffset = false;
 		}
 
 		public void ChangeBodyInformationWeight(float newWeight)
@@ -158,6 +179,11 @@ namespace Interactions.Domain.Opponents
 		OpponentMaximalPositionConstraint _opponentMaximalPositionConstraint;
 		User _user;
 		bool _hasUserStartedTrial;
+		Vector3 _pendingTargetOffset;
+		float _pendingBodyRotationOffset;
+		float _targetOffsetDelay;
+		float _trialElapsed;
+		bool _hasPendingTargetOffset;
 	}
 
 }

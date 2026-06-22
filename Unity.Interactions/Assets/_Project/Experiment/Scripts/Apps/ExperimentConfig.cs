@@ -16,8 +16,12 @@ namespace Interactions.Apps
         public const string FileName = "config.json";
 
         // Proactive-interactive opponent target offset.
-        public const string LateralOffsetMeterKey = "lateralOffsetMeter";
+        public const string LateralOffsetMinKey = "lateralOffsetMin";
+        public const string LateralOffsetMaxKey = "lateralOffsetMax";
         public const string ProbabilityMovementToRightPctKey = "ProbabilityMovementToRightPct";
+        public const string LateralDelayStartKey = "lateralDelayStart";
+        public const string LateralDelayEndKey = "lateralDelayEnd";
+        public const string BodyOrientationDegreesPerMeterKey = "bodyOrientationDegreesPerMeter";
 
         // Opponent / experiment settings (mirror the OpponentSettings + pass UI sliders).
         public const string InterPersonalDistanceKey = "interPersonalDistance";
@@ -29,8 +33,12 @@ namespace Interactions.Apps
         public const string DistanceBetweenGoalsKey = "distanceBetweenGoals";
         public const string PassDetectionThresholdKey = "passDetectionThreshold";
 
-        public const float DefaultLateralOffsetMeter = 1f;
+        public const float DefaultLateralOffsetMin = 0f;
+        public const float DefaultLateralOffsetMax = 3f;
         public const int DefaultProbabilityMovementToRightPct = 50;
+        public const float DefaultLateralDelayStart = 1f;
+        public const float DefaultLateralDelayEnd = 3f;
+        public const float DefaultBodyOrientationDegreesPerMeter = 30f;
         public const float DefaultInterPersonalDistance = 4f;
         public const float DefaultBodyInformationWeight = 0.5f;
         public const float DefaultFootInformationWeight = 0.33f;
@@ -54,8 +62,12 @@ namespace Interactions.Apps
         }
 
         // Getters fall back to defaults; setters write through to config.json immediately.
-        public float LateralOffsetMeter { get => GetFloat(LateralOffsetMeterKey, DefaultLateralOffsetMeter); set => SetFloat(LateralOffsetMeterKey, value); }
+        public float LateralOffsetMin { get => GetFloat(LateralOffsetMinKey, DefaultLateralOffsetMin); set => SetFloat(LateralOffsetMinKey, value); }
+        public float LateralOffsetMax { get => GetFloat(LateralOffsetMaxKey, DefaultLateralOffsetMax); set => SetFloat(LateralOffsetMaxKey, value); }
         public int ProbabilityMovementToRightPct { get => GetInt(ProbabilityMovementToRightPctKey, DefaultProbabilityMovementToRightPct); set => SetInt(ProbabilityMovementToRightPctKey, value); }
+        public float LateralDelayStart { get => GetFloat(LateralDelayStartKey, DefaultLateralDelayStart); set => SetFloat(LateralDelayStartKey, value); }
+        public float LateralDelayEnd { get => GetFloat(LateralDelayEndKey, DefaultLateralDelayEnd); set => SetFloat(LateralDelayEndKey, value); }
+        public float BodyOrientationDegreesPerMeter { get => GetFloat(BodyOrientationDegreesPerMeterKey, DefaultBodyOrientationDegreesPerMeter); set => SetFloat(BodyOrientationDegreesPerMeterKey, value); }
         public float InterPersonalDistance { get => GetFloat(InterPersonalDistanceKey, DefaultInterPersonalDistance); set => SetFloat(InterPersonalDistanceKey, value); }
         public float BodyInformationWeight { get => GetFloat(BodyInformationWeightKey, DefaultBodyInformationWeight); set => SetFloat(BodyInformationWeightKey, value); }
         public float FootInformationWeight { get => GetFloat(FootInformationWeightKey, DefaultFootInformationWeight); set => SetFloat(FootInformationWeightKey, value); }
@@ -67,8 +79,12 @@ namespace Interactions.Apps
 
         void SeedDefaults()
         {
-            Seed(LateralOffsetMeterKey, DefaultLateralOffsetMeter);
+            Seed(LateralOffsetMinKey, DefaultLateralOffsetMin);
+            Seed(LateralOffsetMaxKey, DefaultLateralOffsetMax);
             Seed(ProbabilityMovementToRightPctKey, DefaultProbabilityMovementToRightPct);
+            Seed(LateralDelayStartKey, DefaultLateralDelayStart);
+            Seed(LateralDelayEndKey, DefaultLateralDelayEnd);
+            Seed(BodyOrientationDegreesPerMeterKey, DefaultBodyOrientationDegreesPerMeter);
             Seed(InterPersonalDistanceKey, DefaultInterPersonalDistance);
             Seed(BodyInformationWeightKey, DefaultBodyInformationWeight);
             Seed(FootInformationWeightKey, DefaultFootInformationWeight);

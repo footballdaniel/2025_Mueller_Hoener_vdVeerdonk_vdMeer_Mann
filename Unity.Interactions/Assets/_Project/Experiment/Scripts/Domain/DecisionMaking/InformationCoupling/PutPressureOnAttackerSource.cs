@@ -24,6 +24,11 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			_targetOffset = offset;
 		}
 
+		public void SetBodyRotationOffset(float degrees)
+		{
+			_bodyRotationOffsetDegrees = degrees;
+		}
+
 		public Vector3 TargetPosition()
 		{
 			var positionBetweenGoals = (_goalLeft.position + _goalRight.position) / 2;
@@ -39,12 +44,13 @@ namespace Interactions.Domain.DecisionMaking.InformationCoupling
 			var pos = _perceptionOfAttacker.Perceive();
 			var userPosition = new Vector3(pos.x, 0, pos.y);
 			var dir = (userPosition - positionBetweenGoals).normalized;
-			return Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+			return Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg + _bodyRotationOffsetDegrees;
 		}
 
 		public float Weight { get; set; }
 		float _desiredInterpersonalDistance;
 		Vector3 _targetOffset;
+		float _bodyRotationOffsetDegrees;
 		readonly Transform _goalLeft;
 		readonly Transform _goalRight;
 		readonly IPercept _perceptionOfAttacker;
