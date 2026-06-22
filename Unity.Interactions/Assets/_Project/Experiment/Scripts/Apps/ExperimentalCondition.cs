@@ -5,6 +5,7 @@
 		InSitu,
 		LaboratoryInteractive,
 		LaboratoryNonInteractive,
-		LaboratoryNoOpponent
+		LaboratoryNoOpponent,
+		LaboratoryProactiveInteractive
 	}
 }

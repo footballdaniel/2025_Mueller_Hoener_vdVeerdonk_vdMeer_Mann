@@ -1,4 +1,4 @@
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEditor.AssetImporters;
 
 namespace _Project.MachineLearning.Editor

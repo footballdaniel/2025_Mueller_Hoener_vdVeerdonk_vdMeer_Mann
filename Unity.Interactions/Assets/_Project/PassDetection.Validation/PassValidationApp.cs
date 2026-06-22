@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Tactive.MachineLearning.Models;
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 

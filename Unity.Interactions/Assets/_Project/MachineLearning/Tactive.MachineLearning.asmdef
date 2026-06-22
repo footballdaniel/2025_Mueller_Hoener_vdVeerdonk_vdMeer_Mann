@@ -2,8 +2,7 @@
   "name": "Tactive.MachineLearning",
   "rootNamespace": "Tactive",
   "references": [
-    "Unity.Sentis",
-    "Unity.Sentis.ONNX"
+    "Unity.InferenceEngine"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

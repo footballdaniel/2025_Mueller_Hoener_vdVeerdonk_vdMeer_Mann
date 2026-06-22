@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using _Project.PassDetection.Common;
 using Tactive.MachineLearning.Features;
 using Tactive.MachineLearning.Models;
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEngine;
 
 namespace PassDetection.Replay

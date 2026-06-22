@@ -8,6 +8,7 @@ namespace Interactions.Apps.StateTransitions
 		public Transition LaboratoryTrialInteractive { get; set; }
 		public Transition InSituTrial { get; set; }
 		public Transition LaboratoryTrialNonInteractive { get; set; }
+		public Transition LaboratoryTrialProactiveInteractive { get; set; }
 		public Transition LaboratoryNoOpponent { get; set; }
 		public ImmediateTransition Quit { get; set; }
 	}

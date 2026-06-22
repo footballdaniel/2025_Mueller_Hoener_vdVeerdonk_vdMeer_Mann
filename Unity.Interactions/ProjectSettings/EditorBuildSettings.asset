@@ -12,6 +12,8 @@ EditorBuildSettings:
     path: Packages/com.vu.powerwall/Samples/Powerwall/Powerwall.unity
     guid: 0f725d4b13e510c438bc636ee68c5704
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f,
+      type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: c4b647b02fcb47a44890bbe842707b73,
       type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 53a08a6060541574788d1f5191c83ae0,
@@ -20,4 +22,3 @@ EditorBuildSettings:
       type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 5e527001e93708642b45efb9803e8b6e,
       type: 2}
-  m_UseUCBPForAssetBundles: 0

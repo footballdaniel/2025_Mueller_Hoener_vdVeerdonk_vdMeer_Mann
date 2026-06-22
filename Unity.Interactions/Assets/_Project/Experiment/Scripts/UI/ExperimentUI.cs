@@ -23,6 +23,7 @@ namespace Interactions.UI
 		[SerializeField] Toggle _labEnvironmentVisibilityToggle;
 		[SerializeField] Button _laboratoryInteractiveButton;
 		[SerializeField] Button _laboratoryNonInteractiveButton;
+		[SerializeField] Button _laboratoryProactiveInteractiveButton;
 		[SerializeField] Button _laboratoryNoOpponentButton;
 
 		void Update()
@@ -56,6 +57,7 @@ namespace Interactions.UI
 			
 			_laboratoryInteractiveButton.onClick.AddListener(viewModel.SelectInteractiveCondition);
 			_laboratoryNonInteractiveButton.onClick.AddListener(viewModel.SelectNonInteractiveCondition);
+			_laboratoryProactiveInteractiveButton.onClick.AddListener(viewModel.SelectProactiveInteractiveCondition);
 			_laboratoryNoOpponentButton.onClick.AddListener(viewModel.SelectNoOpponentCondition);
 
 			var headTracker = Instantiate(_xrTrackerStatusPrefab, _xrTrackerStatusContainer);
@@ -96,6 +98,7 @@ namespace Interactions.UI
 			
 			_laboratoryInteractiveButton.onClick.RemoveAllListeners();
 			_laboratoryNonInteractiveButton.onClick.RemoveAllListeners();
+			_laboratoryProactiveInteractiveButton.onClick.RemoveAllListeners();
 			_laboratoryNoOpponentButton.onClick.RemoveAllListeners();
 			
 			_containsError.interactable = true;

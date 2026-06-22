@@ -36,6 +36,9 @@ namespace Interactions.Apps.ViewModels
 				case ExperimentalCondition.LaboratoryNonInteractive:
 					_app.Transitions.LaboratoryTrialNonInteractive.Execute();
 					break;
+				case ExperimentalCondition.LaboratoryProactiveInteractive:
+					_app.Transitions.LaboratoryTrialProactiveInteractive.Execute();
+					break;
 				case ExperimentalCondition.LaboratoryNoOpponent:
 					_app.Transitions.LaboratoryNoOpponent.Execute();
 					break;
@@ -101,6 +104,11 @@ namespace Interactions.Apps.ViewModels
 		public void SelectNonInteractiveCondition()
 		{
 			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryNonInteractive);
+		}
+
+		public void SelectProactiveInteractiveCondition()
+		{
+			_app.Experiment.ChangeCondition(ExperimentalCondition.LaboratoryProactiveInteractive);
 		}
 		
 		public void SelectNoOpponentCondition()

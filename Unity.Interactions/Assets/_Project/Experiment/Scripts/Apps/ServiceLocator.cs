@@ -42,6 +42,13 @@ namespace Interactions.Apps
 		{
 			foreach (var scriptableObject in scriptableObjects)
 			{
+				if (scriptableObject == null)
+				{
+					Debug.LogWarning("ServiceLocator: a ScriptableObject entry is null and was skipped. " +
+					                 "Check the ServiceLocator's 'Scriptable Objects' list for a missing/unassigned asset.");
+					continue;
+				}
+
 				var type = scriptableObject.GetType();
 				_services.TryAdd(type, scriptableObject);
 			}

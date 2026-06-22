@@ -2,8 +2,8 @@
   "name": "Tactive.MachineLearning.Editor",
   "rootNamespace": "",
   "references": [
-    "Unity.Sentis",
-    "Unity.Sentis.ONNX",
+    "Unity.InferenceEngine",
+    "Unity.InferenceEngine.ONNX.Editor",
     "Tactive.MachineLearning"
   ],
   "includePlatforms": [
