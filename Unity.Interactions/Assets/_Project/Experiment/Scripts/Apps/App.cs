@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Interactions.Apps.States;
 using Interactions.Apps.StateTransitions;
 using Interactions.Apps.ViewModels;
@@ -32,6 +33,7 @@ namespace Interactions.Apps
 		[Header("State")]
 		public Side DominantFootSide { get; set; }
 		public Transitions Transitions { get; private set; }
+		public Dictionary<ExperimentalCondition, Transition> TrialTransitions { get; private set; }
 		public StateMachine StateMachine { get; private set; }
 		public WebcamSelectionViewModel WebcamSelectionViewModel { get; private set; }
 		public XRStatusViewModel XRStatusViewModel { get; private set; }
@@ -44,6 +46,7 @@ namespace Interactions.Apps
 		public OpponentMaximalPositionConstraint OpponentMaximalPositionConstraint { get; set; }
 		public PassDetector PassDetector { get; set; }
 		public Ball Ball { get; set; }
+		public ExperimentConfig Config { get; private set; }
 
 		void Start()
 		{
@@ -65,6 +68,7 @@ namespace Interactions.Apps
 			// Other Dependencies
 			var lstmModelAsset = ServiceLocator.Get<ModelAssetWithMetadata>();
 			Experiment.Bind(DominantFootSide, LeftGoal, RightGoal);
+			ApplyExperimentConfig();
 			LstmModel = new LstmModel(lstmModelAsset);
 			OpponentMaximalPositionConstraint = new OpponentMaximalPositionConstraint(2);
 			PassCorrector = new PassCorrector(User, Experiment.RightGoal, Experiment.LeftGoal);
@@ -85,27 +89,59 @@ namespace Interactions.Apps
 			var startExperiment = new StartExperiment(this);
 			var selectWebcam = new SelectWebcam(this);
 			var waitForNextTrial = new WaitForNextTrial(this);
-			var labTrialInteractive = new LaboratoryTrialInteractive(this);
-			var labTrialNonInteractive = new LaboratoryTrialNonInteractive(this);
-			var labTrialProactiveInteractive = new LaboratoryTrialProactiveInteractive(this);
-			var labTrialNoOpponent = new LaboratoryTrialNoOpponent(this);
-			var inSituTrial = new InSituTrial(this);
+
+			// One state per experimental condition. The three lab-with-opponent variants share
+			// LaboratoryTrial and differ only by their injected IOpponentBehavior strategy.
+			var trialStates = new Dictionary<ExperimentalCondition, State>
+			{
+				[ExperimentalCondition.LaboratoryInteractive] = new LaboratoryTrial(this, new InteractiveBehavior()),
+				[ExperimentalCondition.LaboratoryNonInteractive] = new LaboratoryTrial(this, new NonInteractiveBehavior()),
+				[ExperimentalCondition.LaboratoryProactiveInteractive] = new LaboratoryTrial(this, new ProactiveBehavior()),
+				[ExperimentalCondition.LaboratoryNoOpponent] = new LaboratoryTrialNoOpponent(this),
+				[ExperimentalCondition.InSitu] = new InSituTrial(this),
+			};
 
 			// Flow for starting app
 			Transitions.StartExperiment = new Transition(this, startupXr, startExperiment);
 			Transitions.SelectWebcam = new Transition(this, startExperiment, selectWebcam);
-			Transitions.WaitForNextTrial = new Transition(this, new State[] { selectWebcam, labTrialInteractive, labTrialNonInteractive, labTrialProactiveInteractive, labTrialNoOpponent, inSituTrial }, waitForNextTrial);
-			Transitions.LaboratoryTrialInteractive = new Transition(this, waitForNextTrial, labTrialInteractive);
-			Transitions.LaboratoryTrialNonInteractive = new Transition(this, waitForNextTrial, labTrialNonInteractive);
-			Transitions.LaboratoryTrialProactiveInteractive = new Transition(this, waitForNextTrial, labTrialProactiveInteractive);
-			Transitions.LaboratoryNoOpponent = new Transition(this, waitForNextTrial, labTrialNoOpponent);
-			Transitions.InSituTrial = new Transition(this, waitForNextTrial, inSituTrial);
+
+			var waitForNextTrialSources = new List<State> { selectWebcam };
+			waitForNextTrialSources.AddRange(trialStates.Values);
+			Transitions.WaitForNextTrial = new Transition(this, waitForNextTrialSources.ToArray(), waitForNextTrial);
+
+			// condition -> transition (waitForNextTrial -> that trial). Replaces the NextTrial switch.
+			TrialTransitions = new Dictionary<ExperimentalCondition, Transition>();
+			foreach (var entry in trialStates)
+				TrialTransitions[entry.Key] = new Transition(this, waitForNextTrial, entry.Value);
+
 			Transitions.Quit = new ImmediateTransition(this);
 
 			// Start app
 			StateMachine.SetState(startupXr);
 		}
 
+
+		void ApplyExperimentConfig()
+		{
+			Config = ExperimentConfig.Load();
+
+			Experiment.InterPersonalDistance = Config.InterPersonalDistance;
+			Experiment.BodyInformationWeight = Config.BodyInformationWeight;
+			Experiment.FootInformationWeight = Config.FootInformationWeight;
+			Experiment.OpponentAcceleration = Config.OpponentAcceleration;
+			Experiment.OpponentReactionTimeBody = Config.OpponentReactionTimeBody;
+			Experiment.OpponentReactionTimeFoot = Config.OpponentReactionTimeFoot;
+			Experiment.DistanceBetweenGoals = Config.DistanceBetweenGoals;
+			Experiment.PassDetectionThreshold = Config.PassDetectionThreshold;
+		}
+
+		public void StartTrialFor(ExperimentalCondition condition)
+		{
+			if (TrialTransitions.TryGetValue(condition, out var transition))
+				transition.Execute();
+			else
+				Debug.Log($"No trial registered for condition {condition}");
+		}
 
 		void Update()
 		{
@@ -125,14 +161,14 @@ namespace Interactions.Apps
 			{
 				var recorder = WebCamRecorders.Get(0);
 				WebcamSelectionViewModel.Select(recorder);
-				Transitions.LaboratoryTrialInteractive.Execute();
+				StartTrialFor(ExperimentalCondition.LaboratoryInteractive);
 			}
 
 			if (Keyboard.current.digit4Key.wasPressedThisFrame)
-				Transitions.LaboratoryTrialInteractive.Execute();
+				StartTrialFor(ExperimentalCondition.LaboratoryInteractive);
 
 			if (Keyboard.current.digit5Key.wasPressedThisFrame)
-				Transitions.InSituTrial.Execute();
+				StartTrialFor(ExperimentalCondition.InSitu);
 		}
 	}
 

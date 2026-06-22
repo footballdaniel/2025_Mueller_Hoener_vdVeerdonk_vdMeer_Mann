@@ -27,28 +27,7 @@ namespace Interactions.Apps.ViewModels
 		public void NextTrial()
 		{
 			CanStartNextTrial.Value = false;
-
-			switch (_app.Experiment.ExperimentalCondition)
-			{
-				case ExperimentalCondition.LaboratoryInteractive:
-					_app.Transitions.LaboratoryTrialInteractive.Execute();
-					break;
-				case ExperimentalCondition.LaboratoryNonInteractive:
-					_app.Transitions.LaboratoryTrialNonInteractive.Execute();
-					break;
-				case ExperimentalCondition.LaboratoryProactiveInteractive:
-					_app.Transitions.LaboratoryTrialProactiveInteractive.Execute();
-					break;
-				case ExperimentalCondition.LaboratoryNoOpponent:
-					_app.Transitions.LaboratoryNoOpponent.Execute();
-					break;
-				case ExperimentalCondition.InSitu:
-					_app.Transitions.InSituTrial.Execute();
-					break;
-				default:
-					Debug.Log("No trial type selected");
-					break;
-			}
+			_app.StartTrialFor(_app.Experiment.ExperimentalCondition);
 		}
 
 		public void ShowData()
@@ -94,6 +73,7 @@ namespace Interactions.Apps.ViewModels
 		public void ChangePassProbabilityDetectionThreshold(float arg0)
 		{
 			_app.Experiment.PassDetectionThreshold = arg0;
+			_app.Config.PassDetectionThreshold = arg0;
 		}
 		
 		public void SelectInteractiveCondition()

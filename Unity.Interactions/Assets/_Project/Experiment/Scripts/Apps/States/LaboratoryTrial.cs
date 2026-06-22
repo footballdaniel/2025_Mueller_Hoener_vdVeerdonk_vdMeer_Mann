@@ -3,11 +3,16 @@ using UnityEngine;
 
 namespace Interactions.Apps.States
 {
-	internal class LaboratoryTrialNonInteractive : State
+	/// <summary>
+	/// Single laboratory-with-opponent trial. All per-condition variation lives in the injected
+	/// <see cref="IOpponentBehavior"/> (how the opponent is configured on spawn and whether it
+	/// reacts to a pass), so this class has no condition branching.
+	/// </summary>
+	internal class LaboratoryTrial : State
 	{
-
-		public LaboratoryTrialNonInteractive(App app) : base(app)
+		public LaboratoryTrial(App app, IOpponentBehavior behavior) : base(app)
 		{
+			_behavior = behavior;
 		}
 
 		public override void Enter()
@@ -16,12 +21,18 @@ namespace Interactions.Apps.States
 			_app.Experiment.WebcamRecorder.StartRecording(_app.Experiment.CurrentTrial.TrialNumber, _app.Experiment.ExperimentalCondition);
 
 			_app.Experiment.Opponent = Object.Instantiate(_app.OpponentPrefab);
-			_app.Experiment.Opponent.Bind(_app.User, _app.LeftGoal, _app.RightGoal, _app.OpponentMaximalPositionConstraint, false);
+			_behavior.Configure(_app.Experiment.Opponent, _app);
 
 			_app.UI.OpponentSettingsUI.Bind(_app.OpponentSettingsViewModel);
 			_app.UI.OpponentSettingsUI.Show();
 
 			_app.Experiment.Opponent.Legs.BallIntercepted += OnBallIntercepted;
+		}
+
+		void OnBallIntercepted(Vector3 direction)
+		{
+			_app.Ball.Play(new Pass(3, _app.Ball.transform.position, direction));
+			_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Intercepted", _app.Experiment.CurrentTrial.Timestamps[^1], _app.Experiment.Opponent.Position));
 		}
 
 		public override void Exit()
@@ -50,24 +61,22 @@ namespace Interactions.Apps.States
 				_app.Experiment.CurrentTrial.Tick(deltaTime);
 
 				_app.Experiment.CurrentTrial.OpponentHipPositions.Add(_app.Experiment.Opponent.transform.position);
-				_app.Experiment.CurrentTrial.UserHipPositions.Add(_app.User.Hips.Position);
 				_app.Experiment.CurrentTrial.UserHeadPositions.Add(_app.User.TrackedHead.transform.position);
+				_app.Experiment.CurrentTrial.UserHipPositions.Add(_app.User.Hips.Position);
 				_app.Experiment.CurrentTrial.UserDominantFootPositions.Add(_app.User.DominantFoot.transform.position);
 				_app.Experiment.CurrentTrial.UserNonDominantFootPositions.Add(_app.User.NonDominantFoot.transform.position);
 
 				if (_app.PassDetector.DetectPass())
+				{
 					_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Pass", _app.Experiment.CurrentTrial.Timestamps[^1], _app.User.DominantFoot.transform.position));
+					_behavior.OnPassDetected(_app.Experiment.Opponent, _app.Ball);
+				}
 
 				_updateTimer -= deltaTime;
 			}
 		}
 
-		void OnBallIntercepted(Vector3 direction)
-		{
-			_app.Ball.Play(new Pass(3, _app.Ball.transform.position, direction));
-			_app.Experiment.CurrentTrial.BallEvents.Add(new BallEvent("Intercepted", _app.Experiment.CurrentTrial.Timestamps[^1], _app.Experiment.Opponent.Position));
-		}
-
+		readonly IOpponentBehavior _behavior;
 		float _updateTimer;
 	}
 }

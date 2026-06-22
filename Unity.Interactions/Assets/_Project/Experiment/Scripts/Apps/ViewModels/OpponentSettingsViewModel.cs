@@ -54,34 +54,43 @@ namespace Interactions.Apps.ViewModels
 		{
 			_app.Experiment.OpponentAcceleration = newAcceleration;
 			_app.Experiment.Opponent.ChangeAcceleration(newAcceleration);
+			_app.Config.OpponentAcceleration = newAcceleration;
 		}
 
 		public void ChangeBodyInformationWeight(float arg0)
 		{
+			_app.Experiment.BodyInformationWeight = arg0;
 			_app.Experiment.Opponent.ChangeBodyInformationWeight(arg0);
+			_app.Config.BodyInformationWeight = arg0;
 		}
 
 		public void ChangeFootInformation(float arg0)
 		{
+			_app.Experiment.FootInformationWeight = arg0;
 			_app.Experiment.Opponent.ChangeFootInformation(arg0);
+			_app.Config.FootInformationWeight = arg0;
 		}
 
 		public void ChangeGoalDistance(float newDistance)
 		{
+			_app.Experiment.DistanceBetweenGoals = newDistance;
 			_app.Experiment.LeftGoal.PlaceWithDistance(newDistance / 2f);
 			_app.Experiment.RightGoal.PlaceWithDistance(newDistance / 2f);
+			_app.Config.DistanceBetweenGoals = newDistance;
 		}
 
 		public void ChangeInterpersonalDistance(float newDistance)
 		{
 			_app.Experiment.InterPersonalDistance = newDistance;
 			_app.Experiment.Opponent.ChangeInterpersonalDistance(newDistance);
+			_app.Config.InterPersonalDistance = newDistance;
 		}
 
 		public void ChangeReactionTime(float newReactionTime)
 		{
 			_app.Experiment.OpponentReactionTimeBody = newReactionTime;
 			_app.Experiment.Opponent.ChangeReactionTimeBody(newReactionTime);
+			_app.Config.OpponentReactionTimeBody = newReactionTime;
 		}
 
 		readonly App _app;
@@ -90,6 +99,7 @@ namespace Interactions.Apps.ViewModels
 		{
 			_app.Experiment.OpponentReactionTimeFoot = arg0;
 			_app.Experiment.Opponent.ChangeReactionTimeFoot(arg0);
+			_app.Config.OpponentReactionTimeFoot = arg0;
 		}
 	}
 }

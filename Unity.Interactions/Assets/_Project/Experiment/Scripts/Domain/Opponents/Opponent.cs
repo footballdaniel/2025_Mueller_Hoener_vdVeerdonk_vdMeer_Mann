@@ -81,6 +81,16 @@ namespace Interactions.Domain.Opponents
 			_motorController.ChangeAcceleration(newAcceleration);
 		}
 
+		/// <summary>
+		/// Adds a constant world-space offset to the spot the opponent runs to while putting
+		/// pressure on the attacker. Used by the proactive variant to shift the target laterally.
+		/// Call after <see cref="Bind"/>, which creates the underlying source.
+		/// </summary>
+		public void SetPressureTargetOffset(Vector3 offset)
+		{
+			_attackerSource.SetTargetOffset(offset);
+		}
+
 		public void ChangeBodyInformationWeight(float newWeight)
 		{
 			_sources.AddNewSource(_attackerSource, newWeight);
