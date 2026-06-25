@@ -19,7 +19,7 @@ namespace Interactions.Apps
             var offsetMeters = Random.Range(config.LateralOffsetMin, config.LateralOffsetMax);
 
             var positionOffset = LateralDirection(app) * (offsetMeters * sign);
-            var bodyRotationOffset = -sign * offsetMeters * config.BodyOrientationDegreesPerMeter;
+            var bodyRotationOffset = sign * offsetMeters * config.BodyOrientationDegreesPerMeter;
             var delay = Random.Range(config.LateralDelayStart, config.LateralDelayEnd);
 
             opponent.ScheduleLateralOffset(positionOffset, bodyRotationOffset, delay);
