@@ -26,50 +26,39 @@ namespace Interactions.Infra
 			_timestamps.Enqueue(timestamp);
 		}
 
-		public Vector3 CalculateGetHighestObservedVelocity()
+		/// Reports the peak velocity across both feet and which foot produced it, so the
+		/// caller can spawn the ball at the foot that actually kicked. Ties go to the
+		/// dominant foot.
+		// OPTIONAL: If needed, report not the peak but the direction a short delay (300ms)
+		// after the peak, by tracking the index of the peak sample in PeakVelocity.
+		public KickingFoot CalculateHighestObservedVelocity()
 		{
-			var dominantFootList = _dominantFootPositions.ToList();
 			var timestampList = _timestamps.ToList();
+			var dominantVelocity = PeakVelocity(_dominantFootPositions.ToList(), timestampList);
+			var nonDominantVelocity = PeakVelocity(_nonDominantFootPositions.ToList(), timestampList);
 
-			if (dominantFootList.Count < 2 || timestampList.Count < 2)
+			return nonDominantVelocity.magnitude > dominantVelocity.magnitude
+				? new KickingFoot(nonDominantVelocity, false)
+				: new KickingFoot(dominantVelocity, true);
+		}
+
+		static Vector3 PeakVelocity(List<Vector3> positions, List<float> timestamps)
+		{
+			if (positions.Count < 2 || timestamps.Count < 2)
 				return Vector3.zero;
 
-			// Step 1: Calculate velocity vectors
-			var velocities = new List<Vector3>();
-
-			for (var i = 1; i < dominantFootList.Count; i++)
-			{
-				var deltaPosition = dominantFootList[i] - dominantFootList[i - 1];
-				var deltaTime = timestampList[i] - timestampList[i - 1];
-
-				if (deltaTime > 0)
-					velocities.Add(deltaPosition / deltaTime);
-				else
-					velocities.Add(Vector3.zero);
-			}
-
-			// Step 2: Find the highest velocity
 			var highestVelocity = Vector3.zero;
-			var highestVelocityIndex = -1;
 
-			for (var i = 0; i < velocities.Count; i++)
-				if (velocities[i].magnitude > highestVelocity.magnitude)
-				{
-					highestVelocity = velocities[i];
-					highestVelocityIndex = i + 1; // Shift index to match dominantFootList
-				}
-			
-			// OPTIONAL: If needed, report not the peak but the direction after a short delay
-			// // Step 3: Check if there is a timestamp 300ms later
-			// if (highestVelocityIndex != -1)
-			// {
-			// 	for (var i = highestVelocityIndex; i < timestampList.Count; i++)
-			// 		if (timestampList[i] - timestampList[highestVelocityIndex - 1] >= 0.3f)
-			// 		{
-			// 			highestVelocity = Vector3.zero;
-			// 			break;
-			// 		}
-			// }
+			for (var i = 1; i < positions.Count; i++)
+			{
+				var deltaTime = timestamps[i] - timestamps[i - 1];
+				if (deltaTime <= 0)
+					continue;
+
+				var velocity = (positions[i] - positions[i - 1]) / deltaTime;
+				if (velocity.magnitude > highestVelocity.magnitude)
+					highestVelocity = velocity;
+			}
 
 			return highestVelocity;
 		}

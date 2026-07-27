@@ -28,8 +28,9 @@ namespace Interactions.Apps.States
 
 			if (prediction > _app.Experiment.PassDetectionThreshold && Time.time - _lastPassTime >= 1f)
 			{
-				var passVelocity = _inputDataQueue.CalculateGetHighestObservedVelocity();
-				var passDirection = new Vector3(passVelocity.normalized.x, passVelocity.normalized.y, passVelocity.normalized.z);
+				var kickingFoot = _inputDataQueue.CalculateHighestObservedVelocity();
+				var passVelocity = kickingFoot.Velocity;
+				var passDirection = passVelocity.normalized;
 
 				var forwardDirection = Vector3.right;
 				var angle = Vector3.Angle(forwardDirection, passDirection);
@@ -44,10 +45,14 @@ namespace Interactions.Apps.States
 				if (_app.Ball)
 					Object.Destroy(_app.Ball.gameObject);
 
-				AudioSource.PlayClipAtPoint(_app.PassSoundClip, _app.User.DominantFoot.transform.position);
+				var kickingFootPosition = kickingFoot.IsDominantFoot
+					? _app.User.DominantFoot.transform.position
+					: _app.User.NonDominantFoot.transform.position;
+
+				AudioSource.PlayClipAtPoint(_app.PassSoundClip, kickingFootPosition);
 				_lastPassTime = Time.time;
-				
-				var pass = new Pass(passVelocity.magnitude, _app.User.DominantFoot.transform.position, passDirection);
+
+				var pass = new Pass(passVelocity.magnitude, kickingFootPosition, passDirection);
 				pass = _app.PassCorrector.Correct(pass, Vector3.zero);
 
 				_app.Ball = Object.Instantiate(_app.BallPrefab, pass.Position, Quaternion.identity);
