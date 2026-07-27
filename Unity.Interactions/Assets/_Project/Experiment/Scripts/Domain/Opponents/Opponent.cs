@@ -59,7 +59,7 @@ namespace Interactions.Domain.Opponents
 			{
 				_attackerPerception = new DelayedAttackerPercept(_memoryDuration, _reactionDelayBody, _user);
 				_footPerception = new DelayedFootPerception(_memoryDuration, _reactionDelayFoot, 0.4f, _user.DominantFoot, user.NonDominantFoot);
-				_bodyOrientation.LookAt(_user.transform);
+				_bodyOrientation.LookAt(_user.TrackedHead.transform);
 			}
 			else
 			{

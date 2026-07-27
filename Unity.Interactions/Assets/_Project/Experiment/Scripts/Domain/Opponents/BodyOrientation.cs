@@ -34,17 +34,33 @@ namespace Interactions.Domain.Opponents
 			var lookingStraightForwardOrientation = Quaternion.Euler(0, 90, -90);
 			var targetRotation = Quaternion.LookRotation(lookDirection) * lookingStraightForwardOrientation; // compensate for the head bone's orientation
 
-			_headBone.rotation = Quaternion.RotateTowards(_headBone.rotation, targetRotation, _neckSpeedDegreesPerSecond * Time.deltaTime);
+			// Turn our own state towards the target rather than the bone's current rotation.
+			// The Animator rewrites the head bone every frame before LateUpdate, so slewing
+			// from _headBone.rotation would restart from the animated pose each frame and
+			// never travel more than one frame's worth of degrees away from it.
+			if (!_isTurning)
+			{
+				_neckRotation = _headBone.rotation;
+				_isTurning = true;
+			}
+
+			_neckRotation = Quaternion.RotateTowards(_neckRotation, targetRotation, _neckSpeedDegreesPerSecond * Time.deltaTime);
+			_headBone.rotation = _neckRotation;
 		}
 
 		public void LookAt(Transform target)
 		{
 			_target = target;
+			_isTurning = false; // pick the turn up from wherever the animation currently has the head
 		}
 
 		public void LookStraightAhead()
 		{
 			_target = null;
+			_isTurning = false;
 		}
+
+		Quaternion _neckRotation;
+		bool _isTurning;
 	}
 }
