@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Interactions.Apps.ViewModels;
+using Interactions.Domain;
 using Interactions.Domain.Opponents;
 using UnityEngine;
 
@@ -14,8 +15,9 @@ namespace Interactions.Apps
 
             var config = ExperimentConfig.Load();
 
-            var movesToRight = Random.Range(0f, 100f) < config.ProbabilityMovementToRightPct;
-            var sign = movesToRight ? 1f : -1f;
+            var movesToDominantFootSide = Random.Range(0f, 100f) < config.ProbabilityMovingToDominantFootSidePct;
+            var dominantFootSign = app.DominantFootSide == Side.RIGHT ? 1f : -1f;
+            var sign = movesToDominantFootSide ? dominantFootSign : -dominantFootSign;
             var offsetMeters = Random.Range(config.LateralOffsetMin, config.LateralOffsetMax);
 
             var positionOffset = LateralDirection(app) * (offsetMeters * sign);

@@ -12,7 +12,7 @@ namespace Interactions.Apps
 
         public const string LateralOffsetMinKey = "lateralOffsetMin";
         public const string LateralOffsetMaxKey = "lateralOffsetMax";
-        public const string ProbabilityMovementToRightPctKey = "ProbabilityMovementToRightPct";
+        public const string ProbabilityMovingToDominantFootSidePctKey = "probabilityMovingToDominantFootSidePct";
         public const string LateralDelayStartKey = "lateralDelayStart";
         public const string LateralDelayEndKey = "lateralDelayEnd";
         public const string BodyOrientationDegreesPerMeterKey = "bodyOrientationDegreesPerMeter";
@@ -28,7 +28,7 @@ namespace Interactions.Apps
 
         public const float DefaultLateralOffsetMin = 0f;
         public const float DefaultLateralOffsetMax = 3f;
-        public const int DefaultProbabilityMovementToRightPct = 50;
+        public const int DefaultProbabilityMovingToDominantFootSidePct = 50;
         public const float DefaultLateralDelayStart = 1f;
         public const float DefaultLateralDelayEnd = 3f;
         public const float DefaultBodyOrientationDegreesPerMeter = 30f;
@@ -55,7 +55,7 @@ namespace Interactions.Apps
 
         public float LateralOffsetMin { get => GetFloat(LateralOffsetMinKey, DefaultLateralOffsetMin); set => SetFloat(LateralOffsetMinKey, value); }
         public float LateralOffsetMax { get => GetFloat(LateralOffsetMaxKey, DefaultLateralOffsetMax); set => SetFloat(LateralOffsetMaxKey, value); }
-        public int ProbabilityMovementToRightPct { get => GetInt(ProbabilityMovementToRightPctKey, DefaultProbabilityMovementToRightPct); set => SetInt(ProbabilityMovementToRightPctKey, value); }
+        public int ProbabilityMovingToDominantFootSidePct { get => GetInt(ProbabilityMovingToDominantFootSidePctKey, DefaultProbabilityMovingToDominantFootSidePct); set => SetInt(ProbabilityMovingToDominantFootSidePctKey, value); }
         public float LateralDelayStart { get => GetFloat(LateralDelayStartKey, DefaultLateralDelayStart); set => SetFloat(LateralDelayStartKey, value); }
         public float LateralDelayEnd { get => GetFloat(LateralDelayEndKey, DefaultLateralDelayEnd); set => SetFloat(LateralDelayEndKey, value); }
         public float BodyOrientationDegreesPerMeter { get => GetFloat(BodyOrientationDegreesPerMeterKey, DefaultBodyOrientationDegreesPerMeter); set => SetFloat(BodyOrientationDegreesPerMeterKey, value); }
@@ -72,7 +72,7 @@ namespace Interactions.Apps
         {
             Seed(LateralOffsetMinKey, DefaultLateralOffsetMin);
             Seed(LateralOffsetMaxKey, DefaultLateralOffsetMax);
-            Seed(ProbabilityMovementToRightPctKey, DefaultProbabilityMovementToRightPct);
+            Seed(ProbabilityMovingToDominantFootSidePctKey, DefaultProbabilityMovingToDominantFootSidePct);
             Seed(LateralDelayStartKey, DefaultLateralDelayStart);
             Seed(LateralDelayEndKey, DefaultLateralDelayEnd);
             Seed(BodyOrientationDegreesPerMeterKey, DefaultBodyOrientationDegreesPerMeter);
