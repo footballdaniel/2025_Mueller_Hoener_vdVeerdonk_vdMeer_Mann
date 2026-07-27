@@ -11,15 +11,15 @@ namespace Interactions.Domain
 	[Serializable]
 	public class Experiment
 	{
-		[field: SerializeReference] public float InterPersonalDistance { get; set; } = 4f;
-		[field: SerializeReference] public int FrameRateHz { get; private set; } = 10;
-		[field: SerializeReference] public float BodyInformationWeight { get; set; } = 0.5f;
-		[field: SerializeReference] public float FootInformationWeight { get; set; } = 0.33f;
-		[field: SerializeReference] public float OpponentAcceleration { get; set; } = 10f;
-		[field: SerializeReference] public float OpponentReactionTimeBody { get; set; } = 1f;
-		[field: SerializeReference] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
-		[field: SerializeReference] public float DistanceBetweenGoals { get; set; } = 2.5f;
-		[field: SerializeReference, Range(0,1)] public float PassDetectionThreshold { get; set; } = 0.9f;
+		[field: SerializeField] public float InterPersonalDistance { get; set; } = 4f;
+		[field: SerializeField] public int FrameRateHz { get; private set; } = 10;
+		[field: SerializeField] public float BodyInformationWeight { get; set; } = 0.5f;
+		[field: SerializeField] public float FootInformationWeight { get; set; } = 0.33f;
+		[field: SerializeField] public float OpponentAcceleration { get; set; } = 10f;
+		[field: SerializeField] public float OpponentReactionTimeBody { get; set; } = 1f;
+		[field: SerializeField] public float OpponentReactionTimeFoot { get; set; } = 0.4f;
+		[field: SerializeField] public float DistanceBetweenGoals { get; set; } = 2.5f;
+		[field: SerializeField, Range(0,1)] public float PassDetectionThreshold { get; set; } = 0.9f;
 		public ExperimentalCondition ExperimentalCondition { get; private set; }
 		public Side DominantFoot { get; set; }
 		public IWebcamRecorder WebcamRecorder { get; set; } = new NotSpecifiedWebcamRecorder();

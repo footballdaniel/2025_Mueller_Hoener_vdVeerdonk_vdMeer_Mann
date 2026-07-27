@@ -7,8 +7,8 @@ namespace Interactions.Domain.Feet
 	{
 		const int FrameWindow = 5;
 		[Header("Dependencies"), SerializeField] XRTracker _dominantFootTracker;
-		[field: SerializeReference] public float Speed { get; private set; }
-		[field: SerializeReference] public Vector3 Velocity { get; private set; }
+		[field: SerializeField] public float Speed { get; private set; }
+		[field: SerializeField] public Vector3 Velocity { get; private set; }
 
 		void Start()
 		{

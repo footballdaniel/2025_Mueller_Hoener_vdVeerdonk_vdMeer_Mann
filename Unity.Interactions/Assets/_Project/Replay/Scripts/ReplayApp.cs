@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using _Project.Replay.Scripts;
 using Interactions.Common;
 using Interactions.Domain;
+using Interactions.Domain.Tracking;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Video;
@@ -58,7 +60,7 @@ namespace Replay.Scripts
 			_trial = JsonConvert.DeserializeObject<Trial>(json, jsonSettings);
 
 			_frameEvents = CsvParser.ParseCsv(csvFile);
-			_ballController = new BallController(Ball, _frameEvents, _trial);
+			_trackingSource = new TrialTrackingSource(_trial, _frameEvents);
 			_goalController = new GoalController(_frameEvents, LeftGoal, RightGoal);
 
 			ReplayUI.Set(this);
@@ -84,12 +86,30 @@ namespace Replay.Scripts
 			var t = _currentTimeStamp * _trial.FrameRateHz - _currentFrameIndex;
 
 			_goalController.Tick(_currentFrameIndex);
-			_ballController.Tick(_currentFrameIndex, t);
 
-			DominantFoot.transform.position = Vector3.Lerp(DominantFoot.transform.position, _trial.UserDominantFootPositions[_currentFrameIndex], t);
-			NonDominantFoot.transform.position = Vector3.Lerp(NonDominantFoot.transform.position, _trial.UserNonDominantFootPositions[_currentFrameIndex], t);
-			Opponent.transform.position = Vector3.Lerp(Opponent.transform.position, _trial.OpponentHipPositions[_currentFrameIndex], t);
-			UserHead.transform.position = Vector3.Lerp(UserHead.transform.position, _trial.UserHeadPositions[_currentFrameIndex], t);
+			var time = TimeSpan.FromSeconds(_currentTimeStamp);
+			var frame = _trackingSource.GetFrameAt(time);
+			var userPose = PoseOf(frame, TrialTrackingSource.UserActorId);
+			var opponentPose = PoseOf(frame, TrialTrackingSource.OpponentActorId);
+
+			var dominantFootBone = _trial.DominantFoot == Side.LEFT ? Bone.LeftFoot : Bone.RightFoot;
+			var nonDominantFootBone = _trial.DominantFoot == Side.LEFT ? Bone.RightFoot : Bone.LeftFoot;
+
+			Ball.SetActive(_trackingSource.IsBallInPlay(time));
+			Ball.transform.position = frame.BallPosition;
+
+			DominantFoot.transform.position = Vector3.Lerp(DominantFoot.transform.position, userPose.Position(dominantFootBone), t);
+			NonDominantFoot.transform.position = Vector3.Lerp(NonDominantFoot.transform.position, userPose.Position(nonDominantFootBone), t);
+			Opponent.transform.position = Vector3.Lerp(Opponent.transform.position, opponentPose.Position(Bone.Hips), t);
+			UserHead.transform.position = Vector3.Lerp(UserHead.transform.position, userPose.Position(Bone.Head), t);
+		}
+
+		static BodyPose PoseOf(Frame frame, int actorId)
+		{
+			for (var i = 0; i < frame.Actors.Count; i++)
+				if (frame.Actors[i].ActorId == actorId)
+					return frame.Actors[i].Pose;
+			return default;
 		}
 
 
@@ -105,12 +125,12 @@ namespace Replay.Scripts
 			_isPlaying = !_isPlaying;
 		}
 
-		BallController _ballController;
 		int _currentFrameIndex;
 		float _currentTimeStamp;
 		List<FrameEvent> _frameEvents;
 		GoalController _goalController;
 		bool _isPlaying;
+		TrialTrackingSource _trackingSource;
 
 		Trial _trial;
 		bool _videoReady;
