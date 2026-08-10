@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
 
 [Serializable]
 public class XRTracker : MonoBehaviour
@@ -11,6 +12,18 @@ public class XRTracker : MonoBehaviour
 	[field: SerializeReference] public string TrackerMappingName { get; private set; }
 
 	public Vector3 Position { get; set; }
+
+	public bool IsTracked
+	{
+		get
+		{
+			var action = _positionAction != null ? _positionAction.action : null;
+			if (action == null || action.controls.Count == 0)
+				return false;
+
+			return action.controls[0].device is TrackedDevice device && device.isTracked.isPressed;
+		}
+	}
 
 	void OnEnable()
 	{

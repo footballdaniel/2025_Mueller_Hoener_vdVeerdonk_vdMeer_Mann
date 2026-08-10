@@ -9,7 +9,6 @@ namespace Interactions.UI
 		[SerializeField] Image _xrStatusImage;
 		[SerializeField] TMP_Text _xrStatusText;
 		XRTracker _tracker;
-		Vector3 _lastPosition;
 
 		public void Bind(XRTracker tracker)
 		{
@@ -19,9 +18,7 @@ namespace Interactions.UI
 
 		void Update()
 		{
-			var isMoving = _lastPosition != _tracker.Position;
-			_xrStatusImage.color = isMoving ? Color.green : Color.red;
-			_lastPosition = _tracker.Position;
+			_xrStatusImage.color = _tracker.IsTracked ? Color.green : Color.red;
 		}
 	}
 }

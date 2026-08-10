@@ -4,6 +4,7 @@
   "references": [
     "SteamVR",
     "Unity.XR.OpenXR",
+    "Unity.XR.Management",
     "Unity.InputSystem"
   ],
   "includePlatforms": [],

@@ -2,7 +2,9 @@
   "name": "Interactions.Editor",
   "rootNamespace": "",
   "references": [
-    "GUID:4f4864879987c63429f81b3fd17aab6b"
+    "GUID:4f4864879987c63429f81b3fd17aab6b",
+    "GUID:44cba267781211e48a432a2b6ab15ff2",
+    "GUID:75469ad4d38634e559750d17036d5f7c"
   ],
   "includePlatforms": [
     "Editor"
